@@ -219,7 +219,7 @@
     const userSeed = generateSeed(seedString);
     const fixedStatsTable = generateFixedStats(userSeed);
 
-    // [아키텍트 패치] 자산 등급(Tier)과 확률(%) 100% 고정 로직 추가
+   // [아키텍트 패치] 자산 등급(Tier)과 확률(%) 100% 고정 로직 추가
     const randWealth = userSeed % 100;
     // 85% 확률로 Base는 B급, 15% 확률로 Base가 A급이 되도록 현실적 고정
     let baseT = (randWealth > 85) ? "A급 (15~30억)" : "B급 (7~15억)";
@@ -230,11 +230,16 @@
     let bestP = 15 + (userSeed % 11); // Best 확률 15~25%
     let worstP = 100 - baseP - bestP; // 나머지 Worst 확률
 
+    // [추가 패치] 부동산 골든타임(연도) 100% 고정 로직
+    const currentYear = new Date().getFullYear();
+    const goldenYear = currentYear + (userSeed % 6); // 현재 연도 기준 0~5년 뒤로 절대 고정
+
     const fixedWealthData = `
     [자산 시나리오 확정 데이터 - 절대 변경 금지]
     - Best: 등급(${bestT}), 확률(${bestP}%)
     - Base: 등급(${baseT}), 확률(${baseP}%)
-    - Worst: 등급(${worstT}), 확률(${worstP}%)`;
+    - Worst: 등급(${worstT}), 확률(${worstP}%)
+    - 부동산 골든타임 확정 연도: ${goldenYear}년`;
 
     baziContext = { 
       name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
@@ -300,7 +305,7 @@
       ---
       ### 📈 1. 생애 자산 Tier 시뮬레이션
       (위 [자산 시나리오 확정 데이터]에 명시된 등급과 확률(%)을 토씨 하나 틀리지 말고 100% 그대로 표에 기재하십시오. AI는 오직 내담자의 사주를 분석하여 각 시나리오별 달성 이유인 '핵심 동인'만 추가 작성해야 합니다.)
-      * **부동산(문서운) 매입 골든타임:** (연도 및 이유 1줄 요약)
+      * **부동산(문서운) 매입 골든타임:** (반드시 위 확정 데이터에 주어진 연도를 기재하고, 사주 명식에 근거한 매입 이유를 1줄로 요약할 것)
       ---
       ### 🌊 2. 10년 대운 심층 서사
       (${baziContext.dn}세부터 10년 단위 8개 대운 나열. 대운별 재무 기회와 리스크를 단 1줄씩 요약)
