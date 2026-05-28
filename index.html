@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>팔자길드 - 프리미엄 사주</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg-dark: #0f0f11;
+    --card-bg: #1a1a1c;
+    --text-main: #f5f0e8;
+    --text-muted: #88888b;
+    --gold: #d4af37;
+    --gold-hover: #e8c34f;
+    --blue-btn: #1a5c9e;
+    --blue-hover: #2173c4;
+    --border: #333336;
+    --input-bg: #131314;
+    
+    /* 오행 색상 */
+    --wood: #4cd137; --fire: #e84118; --earth: #e1b12c; --metal: #dcdde1; --water: #00a8ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-image: radial-gradient(circle at 50% 0%, #2a2a2e 0%, transparent 60%);
+  }
+
+  .hero-section {
+    text-align: center;
+    margin: 4rem 0 2rem;
+    animation: fadeInDown 0.8s ease;
+  }
+  .hero-section h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+  .hero-section p { color: var(--text-muted); font-size: 0.95rem; letter-spacing: 0.05em; }
+  .gold-text { color: var(--gold); }
+
+  .input-container {
+    width: 100%;
+    max-width: 480px;
+    padding: 0 1.5rem;
+    margin-bottom: 4rem;
+    animation: fadeInUp 0.8s ease 0.2s both;
+  }
+  .input-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem 1.8rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .form-group { margin-bottom: 1.5rem; }
+  .form-group label {
+    display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; letter-spacing: 0.05em;
+  }
+  .input-row { display: flex; gap: 0.8rem; }
+  
+  input[type="text"], input[type="number"], select {
+    width: 100%; background-color: var(--input-bg); border: 1px solid var(--border);
+    color: var(--text-main); padding: 0.8rem 1rem; border-radius: 8px;
+    font-family: inherit; font-size: 1rem; outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s; appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2); }
+
+  .toggle-group { display: flex; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .toggle-group label { flex: 1; text-align: center; padding: 0.8rem 0; margin: 0; cursor: pointer; font-size: 0.9rem; color: var(--text-muted); transition: all 0.2s; }
+  .toggle-group input[type="radio"] { display: none; }
+  .toggle-group input[type="radio"]:checked + label { background-color: var(--border); color: var(--text-main); font-weight: 500; }
+
+  .action-buttons { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+  .btn { width: 100%; padding: 1rem; border-radius: 10px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+  .btn-gold { background-color: var(--gold); color: #111; }
+  .btn-gold:hover { background-color: var(--gold-hover); transform: translateY(-2px); }
+  .btn-blue { background-color: var(--blue-btn); color: white; }
+  .btn-blue:hover { background-color: var(--blue-hover); transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+
+  #error-msg { color: #ff6b6b; font-size: 0.85rem; text-align: center; margin-top: 1rem; min-height: 20px; }
+
+  #result-screen { display: none; width: 100%; max-width: 760px; padding: 0 1.5rem 4rem; animation: fadeIn 0.5s ease; }
+  .bazi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; margin-top: 1.5rem; }
+  .bazi-col { display: flex; flex-direction: column; gap: 0.5rem; }
+  .bazi-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+  .bazi-char { font-family: 'Noto Serif KR', serif; font-size: 2rem; font-weight: 700; line-height: 1; }
+  
+  @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+  th, td { border: 1px solid var(--border); padding: 0.8rem; text-align: center; }
+  th { background-color: rgba(212, 175, 55, 0.1); color: var(--gold); font-weight: 600; }
+  td { background-color: var(--input-bg); }
+</style>
+</head>
+<body>
+
+  <div class="hero-section" id="hero">
+    <h1>운명의 <span class="gold-text">명식</span></h1>
+    <p>우주가 당신에게 부여한 오리지널 스탯</p>
+  </div>
+
+  <div class="input-container" id="input-screen">
+    <div class="input-card">
+      <div class="form-group">
+        <label>이름 (선택)</label>
+        <input type="text" id="f-name" placeholder="이름을 입력해주세요" autocomplete="off">
+      </div>
+      <div class="input-row">
+        <div class="form-group" style="flex: 1;">
+          <label>성별</label>
+          <div class="toggle-group">
+            <input type="radio" id="gender-m" name="gender" value="M">
+            <label for="gender-m">남자</label>
+            <input type="radio" id="gender-f" name="gender" value="F" checked>
+            <label for="gender-f">여자</label>
+          </div>
+        </div>
+        <div class="form-group" style="flex: 1;">
+          <label>달력</label>
+          <div class="toggle-group">
+            <input type="radio" id="cal-solar" name="caltype" value="solar" checked>
+            <label for="cal-solar">양력</label>
+            <input type="radio" id="cal-lunar" name="caltype" value="lunar">
+            <label for="cal-lunar">음력</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>생년월일</label>
+        <div class="input-row">
+          <input type="number" id="f-year" placeholder="YYYY" min="1900" max="2100">
+          <input type="number" id="f-month" placeholder="MM" min="1" max="12">
+          <input type="number" id="f-day" placeholder="DD" min="1" max="31">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>태어난 시간 (모를 경우 12시)</label>
+        <div class="input-row">
+          <select id="f-hour">
+            <option value="12" selected>시간 모름 (12시 기준)</option>
+          </select>
+          <input type="number" id="f-minute" placeholder="분(0~59)" min="0" max="59" value="0">
+        </div>
+      </div>
+      <div id="error-msg"></div>
+      <div class="action-buttons">
+        <button class="btn btn-gold" onclick="handleBasicStat()">⚔️ 기본 스탯 카드 발급</button>
+        <button class="btn btn-blue" onclick="handlePremiumReport()">👑 GEM 2.0 프리미엄 리포트 발급</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-screen">
+    <button onclick="goBack()" style="background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:0.5rem 1rem; border-radius:8px; cursor:pointer; margin-bottom:1rem;">← 다시 입력하기</button>
+    <div class="hero-section" style="margin-top:0;">
+      <h2 id="res-name" style="font-family:'Noto Serif KR'; font-size:1.5rem;"></h2>
+      <p id="res-meta" style="margin-top:0.5rem;"></p>
+    </div>
+    <div class="bazi-grid" id="bazi-table"></div>
+  </div>
+
+<script>
+  const hourSelect = document.getElementById('f-hour');
+  for(let i=0; i<24; i++) {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = `${i}시 (${i < 12 ? '오전' : '오후'})`;
+    hourSelect.appendChild(opt);
+  }
+
+  const STEMS = ['갑甲','을乙','병丙','정丁','무戊','기己','경庚','신辛','임壬','계癸'];
+  const BRANCHES = ['자子','축丑','인寅','묘卯','진辰','사巳','오午','미未','신申','유酉','술戌','해亥'];
+  const STEM_ELEM = ['목','목','화','화','토','토','금','금','수','수'];
+  const BR_ELEM = ['수','토','목','목','토','화','화','토','금','금','토','수'];
+  const EC = {'목':'var(--wood)','화':'var(--fire)','토':'var(--earth)','금':'var(--metal)','수':'var(--water)'};
+
+  function julianDay(y,m,d,hut=0){
+    if(m<=2){y--;m+=12;}
+    const A=Math.trunc(y/100), B=2-A+Math.trunc(A/4);
+    return Math.trunc(365.25*(y+4716))+Math.trunc(30.6001*(m+1))+d+hut/24+B-1524.5;
+  }
+  function solarLongitude(jd){
+    const T=(jd-2451545)/36525;
+    const L0=((280.46646+36000.76983*T+0.0003032*T*T)%360+360)%360;
+    const M=(((357.52911+35999.05029*T-0.0001537*T*T)%360)+360)%360;
+    const Mr=M*Math.PI/180;
+    const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(Mr)+(0.019993-0.000101*T)*Math.sin(2*Mr)+0.000289*Math.sin(3*Mr);
+    const omega=125.04-1934.136*T;
+    return ((L0+C-0.00569-0.00478*Math.sin(omega*Math.PI/180))%360+360)%360;
+  }
+  function findSolarTermJD(year, targetLon){
+    const am=Math.trunc((targetLon/30+3)%12)+1;
+    let jdStart=julianDay(year,am,1,0)-20;
+    for(let i=0;i<60;i++){
+      const jd=jdStart+i; const sl=solarLongitude(jd), slN=solarLongitude(jd+1);
+      const d=(targetLon-sl+360)%360, dN=(targetLon-slN+360)%360;
+      if(d<180 && dN>180){
+        let lo=jd,hi=jd+1;
+        for(let k=0;k<60;k++){
+          const mid=(lo+hi)/2;
+          if((targetLon-solarLongitude(mid)+360)%360<180) lo=mid; else hi=mid;
+        }
+        return (lo+hi)/2;
+      }
+    }
+    return null;
+  }
+
+  function getBasicBazi(year, month, day, hour) {
+    const jdNoon = julianDay(year, month, day, 12-9);
+    const licJD = findSolarTermJD(year,315);
+    const y = (licJD && jdNoon>=licJD) ? year : year-1;
+    const ysI = ((y-1984)%10+10)%10;
+    const ybI = ((y-1984)%12+12)%12;
+    let dsIdx = Math.round(jdNoon - 2460311.0)%60; if(dsIdx<0) dsIdx+=60;
+    const dsI = dsIdx%10; const dbI = dsIdx%12;
+    let hbI = 0; const t = hour*60;
+    if(t>=23*60||t<60) hbI=0; else hbI=Math.trunc((t+60)/120);
+    const hsI = ([0,2,4,6,8,0,2,4,6,8][dsI]+hbI)%10;
+    
+    return [
+      {label:'시주', stem:STEMS[hsI], stemElem:STEM_ELEM[hsI], branch:BRANCHES[hbI], branchElem:BR_ELEM[hbI]},
+      {label:'일주', stem:STEMS[dsI], stemElem:STEM_ELEM[dsI], branch:BRANCHES[dbI], branchElem:BR_ELEM[dbI]},
+      {label:'월주', stem:'-미상-', stemElem:'토', branch:'-미상-', branchElem:'토'},
+      {label:'년주', stem:STEMS[ysI], stemElem:STEM_ELEM[ysI], branch:BRANCHES[ybI], branchElem:BR_ELEM[ybI]}
+    ];
+  }
+
+  function validateInput() {
+    const year = document.getElementById('f-year').value;
+    const month = document.getElementById('f-month').value;
+    const day = document.getElementById('f-day').value;
+    const isLunar = document.getElementById('cal-lunar').checked;
+    
+    if(!year || !month || !day) {
+      document.getElementById('error-msg').innerText = "생년월일을 모두 입력해주세요.";
+      return false;
+    }
+    if(isLunar) {
+      document.getElementById('error-msg').innerText = "음력 변환은 현재 준비 중입니다. 양력으로 입력해주세요.";
+      return false;
+    }
+    document.getElementById('error-msg').innerText = "";
+    return true;
+  }
+
+  function handleBasicStat() {
+    if(!validateInput()) return;
+    const name = document.getElementById('f-name').value || '도전자';
+    const year = parseInt(document.getElementById('f-year').value);
+    const month = parseInt(document.getElementById('f-month').value);
+    const day = parseInt(document.getElementById('f-day').value);
+    const hour = parseInt(document.getElementById('f-hour').value);
+    
+    const bazi = getBasicBazi(year, month, day, hour);
+    
+    document.getElementById('hero').style.display = 'none';
+    document.getElementById('input-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    document.getElementById('res-name').innerText = `${name}님의 명식`;
+    document.getElementById('res-meta').innerText = `${year}년 ${month}월 ${day}일 ${hour}시`;
+    
+    const table = document.getElementById('bazi-table');
+    table.innerHTML = '';
+    table.style.display = 'grid';
+    table.style.textAlign = 'center';
+    
+    bazi.forEach(p => {
+      table.innerHTML += `
+        <div class="bazi-col">
+          <div class="bazi-label">${p.label}</div>
+          <div class="bazi-char" style="color:${EC[p.stemElem]}">${p.stem.charAt(0)}</div>
+          <div class="bazi-char" style="color:${EC[p.branchElem]}">${p.branch.charAt(0)}</div>
+        </div>
+      `;
+    });
+  }
+
+  // GEM 2.0 연동 
+  async function handlePremiumReport() {
+    if(!validateInput()) return;
+    const btn = document.querySelector('.btn-blue');
+    const errorBox = document.getElementById('error-msg');
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = '⏳ GEM 2.0 딥다이브 분석 중... (약 40초 소요)';
+    btn.style.backgroundColor = '#555';
+    btn.disabled = true;
+    errorBox.innerText = '';
+
+    try {
+      const name = document.getElementById('f-name').value || '도전자';
+      const year = parseInt(document.getElementById('f-year').value);
+      const month = parseInt(document.getElementById('f-month').value);
+      const day = parseInt(document.getElementById('f-day').value);
+      const hour = parseInt(document.getElementById('f-hour').value);
+      const gender = document.querySelector('input[name="gender"]:checked').value === 'M' ? '남성' : '여성';
+
+      const bazi = getBasicBazi(year, month, day, hour);
+      let pillarsText = "";
+      bazi.forEach(p => { pillarsText += `${p.label}: ${p.stem}${p.branch} (${p.stemElem}${p.branchElem})\n`; });
+
+      const baziDataText = `[내담자 정보]\n이름: ${name}\n성별: ${gender}\n생년월일시: ${year}년 ${month}월 ${day}일 ${hour}시\n\n[명식 8글자 데이터]\n${pillarsText}\n\n*위 명식 데이터를 바탕으로 GEM 2.0 규격에 맞는 프리미엄 리포트를 출력하십시오.`;
+
+      const response = await fetch('https://saju-backend-3vgw.onrender.com/api/llm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          baziData: baziDataText,
+          systemPrompt: "GEM 2.0 Mode" 
+        })
+      });
+
+      if (!response.ok) throw new Error(`API 응답 오류 (상태 코드: ${response.status})`);
+
+      const resultData = await response.json();
+      let aiContent = resultData.content && resultData.content[0] ? resultData.content[0].text : "";
+
+      aiContent = aiContent.replace(/```json[\s\S]*?```/g, '').trim();
+      aiContent = aiContent.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--gold);">$1</strong>');
+      aiContent = aiContent.replace(/### (.*?)\n/g, '<h3 style="color:var(--gold); margin-top:2rem; margin-bottom:1rem; border-bottom:1px solid #333; padding-bottom:0.5rem;">$1</h3>\n');
+      
+      // 테이블 마크다운 렌더링용 처리
+      aiContent = aiContent.replace(/\|(.+)\|/g, function(match, p1) {
+          if (p1.includes('---')) return ''; // 구분선 제거
+          const cells = p1.split('|').filter(c => c.trim() !== '').map(c => `<td>${c.trim()}</td>`).join('');
+          return `<tr>${cells}</tr>`;
+      });
+      aiContent = aiContent.replace(/(<tr>.*<\/tr>\n?)+/g, '<table>$&</table>');
+      aiContent = aiContent.replace(/<table>\n?<tr>/g, '<table><tr>');
+
+      document.getElementById('hero').style.display = 'none';
+      document.getElementById('input-screen').style.display = 'none';
+      document.getElementById('result-screen').style.display = 'block';
+      document.getElementById('res-name').innerText = `${name}님의 프리미엄 리포트`;
+      document.getElementById('res-meta').innerText = `GEM 2.0 엔진 분석 완료`;
+
+      const table = document.getElementById('bazi-table');
+      table.style.display = 'block';
+      table.style.textAlign = 'left';
+      table.style.lineHeight = '1.8';
+      table.style.whiteSpace = 'normal'; // HTML 태그(테이블) 정상 렌더링을 위해 normal 적용
+      table.style.fontSize = '0.95rem';
+      table.style.color = '#e0e0e0';
+      table.innerHTML = aiContent;
+
+    } catch (error) {
+      errorBox.innerText = `통신 중 문제가 발생했습니다: ${error.message}`;
+    } finally {
+      btn.innerHTML = originalText;
+      btn.style.backgroundColor = 'var(--blue-btn)';
+      btn.disabled = false;
+    }
+  }
+
+  function goBack() {
+    document.getElementById('hero').style.display = 'block';
+    document.getElementById('input-screen').style.display = 'block';
+    document.getElementById('result-screen').style.display = 'none';
+  }
+</script>
+</body>
+</html>
