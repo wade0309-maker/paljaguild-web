@@ -176,7 +176,6 @@
   const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
   const termDays = [0, 6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7]; 
 
-  // [신규 추가] 오행 매핑 딕셔너리
   const ELEMENT_MAP = {
     '甲':'木', '乙':'木', '寅':'木', '卯':'木',
     '丙':'火', '丁':'火', '巳':'火', '午':'火',
@@ -288,25 +287,25 @@
       const exactBazi = getExactBazi(year, month, day, hour, minute);
       const daewunNum = getDaewunNumber(year, month, day, gender, exactBazi.yearStemIdx);
 
-      // [핵심 추가] 8글자의 오행을 프론트엔드에서 완벽하게 카운팅
       const baziChars = exactBazi.year + exactBazi.month + exactBazi.day + exactBazi.hour;
       let elCounts = {'木':0, '火':0, '土':0, '金':0, '水':0};
       for (let char of baziChars) {
         if(ELEMENT_MAP[char]) elCounts[ELEMENT_MAP[char]]++;
       }
-      // AI에게 강제 주입할 팩트 데이터 문자열 완성
       const exactElementCounts = `木 ${elCounts['木']}개, 火 ${elCounts['火']}개, 土 ${elCounts['土']}개, 金 ${elCounts['金']}개, 水 ${elCounts['水']}개`;
 
+      // [핵심 업데이트] 동적 확률 계산 알고리즘 프롬프트 주입
       const GEM_PROMPT = `
 당신은 최고위급 명리 전략 컨설턴트입니다.
 
 [출력 및 디자인 절대 규칙]
-1. 줄글을 절대 금지합니다. 서술형 섹션은 반드시 글머리 기호(-)를 사용하여 항목별로 줄바꿈을 적용하십시오.
-2. 3단 논법 서술 시, 반드시 아래와 같이 접두어를 붙여 각 줄을 띄워 쓰십시오.
+1. 도입부 인사말 금지. 무조건 "[1] 명식 검증"으로 시작하십시오.
+2. 육각형 능력치 점수는 반드시 "0~100점 만점" 기준으로 작성하십시오.
+3. 서술형 섹션은 반드시 글머리 기호(-)를 사용하여 줄바꿈을 적용하십시오.
+4. 3단 논법 서술 시, 반드시 아래와 같이 접두어를 붙여 각 줄을 띄워 쓰십시오.
    - **[결론]**: (내용)
    - **[근거]**: (내용)
    - **[예시]**: (내용)
-3. 표 내부의 '예상 자산 Tier' 열에는 오직 'SS급', 'S급', 'A급', 'B급', 'C급' 단어만 사용하십시오.
 
 [OUTPUT 구조 0~13]
 
@@ -316,12 +315,12 @@
 | 항목 | 내용 |
 |---|---|
 | 확정 8글자 명식 | ${exactBazi.year} ${exactBazi.month} ${exactBazi.day} ${exactBazi.hour} |
-| 오행 비율 | ${exactElementCounts} (반드시 이 데이터를 그대로 출력하고 이에 맞춰 분석할 것) |
+| 오행 비율 | ${exactElementCounts} (수정 금지) |
 | 격국 | (내용) |
 | 용희기신 | (내용) |
 
 [2] 3중 육각형 능력치
-| 능력치 항목 | Worst 점수 | Base 점수 | Best 점수 |
+| 능력치 항목 | Worst 점수 (0~100) | Base 점수 (0~100) | Best 점수 (0~100) |
 |---|---|---|---|
 | (6개 항목 작성) | | | |
 
@@ -340,11 +339,18 @@
 - **C급 (그 외)**: 7억 미만 (현상 유지 및 부채 방어)
 </div>
 
+※ AI 계리적 확률 연산 엔진 적용 지시: 
+대상자의 사주 원국을 바탕으로 아래 로직에 따라 Best/Base/Worst 확률을 도출하십시오. (합계 100%)
+- 기본값: Best 15% / Base 70% / Worst 15%
+- 재물/잠재력(식상/재성) 우수 시: Best 최대 +15%p 증가 (Base 차감)
+- 리스크 방어력(관성/인성) 우수 시: Worst 최대 -10%p 감소 (Base 편입)
+- 변동성(충/극/비겁다자) 강할 시: Best와 Worst 동시 증가, Base 감소
+
 | 시나리오 | 예상 자산 Tier (SS/S/A/B/C) | 발생 확률(%) | 예상 자산 규모 | 달성 가능한 사회적 위치(직급/지위) |
 |---|---|---|---|---|
-| Best | | | | |
-| Base | | | | |
-| Worst | | | | |
+| Best | | (AI 도출 확률)% | | |
+| Base | | (AI 도출 확률)% | | |
+| Worst | | (AI 도출 확률)% | | |
 * 가장 강력한 부동산(문서운) 취득 타이밍: (서술)
 
 [8] 학업 포텐셜: 생략
