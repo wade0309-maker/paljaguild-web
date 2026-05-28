@@ -94,7 +94,6 @@
     font-size: 1.05rem; letter-spacing: 0.02em;
   }
   
-  /* 자산 지표 안내 박스 스타일 */
   .tier-legend {
     background-color: rgba(255, 255, 255, 0.03);
     border: 1px dashed var(--border);
@@ -176,6 +175,15 @@
   const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
   const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
   const termDays = [0, 6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7]; 
+
+  // [신규 추가] 오행 매핑 딕셔너리
+  const ELEMENT_MAP = {
+    '甲':'木', '乙':'木', '寅':'木', '卯':'木',
+    '丙':'火', '丁':'火', '巳':'火', '午':'火',
+    '戊':'土', '己':'土', '辰':'土', '戌':'土', '丑':'土', '未':'土',
+    '庚':'金', '辛':'金', '申':'金', '酉':'金',
+    '壬':'水', '癸':'水', '亥':'水', '子':'水'
+  };
 
   function getExactBazi(year, month, day, hour, minute) {
     const date1 = Date.UTC(year, month - 1, day);
@@ -280,7 +288,15 @@
       const exactBazi = getExactBazi(year, month, day, hour, minute);
       const daewunNum = getDaewunNumber(year, month, day, gender, exactBazi.yearStemIdx);
 
-      // [핵심 업데이트] 자산 Tier 지표를 HTML/CSS 친화적 블록으로 선행 강제 출력
+      // [핵심 추가] 8글자의 오행을 프론트엔드에서 완벽하게 카운팅
+      const baziChars = exactBazi.year + exactBazi.month + exactBazi.day + exactBazi.hour;
+      let elCounts = {'木':0, '火':0, '土':0, '金':0, '水':0};
+      for (let char of baziChars) {
+        if(ELEMENT_MAP[char]) elCounts[ELEMENT_MAP[char]]++;
+      }
+      // AI에게 강제 주입할 팩트 데이터 문자열 완성
+      const exactElementCounts = `木 ${elCounts['木']}개, 火 ${elCounts['火']}개, 土 ${elCounts['土']}개, 金 ${elCounts['金']}개, 水 ${elCounts['水']}개`;
+
       const GEM_PROMPT = `
 당신은 최고위급 명리 전략 컨설턴트입니다.
 
@@ -290,8 +306,7 @@
    - **[결론]**: (내용)
    - **[근거]**: (내용)
    - **[예시]**: (내용)
-3. [7] 섹션을 출력할 때, 표를 그리기 전에 반드시 아래 명시된 <대한민국 금융 통계 기반 자산 Tier 지표> 내용을 그대로 복사하여 먼저 출력해야 합니다.
-4. 표 내부의 '예상 자산 Tier' 열에는 오직 'SS급', 'S급', 'A급', 'B급', 'C급' 단어만 사용하십시오.
+3. 표 내부의 '예상 자산 Tier' 열에는 오직 'SS급', 'S급', 'A급', 'B급', 'C급' 단어만 사용하십시오.
 
 [OUTPUT 구조 0~13]
 
@@ -301,7 +316,7 @@
 | 항목 | 내용 |
 |---|---|
 | 확정 8글자 명식 | ${exactBazi.year} ${exactBazi.month} ${exactBazi.day} ${exactBazi.hour} |
-| 오행 비율 | (내용) |
+| 오행 비율 | ${exactElementCounts} (반드시 이 데이터를 그대로 출력하고 이에 맞춰 분석할 것) |
 | 격국 | (내용) |
 | 용희기신 | (내용) |
 
