@@ -3,118 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>팔자길드 - 프리미엄 사주 전략 리포트</title>
+<title>팔자길드 - 프리미엄 전략 컨설팅</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
-
-  :root {
-    --bg-dark: #0f0f11;
-    --card-bg: #1a1a1c;
-    --text-main: #f5f0e8;
-    --text-muted: #88888b;
-    --gold: #d4af37;
-    --blue-btn: #1a5c9e;
-    --border: #333336;
-    --input-bg: #131314;
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+  
+  :root { 
+    --bg-dark: #0f0f11; 
+    --card-bg: #1a1a1c; 
+    --text-main: #f5f0e8; 
+    --text-muted: #88888b; 
+    --gold: #d4af37; 
+    --blue-btn: #1a5c9e; 
+    --border: #333336; 
+    --input-bg: #131314; 
   }
-
+  
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-image: radial-gradient(circle at 50% 0%, #2a2a2e 0%, transparent 60%);
-    overflow-x: hidden; /* 모바일 가로 스크롤 방지 */
+  body { 
+    font-family: 'Noto Sans KR', sans-serif; 
+    background-color: var(--bg-dark); 
+    color: var(--text-main); 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    background-image: radial-gradient(circle at 50% 0%, #2a2a2e 0%, transparent 60%); 
+    overflow-x: hidden; 
   }
-
+  
   .hero-section { text-align: center; margin: 3rem 0 2rem; padding: 0 1rem; }
-  .hero-section h1 { font-family: 'Noto Serif KR', serif; font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; word-break: keep-all; }
+  .hero-section h1 { font-family: 'Noto Serif KR', serif; font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
   .gold-text { color: var(--gold); }
-  .hero-section p { color: var(--text-muted); font-size: 0.95rem; word-break: keep-all; }
-
+  .hero-section p { color: var(--text-muted); font-size: 0.95rem; }
+  
   .input-container { width: 100%; max-width: 500px; padding: 0 1.2rem; margin-bottom: 4rem; }
-  .input-card {
-    background-color: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 16px; padding: 2rem 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-
+  .input-card { background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 2rem 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  
   .form-group { margin-bottom: 1.5rem; }
   .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem; font-weight: 500; }
   
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
   
-  input[type="text"], input[type="number"], select {
-    width: 100%; background-color: var(--input-bg); border: 1px solid var(--border);
-    color: var(--text-main); padding: 0.9rem 0.8rem; border-radius: 8px; outline: none; font-family: inherit; font-size: 0.95rem;
-  }
+  input, select { width: 100%; background-color: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); padding: 0.9rem 0.8rem; border-radius: 8px; outline: none; font-size: 0.95rem; }
   input:focus, select:focus { border-color: var(--gold); }
-
+  
   .toggle-group { display: flex; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .toggle-group label { flex: 1; text-align: center; padding: 0.9rem 0; cursor: pointer; font-size: 0.95rem; color: var(--text-muted); }
-  .toggle-group input[type="radio"] { display: none; }
-  .toggle-group input[type="radio"]:checked + label { background-color: var(--border); color: var(--text-main); font-weight: 600; }
-
-  .btn { width: 100%; padding: 1.1rem; border-radius: 10px; font-family: inherit; font-size: 1.05rem; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; margin-top: 1.5rem; }
-  .btn-blue { background-color: var(--blue-btn); color: white; }
+  .toggle-group label { flex: 1; text-align: center; padding: 0.9rem 0; cursor: pointer; color: var(--text-muted); font-size: 0.95rem; }
+  .toggle-group input { display: none; }
+  .toggle-group input:checked + label { background-color: var(--border); color: var(--text-main); font-weight: 600; }
+  
+  .btn-blue { width: 100%; padding: 1.1rem; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; background-color: var(--blue-btn); color: white; margin-top: 1.5rem; font-size: 1.05rem; transition: 0.2s; }
   .btn-blue:hover { opacity: 0.9; }
-
-  /* 결과 화면 모바일 대응 */
+  
+  /* 탭 대시보드 인프라 스타일 */
   #result-screen { display: none; width: 100%; max-width: 850px; padding: 0 1.2rem 4rem; overflow-x: hidden; }
+  .tab-container { display: flex; gap: 6px; margin-bottom: 2rem; background: var(--input-bg); padding: 6px; border-radius: 12px; border: 1px solid var(--border); }
+  .tab-btn { flex: 1; padding: 14px 5px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+  .tab-btn.active { background: var(--border); color: var(--gold); }
   
-  .markdown-body {
-    background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 12px; padding: 2rem 1.5rem; font-size: 0.95rem; line-height: 1.8;
-    color: #e0e0e0; margin-top: 1.5rem; text-align: left;
-    word-break: break-word; /* 글자 깨짐 방지 */
-  }
-  .markdown-body p { margin-bottom: 1.2rem; }
-  .markdown-body h2, .markdown-body h3 {
-    color: var(--gold); margin-top: 3rem; margin-bottom: 1.2rem;
-    border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; font-size: 1.3rem;
-  }
-  .markdown-body strong { color: var(--gold); font-weight: 700; }
-  
-  /* [수석 아키텍트 패치] 모바일 테이블 반응형 (좌우 스크롤 가능) */
-  .markdown-body table { 
-    display: block; overflow-x: auto; white-space: nowrap; /* 스크롤 활성화 */
-    width: 100%; border-collapse: collapse; margin: 2rem 0; font-size: 0.9rem; 
-    background-color: var(--input-bg); border-radius: 8px;
-  }
-  .markdown-body th, .markdown-body td { 
-    border: 1px solid var(--border); padding: 0.8rem 1rem; text-align: center; vertical-align: middle; 
-  }
-  .markdown-body td { white-space: normal; min-width: 120px; } /* 셀 내부 글자 줄바꿈 허용 */
-  .markdown-body th { background-color: rgba(212, 175, 55, 0.15); color: var(--gold); font-weight: 700; min-width: 120px; }
-  
-  .markdown-body blockquote { 
-    border-left: 4px solid var(--gold); padding: 1.2rem 1.5rem; color: #fff; 
-    background: rgba(212, 175, 55, 0.1); margin: 2rem 0; font-style: normal;
-    white-space: pre-wrap; line-height: 2; border-radius: 0 8px 8px 0;
-    font-size: 1rem;
-  }
-  
-  .chart-box {
-    background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; width: 100%; height: 350px;
-  }
+  /* 모바일 반응형 및 본문 스타일 최적화 */
+  .markdown-body { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.5rem; font-size: 0.95rem; line-height: 1.8; color: #e0e0e0; min-height: 300px; word-break: break-word; }
+  .markdown-body table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; border-collapse: collapse; margin: 1.5rem 0; background-color: var(--input-bg); border-radius: 8px; }
+  .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 10px 14px; text-align: center; vertical-align: middle; }
+  .markdown-body td { white-space: normal; min-width: 110px; }
+  .markdown-body th { background-color: rgba(212, 175, 55, 0.15); color: var(--gold); font-weight: 700; min-width: 110px; }
+  .markdown-body h3 { color: var(--gold); margin: 2.5rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; font-size: 1.3rem; }
+  .markdown-body blockquote { border-left: 4px solid var(--gold); padding: 1.2rem 1.5rem; background: rgba(212, 175, 55, 0.08); margin: 2rem 0; border-radius: 0 8px 8px 0; white-space: pre-wrap; font-size: 1rem; }
+  .markdown-body ul { list-style-type: disc; padding-left: 20px; margin: 1rem 0; }
+  .markdown-body li { margin-bottom: 6px; }
 
-  .tier-legend {
-    background-color: rgba(255, 255, 255, 0.03);
-    border: 1px dashed var(--border); padding: 1.2rem; border-radius: 8px;
-    margin-bottom: 1.5rem; font-size: 0.85rem; color: #bbb; white-space: normal;
-  }
+  .loading-tab { text-align: center; padding: 4rem 0; color: var(--gold); font-size: 0.95rem; }
+  .chart-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; height: 350px; }
+  .tier-legend { background-color: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border); padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.85rem; color: #bbb; white-space: normal; }
   
   @media (min-width: 768px) {
-    .markdown-body table { display: table; white-space: normal; } /* PC에서는 원래대로 꽉 차게 */
+    .tab-btn { font-size: 0.95rem; padding: 16px; }
     .markdown-body { padding: 3rem; font-size: 1rem; }
-    .chart-box { height: 450px; padding: 2rem; }
+    .markdown-body table { display: table; white-space: normal; }
+    .chart-box { height: 430px; padding: 2rem; }
   }
 </style>
 </head>
@@ -122,7 +91,7 @@
 
   <div class="hero-section" id="hero">
     <h1>팔자길드 <span class="gold-text">프리미엄</span></h1>
-    <p>금융 통계와 명리학이 결합된 당신을 위한 인생 전략</p>
+    <p>금융 통계와 명리학이 결합된 최고위급 인생 전략</p>
   </div>
 
   <div class="input-container" id="input-screen">
@@ -135,64 +104,43 @@
           <input type="radio" id="gender-f" name="gender" value="F" checked><label for="gender-f">여성</label>
         </div>
       </div>
-      <div class="form-group">
-        <label>생년월일 (양력)</label>
-        <div class="grid-3">
-          <input type="number" id="f-year" placeholder="YYYY"><input type="number" id="f-month" placeholder="MM"><input type="number" id="f-day" placeholder="DD">
-        </div>
-      </div>
+      <div class="form-group"><label>생년월일 (양력)</label><div class="grid-3"><input type="number" id="f-year" placeholder="YYYY"><input type="number" id="f-month" placeholder="MM"><input type="number" id="f-day" placeholder="DD"></div></div>
       <div class="form-group">
         <label>태어난 시간 (모를 경우 12시 00분)</label>
         <div class="grid-2">
           <select id="f-hour">
             <option value="" disabled selected>시 (Hour)</option>
-            <option value="0">0시 (자시)</option>
-            <option value="1">1시 (축시)</option>
-            <option value="2">2시 (축시)</option>
-            <option value="3">3시 (인시)</option>
-            <option value="4">4시 (인시)</option>
-            <option value="5">5시 (묘시)</option>
-            <option value="6">6시 (묘시)</option>
-            <option value="7">7시 (진시)</option>
-            <option value="8">8시 (진시)</option>
-            <option value="9">9시 (사시)</option>
-            <option value="10">10시 (사시)</option>
-            <option value="11">11시 (오시)</option>
-            <option value="12">12시 (오시)</option>
-            <option value="13">13시 (미시)</option>
-            <option value="14">14시 (미시)</option>
-            <option value="15">15시 (신시)</option>
-            <option value="16">16시 (신시)</option>
-            <option value="17">17시 (유시)</option>
-            <option value="18">18시 (유시)</option>
-            <option value="19">19시 (술시)</option>
-            <option value="20">20시 (술시)</option>
-            <option value="21">21시 (해시)</option>
-            <option value="22">22시 (해시)</option>
-            <option value="23">23시 (자시)</option>
+            <option value="0">0시 (자시)</option><option value="1">1시 (축시)</option><option value="2">2시 (축시)</option><option value="3">3시 (인시)</option><option value="4">4시 (인시)</option><option value="5">5시 (묘시)</option><option value="6">6시 (묘시)</option><option value="7">7시 (진시)</option><option value="8">8시 (진시)</option><option value="9">9시 (사시)</option><option value="10">10시 (사시)</option><option value="11">11시 (오시)</option><option value="12">12시 (오시)</option><option value="13">13시 (미시)</option><option value="14">14시 (미시)</option><option value="15">15시 (신시)</option><option value="16">16시 (신시)</option><option value="17">17시 (유시)</option><option value="18">18시 (유시)</option><option value="19">19시 (술시)</option><option value="20">20시 (술시)</option><option value="21">21시 (해시)</option><option value="22">22시 (해시)</option><option value="23">23시 (자시)</option>
           </select>
           <input type="number" id="f-minute" placeholder="분 (Minute)" min="0" max="59" value="0">
         </div>
       </div>
       <div id="error-msg" style="color:#ff6b6b; text-align:center; font-size:0.9rem; margin-top:1rem;"></div>
-      <button class="btn btn-blue" onclick="handlePremiumReport()">👑 프리미엄 리포트 발급</button>
+      <button class="btn-blue" onclick="startAnalysis()">👑 프리미엄 리포트 발급</button>
     </div>
   </div>
 
   <div id="result-screen">
-    <button onclick="location.reload()" style="background:transparent; color:var(--text-muted); border:1px solid var(--border); padding:0.6rem 1.2rem; border-radius:8px; cursor:pointer; margin-bottom:1.5rem; font-size: 0.9rem;">← 다시 입력하기</button>
-    <h2 id="res-title" style="font-family:'Noto Serif KR'; font-size:1.8rem; color:var(--gold); text-align:center; word-break: keep-all;"></h2>
-    <p id="res-meta" style="text-align:center; margin-top:0.5rem; color:var(--text-muted); font-size: 0.9rem;"></p>
+    <div class="tab-container">
+      <button class="tab-btn active" onclick="switchTab('summary')">종합 전략</button>
+      <button class="tab-btn" onclick="switchTab('wealth')">인생 & 자산</button>
+      <button class="tab-btn" onclick="switchTab('future')">진로 & 성과</button>
+    </div>
     
-    <div class="markdown-body" id="report-content"></div>
-
-    <div id="chart-container" style="display:none; margin-top: 3rem; margin-bottom: 2rem;">
-      <h3 style="color:var(--gold); font-size:1.4rem; border-bottom:1px solid var(--border); padding-bottom:0.8rem; margin-bottom:1.5rem;">[Life Vision] 인생 대운 흐름 시각화 지표</h3>
+    <div id="chart-area" style="display:none; margin-bottom: 2.5rem;">
+      <h3 style="color:var(--gold); font-size:1.4rem; margin-bottom:0.4rem;">[Life Vision] 대운 흐름 시각화 대시보드</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.2rem;">※ Y축(Score)은 사주 원국과 대운의 상호작용을 금융 계리적 확률로 환산한 종합 운세 성과 지표입니다.</p>
       <div class="chart-box"><canvas id="daewunChart"></canvas></div>
     </div>
+
+    <div id="tab-content" class="markdown-body"></div>
   </div>
 
 <script>
+  let baziContext = {}; 
+  let tabCache = { summary: "", wealth: "", future: "" };
+  let currentTab = 'summary';
+
   const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
   const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
   const ELEMENT_MAP = {'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','亥':'水','子':'水'};
@@ -202,8 +150,7 @@
     const date1 = Date.UTC(year, month - 1, day);
     const date2 = Date.UTC(1900, 0, 1);
     const diffDays = Math.floor((date1 - date2) / 86400000);
-    let dayIdx = (diffDays + 10) % 60;
-    if (dayIdx < 0) dayIdx += 60;
+    let dayIdx = (diffDays + 10) % 60; if (dayIdx < 0) dayIdx += 60;
     const dayPillar = STEMS[dayIdx % 10] + BRANCHES[dayIdx % 12];
     
     let totalMinutes = hour * 60 + minute;
@@ -211,222 +158,196 @@
     const hourPillar = STEMS[((dayIdx % 5) * 2 + hbIdx) % 10] + BRANCHES[hbIdx];
 
     let baziYear = (month > 2 || (month === 2 && day >= 4)) ? year : year - 1;
-    let yearIdx = (baziYear - 4) % 60;
-    if (yearIdx < 0) yearIdx += 60;
+    let yearIdx = (baziYear - 4) % 60; if (yearIdx < 0) yearIdx += 60;
     const yearPillar = STEMS[yearIdx % 10] + BRANCHES[yearIdx % 12];
 
     let bm = month; if (day < termDays[month]) bm--; if (bm <= 0) bm += 12;
     const monthPillar = STEMS[((yearIdx % 5) * 2 + bm) % 10] + BRANCHES[bm % 12];
 
-    return { year: yearPillar, month: monthPillar, day: dayPillar, hour: hourPillar, yearStemIdx: yearIdx % 10 };
+    const chars = yearPillar + monthPillar + dayPillar + hourPillar;
+    let el = {'木':0, '火':0, '土':0, '金':0, '水':0};
+    for (let c of chars) { if(ELEMENT_MAP[c]) el[ELEMENT_MAP[c]]++; }
+    const elText = `木 ${el['木']}개, 火 ${el['火']}개, 土 ${el['土']}개, 金 ${el['金']}개, 水 ${el['水']}개`;
+
+    return { year: yearPillar, month: monthPillar, day: dayPillar, hour: hourPillar, yearStemIdx: yearIdx % 10, elText: elText };
   }
 
-  function getDaewunNumber(year, month, day, gender, yearStemIdx) {
-    const isForward = ((yearStemIdx % 2 === 0) && (gender === 'M')) || ((yearStemIdx % 2 !== 0) && (gender === 'F'));
-    let daysDiff = 0;
-    if (isForward) {
-      daysDiff = (day < termDays[month]) ? (termDays[month] - day) : (30 - day + termDays[(month % 12) + 1]);
-    } else {
-      daysDiff = (day >= termDays[month]) ? (day - termDays[month]) : (day + (30 - termDays[month - 1 === 0 ? 12 : month - 1]));
-    }
-    let d = Math.round(daysDiff / 3);
-    return d === 0 ? 1 : d;
-  }
-
-  function renderChart(labels, scores) {
-    const ctx = document.getElementById('daewunChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: '인생 대운 점수',
-          data: scores,
-          borderColor: '#d4af37',
-          backgroundColor: 'rgba(212, 175, 55, 0.1)',
-          borderWidth: 3,
-          pointBackgroundColor: '#d4af37',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: { min: 0, max: 100, grid: { color: '#333' }, ticks: { color: '#888' } },
-          x: { grid: { display: false }, ticks: { color: '#888' } }
-        },
-        plugins: { legend: { display: false } }
-      }
-    });
-  }
-
-  async function handlePremiumReport() {
-    const rawY = document.getElementById('f-year').value;
-    const rawM = document.getElementById('f-month').value;
-    const rawD = document.getElementById('f-day').value;
-    const rawH = document.getElementById('f-hour').value;
+  async function startAnalysis() {
+    const y = document.getElementById('f-year').value;
+    const m = document.getElementById('f-month').value;
+    const d = document.getElementById('f-day').value;
+    const h = document.getElementById('f-hour').value;
     const err = document.getElementById('error-msg');
-    
-    if(!rawY || !rawM || !rawD || rawH === "") { err.innerText = "생년월일시를 모두 입력해주세요."; return; }
+    if(!y || !m || !d || h==="") { err.innerText = "생년월일시를 모두 입력해주세요."; return; }
     err.innerText = "";
+
+    const name = document.getElementById('f-name').value || "내담자";
+    const gender = document.querySelector('input[name="gender"]:checked').value;
+    const b = getExactBazi(parseInt(y), parseInt(m), parseInt(d), parseInt(h), parseInt(document.getElementById('f-minute').value));
+    const age = new Date().getFullYear() - parseInt(y) + 1;
+    const dn = getExactBazi(parseInt(y), parseInt(m), parseInt(d), parseInt(h), 0).yearStemIdx;
+    const calculatedDn = Math.round(((dn % 2 === 0 && gender === 'M') || (dn % 2 !== 0 && gender === 'F')) ? (30 - d) / 3 : d / 3) || 1;
+
+    baziContext = { name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText }; 
     
-    const btn = document.querySelector('.btn-blue');
-    btn.innerHTML = '⏳ 명리학 엔진 2.5 인생 전략 연산 중...';
-    btn.disabled = true;
+    document.getElementById('input-screen').style.display = 'none';
+    document.getElementById('hero').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+    
+    await switchTab('summary');
+  }
+
+  async function switchTab(tabId) {
+    currentTab = tabId;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // 버튼 하이라이트 활성화 제어
+    const activeIdx = tabId === 'summary' ? 1 : tabId === 'wealth' ? 2 : 3;
+    document.querySelector(`.tab-btn:nth-child(${activeIdx})`).classList.add('active');
+    
+    // 차트를 종합 전략(summary) 최상단에만 노출되도록 제어
+    document.getElementById('chart-area').style.display = (tabId === 'summary') ? 'block' : 'none';
+
+    if (tabCache[tabId]) {
+      document.getElementById('tab-content').innerHTML = marked.parse(tabCache[tabId]);
+      return;
+    }
+
+    document.getElementById('tab-content').innerHTML = `<div class="loading-tab">⏳ Gemini 고효율 엔진이 명리 전략 데이터를 연산 중입니다...</div>`;
+
+    const baseRule = "추상적이고 미신적인 어투를 완벽히 배제하고, 글로벌 전략 컨설팅 펌의 임원 보고서처럼 단호, 날카롭고, 직관적으로 작성하십시오. 형용사보다는 명사와 동사 위주로 정보 밀도를 극대화하고, 문장을 짧게 끊어 치십시오.";
+
+    const prompts = {
+      summary: `당신은 VVIP 전담 수석 명리 전략가입니다. ${baseRule}
+      [종합 전략] 탭 작성을 위해 다음 목차 순서로 표와 개조식을 사용하여 작성하십시오.
+      반드시 문서의 **[제일 첫 줄]**에 차트 렌더링용 JSON 데이터를 원문 그대로 출력하십시오:
+      \`\`\`json
+      {"daewun_labels": ["${baziContext.dn}세", "${baziContext.dn+10}세", "${baziContext.dn+20}세", "${baziContext.dn+30}세", "${baziContext.dn+40}세", "${baziContext.dn+50}세", "${baziContext.dn+60}세", "${baziContext.dn+70}세"], "daewun_scores": [50, 65, 80, 95, 85, 70, 60, 65]}
+      \`\`\`
+      
+      ---
+      ### 📊 1. 명식 핵심 진단
+      (확정 명식, 오행 비율, 격국, 용희기신을 4행 2열 표로 직관적으로 제시)
+      ---
+      ### 🛡️ 2. 핵심 역량 다각화 지수 (0~100점)
+      (잠재력 6개 항목을 표로 제시. 항목별 Worst/Base/Best 점수 기재)
+      ---
+      ### 🎭 3. 내재된 본질 vs 사회적 페르소나
+      (단 3줄로 압축. 반드시 **[본질]**, **[페르소나]**, **[전략적 갭]** 접두어 사용)
+      ---
+      ### 🧾 4. 운명 요약 영수증
+      > 👑 메인 타이틀: (한 줄 요약)
+      > 💡 전략적 조언: (뼈를 때리는 날카로운 행동 지침 1줄)
+      > 🏷️ 핵심 키워드: (#해시태그 3개)`,
+
+      wealth: `당신은 최고위급 금융 명리 분석가입니다. ${baseRule}
+      [인생 & 자산] 탭 작성을 위해 다음 목차 순서로 작성하십시오.
+      
+      ---
+      ### 📈 1. 생애 자산 Tier 시뮬레이션
+      (내담자 오행 비율에 기반하여 SS/S/A/B/C 등급 중 Best/Base/Worst 도달 확률(%)과 예상 자산 규모를 표로 제시)
+      * **부동산(문서운) 매입 골든타임:** (연도 및 이유 1줄 요약)
+      ---
+      ### 🌊 2. 10년 대운 심층 서사 (현금흐름 및 자산 관점)
+      (${baziContext.dn}세부터 10년 단위 8개 대운 나열. 각 대운마다 '재무적 기회'와 '리스크'를 단 1줄씩 요약)
+      ---
+      ### 🎯 3. Executive Summary: 향후 3개월 재무 액션 플랜
+      (당장 실행해야 할 재무/투자/계약 관련 명확한 행동 지침 3가지를 글머리 기호로 작성)`,
+
+      future: `당신은 VVIP 커리어 및 라이프 전략가입니다. ${baseRule}
+      [진로 & 성과] 탭 작성을 위해 내담자의 나이(${baziContext.age}세)에 맞춰 아래 조건부 서술 목차를 완벽히 따르십시오.
+      
+      [내담자가 20세 미만일 경우 아래 3개 항목 작성]
+      ### 🎓 1. 두뇌 구조 및 학업 포텐셜 (표 형식)
+      ### 🎯 2. 목표 가능 최상위 대학군 및 전공 3선 (구체적 명시)
+      ### 👨‍👩‍👧 3. 부모 양육 리스크 및 멘탈 관리 전략 (반드시 **[진단]**, **[리스크]**, **[솔루션]** 접두어 사용하여 3줄 압축)
+
+      [내담자가 20세 이상일 경우 아래 3개 항목 작성]
+      ### 🚀 1. 승진 및 권력 쟁취 전략 (반드시 **[현재 궤도]**, **[장애물]**, **[돌파구]** 접두어 사용하여 3줄 압축)
+      ### 👥 2. 배우자 및 비즈니스 파트너 리스크 (반드시 **[관계성]**, **[파국 리스크]**, **[헷징 전략]** 접두어 사용하여 3줄 압축)
+      ### 🏥 3. 건강 및 체질 관리 전략 (취약 장기와 발병 가능성 높은 질환, 예방 액션을 직관적인 표로 제시)`
+    };
 
     try {
-      const name = document.getElementById('f-name').value || '도전자';
-      const gender = document.querySelector('input[name="gender"]:checked').value;
-      const b = getExactBazi(rawY, rawM, rawD, parseInt(rawH), parseInt(document.getElementById('f-minute').value));
-      const dn = getDaewunNumber(parseInt(rawY), parseInt(rawM), parseInt(rawD), gender, b.yearStemIdx);
-      
-      const bChars = b.year + b.month + b.day + b.hour;
-      let el = {'木':0, '火':0, '土':0, '金':0, '水':0};
-      for (let c of bChars) { if(ELEMENT_MAP[c]) el[ELEMENT_MAP[c]]++; }
-      const elText = `木 ${el['木']}개, 火 ${el['火']}개, 土 ${el['土']}개, 金 ${el['金']}개, 水 ${el['水']}개`;
-
-      // [수석 아키텍트 패치] 동일 답변 방지를 위한 프롬프트 고도화 반영
-      const GEM_PROMPT = `
-당신은 최고위급 명리 전략 컨설턴트입니다.
-
-[출력 및 디자인 절대 규칙]
-1. 도입부 인사말 금지. 서술형 섹션은 최대 3줄 이내로 극단적으로 압축할 것.
-2. 각 항목마다 마크다운 제목(###)과 구분선(---) 사용.
-3. 차트 렌더링용 JSON Data는 반드시 문서의 **[제일 첫 줄]**에 마크다운 코드블록(\`\`\`json ... \`\`\`)으로 출력할 것.
-4. 서술형은 글머리 기호(-), 3단 논법(**[결론]:**, **[근거]:**, **[예시]:**) 필수 적용.
-
-[OUTPUT 구조 1~10]
-
-\`\`\`json
-{"daewun_labels": ["${dn}세", "${dn+10}세", "${dn+20}세", "${dn+30}세", "${dn+40}세", "${dn+50}세", "${dn+60}세", "${dn+70}세"], "daewun_scores": [50, 65, 80, 95, 85, 70, 60, 65]}
-\`\`\`
-
----
-### 📊 1. 명식 검증
-| 항목 | 내용 |
-|---|---|
-| 확정 명식 | ${b.year} ${b.month} ${b.day} ${b.hour} |
-| 오행 비율 | ${elText} |
-| 격국 | (분석 내용) |
-| 용희기신 | (분석 내용) |
-
----
-### 🛡️ 2. 3중 육각형 능력치
-| 능력치 항목 | Worst | Base | Best |
-|---|---|---|---|
-| (6개 항목) | | | |
-
----
-### 🎭 3. 본질과 현실 페르소나 (3줄 이내 압축)
-
----
-### 👥 4. 운명의 도플갱어: 평행이론 인물 (2줄 이내)
-
----
-### 📈 5. 인생 시뮬레이션 및 재산 수준
-<div class="tier-legend">
-**[대한민국 금융 통계 기반 자산 Tier]**<br>
-- **SS급**: 순자산 70억 이상<br>
-- **S급**: 순자산 30억~70억<br>
-- **A급**: 순자산 15억~30억<br>
-- **B급**: 순자산 7억~15억<br>
-- **C급**: 7억 미만
-</div>
-
-※ AI 특별 지시: 내담자의 오행 비율(${elText})과 식상/재성의 발달 정도를 개별적으로 계산하여, **기계적인 복사-붙여넣기가 아닌 이 명식만의 고유한 확률(%)과 예상 자산 규모를 반드시 다르게 생성하십시오.**
-
-| 시나리오 | 자산 Tier | 발생 확률(%) | 예상 자산 규모 | 사회적 위치 |
-|---|---|---|---|---|
-| Best | | (계산치)% | | |
-| Base | | (계산치)% | | |
-| Worst | | (계산치)% | | |
-* 부동산(문서운) 취득 타이밍: (1줄 서술)
-
----
-### 🎯 6. 핵심 관계 및 리스크 전략 (3단 논법)
-- **배우자/연애:** (내용)
-- **승진/권력:** (내용)
-- **건강/체질:** (내용)
-
----
-### 🌊 7. 10년 대운 심층 서사 (1줄씩 압축)
-- **${dn}세 ~ ${dn+9}세**: (내용)
-- **${dn+10}세 ~ ${dn+19}세**: (내용)
-- **${dn+20}세 ~ ${dn+29}세**: (내용)
-- **${dn+30}세 ~ ${dn+39}세**: (내용)
-- **${dn+40}세 ~ ${dn+49}세**: (내용)
-- **${dn+50}세 ~ ${dn+59}세**: (내용)
-- **${dn+60}세 ~ ${dn+69}세**: (내용)
-- **${dn+70}세 ~ ${dn+79}세**: (내용)
-
----
-### ⏱️ 8. 단기 자산 흐름도 (표)
-
----
-### 🚀 9. Executive Summary: 3개월 실행 과제 3선
-
----
-### 🧾 10. 운명 요약 영수증
-> 👑 페르소나: [타이틀]
-> 💰 자산 Tier: [등급]
-> 💡 조언: [한 줄]
-> 🏷️ [해시태그 3개]
-`;
-
-      const baziDataText = `이름: ${name}\n성별: ${gender==='M'?'남성':'여성'}\n명식: ${b.year} ${b.month} ${b.day} ${b.hour}\n오행 비율: ${elText}`;
-
       const resp = await fetch('https://saju-backend-3vgw.onrender.com/api/llm', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          baziData: baziDataText,
-          systemPrompt: GEM_PROMPT
+          baziData: `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}`,
+          systemPrompt: prompts[tabId]
         })
       });
-
-      if (!resp.ok) throw new Error(`서버 오류 (${resp.status})`);
-
+      
       const data = await resp.json();
-      let aiRaw = data.content[0].text;
-
-      try {
-        let jsonStr = "";
-        const jsonBlockMatch = aiRaw.match(/```json\n([\s\S]*?)\n```/);
-        if (jsonBlockMatch) {
-            jsonStr = jsonBlockMatch[1];
-        } else {
-            const rawMatch = aiRaw.match(/\{[\s\S]*"daewun_scores"[\s\S]*\}/);
-            if (rawMatch) jsonStr = rawMatch[0];
+      let aiText = data.content[0].text;
+      
+      // 첫 번째 탭에서 전방에 노출된 JSON을 파싱 후 차트로 맵핑
+      if (tabId === 'summary') {
+        const jsonMatch = aiText.match(/```json\n([\s\S]*?)\n```/);
+        if (jsonMatch) {
+          try {
+            const j = JSON.parse(jsonMatch[1]);
+            setTimeout(() => renderChart(j.daewun_labels, j.daewun_scores), 100);
+          } catch(je) { console.warn("차트 데이터 파싱 보류", je); }
+          aiText = aiText.replace(/```json[\s\S]*?```/g, '');
         }
-        
-        if (jsonStr) {
-            const j = JSON.parse(jsonStr.trim());
-            document.getElementById('chart-container').style.display = 'block';
-            renderChart(j.daewun_labels, j.daewun_scores);
-        }
-      } catch (jsonError) {
-        console.warn("JSON Parsing Error", jsonError);
       }
 
-      aiRaw = aiRaw.replace(/```json[\s\S]*?```/g, '').trim();
-      aiRaw = aiRaw.replace(/-{4,}/g, '---');
-      
-      document.getElementById('input-screen').style.display = 'none';
-      document.getElementById('hero').style.display = 'none';
-      document.getElementById('result-screen').style.display = 'block';
-      document.getElementById('res-title').innerText = `${name}님의 프리미엄 인생 전략 리포트`;
-      document.getElementById('res-meta').innerText = `명식: ${b.year} ${b.month} ${b.day} ${b.hour} | 대운수: ${dn}`;
-      document.getElementById('report-content').innerHTML = marked.parse(aiRaw);
-
+      tabCache[tabId] = aiText;
+      document.getElementById('tab-content').innerHTML = marked.parse(aiText);
     } catch (e) {
-      err.innerText = "통신 지연이 발생했습니다. 10초 후 다시 눌러주세요.";
-      console.error(e);
-    } finally {
-      btn.innerHTML = '👑 프리미엄 리포트 발급';
-      btn.disabled = false;
+      document.getElementById('tab-content').innerHTML = "<div class='loading-tab' style='color:#ff6b6b'>서버와 통신하는 도중 지연이 발생했습니다. 탭을 다시 클릭해 주십시오.</div>";
     }
+  }
+
+  function renderChart(labels, scores) {
+    const ctx = document.getElementById('daewunChart').getContext('2d');
+    if(window.myChart) window.myChart.destroy();
+    window.myChart = new Chart(ctx, {
+      type: 'line',
+      data: { 
+        labels: labels, 
+        datasets: [{ 
+          label: '명리 계리적 성과 지수', 
+          data: scores, 
+          borderColor: '#d4af37', 
+          tension: 0.4, 
+          fill: true, 
+          backgroundColor: 'rgba(212, 175, 55, 0.06)',
+          borderWidth: 3,
+          pointBackgroundColor: '#d4af37'
+        }] 
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false, 
+        scales: { 
+          y: { 
+            min: 0, 
+            max: 100,
+            title: {
+              display: true,
+              text: '운세 성과도 (Score)',
+              color: '#88888b',
+              font: { size: 11, weight: 'bold' }
+            },
+            grid: { color: '#232326' },
+            ticks: { color: '#888' }
+          },
+          x: { grid: { display: false }, ticks: { color: '#888' } }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return ` 종합 운세 지수: ${context.parsed.y}점 (100점 만점 기준)`;
+              }
+            }
+          }
+        }
+      }
+    });
   }
 </script>
 </body>
