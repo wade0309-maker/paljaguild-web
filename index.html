@@ -111,6 +111,12 @@
     </div>
 
     <div id="tab-content" class="markdown-body"></div>
+    
+    <div class="tab-container" style="margin-top: 1.5rem;">
+      <button class="tab-btn active" onclick="switchTab('summary')">종합 전략</button>
+      <button class="tab-btn" onclick="switchTab('wealth')">인생 & 자산</button>
+      <button class="tab-btn" onclick="switchTab('future')">진로 & 성과</button>
+    </div>
   </div>
 
 <script>
@@ -267,9 +273,17 @@
     - Worst: 등급(${worstT}), 확률(${worstP}%)
     - 부동산 골든타임 확정 연도: ${goldenYear}년`;
 
+    // [아키텍트 패치] 대운 그래프 점수 다변화 로직 (고유 Seed 기반)
+    const dScores = [];
+    for(let i=0; i<8; i++) {
+      // 40점에서 95점 사이의 유니크한 점수를 8개 생성
+      let score = 40 + ((userSeed + (i+1) * 23) % 55);
+      dScores.push(score);
+    }
+
     baziContext = { 
       name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
-      fixedStatsTable, fixedWealthData 
+      fixedStatsTable, fixedWealthData, dScores 
     };
     
     document.getElementById('input-screen').style.display = 'none';
@@ -281,17 +295,18 @@
 
   async function switchTab(tabId) {
     currentTab = tabId;
+    
+    // [아키텍트 패치] 상/하단 탭 버튼 동시 활성화 및 자동 스크롤
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    const activeIdx = tabId === 'summary' ? 1 : tabId === 'wealth' ? 2 : 3;
-    document.querySelector(`.tab-btn:nth-child(${activeIdx})`).classList.add('active');
+    document.querySelectorAll(`button[onclick="switchTab('${tabId}')"]`).forEach(btn => btn.classList.add('active'));
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // 탭 클릭 시 부드럽게 최상단 이동
     
     document.getElementById('chart-area').style.display = (tabId === 'summary') ? 'block' : 'none';
 
-    // [아키텍트 패치] 유저 고유 키 생성 및 브라우저 캐시 확인 (원가 0원 로직)
     const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
     const cachedText = localStorage.getItem(cacheKey);
 
-    // 캐시가 존재하면 API 호출 없이 0.1초 만에 즉시 로드
     if (cachedText) {
       renderContent(cachedText, tabId);
       return;
@@ -299,13 +314,14 @@
 
     document.getElementById('tab-content').innerHTML = `<div class="loading-tab">⏳ 운명의 모래시계가 당신의 전략 데이터를 연산 중입니다...</div>`;
 
-    const baseRule = "글로벌 전략 컨설팅 펌의 임원 보고서처럼 단호하고 직관적으로 작성하십시오. 형용사보다는 명사와 동사 위주로 정보 밀도를 극대화하십시오.";
+    // [아키텍트 패치] 한자어 금지 및 현대 비즈니스 용어 번역 룰
+    const baseRule = "글로벌 전략 컨설팅 펌의 임원 보고서처럼 단호하고 직관적으로 작성하십시오. 형용사보다는 명사와 동사 위주로 정보 밀도를 극대화하되, [절대 규칙]: '비견, 겁재, 편재, 편관' 등 명리학 전문 한자어 사용을 엄격히 금지합니다. 사주 용어는 반드시 '조직 장악력, 현금 흐름 창출력, 리스크 감수성' 등 대중적인 비즈니스/심리학 용어로 100% 번역하여 일반인이 직관적으로 이해할 수 있게 작성하십시오.";
 
     const prompts = {
       summary: `당신은 VVIP 전담 수석 명리 전략가입니다. ${baseRule}
       반드시 문서의 **제일 첫 줄**에 어떠한 인사말이나 제목 없이 순수 JSON 데이터만 출력하십시오:
       \`\`\`json
-      {"daewun_labels": ["${baziContext.dn}세", "${baziContext.dn+10}세", "${baziContext.dn+20}세", "${baziContext.dn+30}세", "${baziContext.dn+40}세", "${baziContext.dn+50}세", "${baziContext.dn+60}세", "${baziContext.dn+70}세"], "daewun_scores": [50, 65, 80, 95, 85, 70, 60, 65]}
+      {"daewun_labels": ["${baziContext.dn}세", "${baziContext.dn+10}세", "${baziContext.dn+20}세", "${baziContext.dn+30}세", "${baziContext.dn+40}세", "${baziContext.dn+50}세", "${baziContext.dn+60}세", "${baziContext.dn+70}세"], "daewun_scores": [${baziContext.dScores.join(', ')}]}
       \`\`\`
       
       ---
@@ -335,11 +351,11 @@
       
       ---
       ### 📈 1. 생애 자산 Tier 시뮬레이션
-      (위 [자산 시나리오 확정 데이터]에 명시된 등급과 확률(%)을 토씨 하나 틀리지 말고 100% 그대로 표에 기재하십시오. AI는 오직 내담자의 사주를 분석하여 각 시나리오별 달성 이유인 '핵심 동인'만 추가 작성해야 합니다.)
-      * **부동산(문서운) 매입 골든타임:** (반드시 위 확정 데이터에 주어진 연도를 기재하고, 사주 명식에 근거한 매입 이유를 1줄로 요약할 것)
+      (위 [자산 시나리오 확정 데이터]에 명시된 등급과 확률(%)을 토씨 하나 틀리지 말고 100% 그대로 표에 기재하십시오. 단, 각 시나리오별 달성 이유인 '핵심 동인'을 작성할 때 사주 한자어를 절대 쓰지 말고, "안정적 근로 소득의 누적", "공격적인 대체 투자 성공", "불필요한 지출 통제 실패" 등 현대 재무 관점의 쉬운 경제 용어로 작성할 것)
+      * **부동산(문서운) 매입 골든타임:** (반드시 위 확정 데이터에 주어진 연도를 기재하고, 매입 이유 역시 '문서운', '인성' 등의 단어 대신 "실물 자산 취득에 유리한 환경", "계약 운" 등으로 쉽게 풀어서 1줄 요약할 것)
       ---
       ### 🌊 2. 10년 대운 심층 서사
-      (${baziContext.dn}세부터 10년 단위 8개 대운 나열. 대운별 재무 기회와 리스크를 단 1줄씩 요약)
+      (${baziContext.dn}세부터 10년 단위 8개 대운 나열. 대운별 재무 기회와 리스크를 단 1줄씩 요약하되, 한자어 없이 직관적인 서사로 작성)
       ---
       ### 🎯 3. 단기 재무 액션 플랜 (향후 3개월)
       (실행해야 할 재무 행동 지침 3가지를 명확히 작성)`,
@@ -374,9 +390,7 @@
       const data = await resp.json();
       const rawAiText = data.content[0].text;
       
-      // [아키텍트 패치] API 원가 절감을 위해 결과물을 브라우저에 영구 캐싱
       localStorage.setItem(cacheKey, rawAiText);
-      
       renderContent(rawAiText, tabId);
 
     } catch (e) {
