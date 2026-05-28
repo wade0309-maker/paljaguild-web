@@ -219,20 +219,46 @@
     const userSeed = generateSeed(seedString);
     const fixedStatsTable = generateFixedStats(userSeed);
 
-   // [아키텍트 패치] 자산 등급(Tier)과 확률(%) 100% 고정 로직 추가
-    const randWealth = userSeed % 100;
-    // 85% 확률로 Base는 B급, 15% 확률로 Base가 A급이 되도록 현실적 고정
-    let baseT = (randWealth > 85) ? "A급 (15~30억)" : "B급 (7~15억)";
-    let bestT = (baseT.includes("A급")) ? ((randWealth > 95) ? "SS급 (70억 이상)" : "S급 (30~70억)") : "A급 (15~30억)";
-    let worstT = (baseT.includes("A급")) ? "B급 (7~15억)" : "C급 (7억 미만)";
+   // [아키텍트 패치 - Option B] 진짜 명리 기반 자산 스코어링 매트릭스
+    const wealthElementMap = { '甲':'土', '乙':'土', '丙':'金', '丁':'金', '戊':'水', '己':'水', '庚':'木', '辛':'木', '壬':'火', '癸':'火' };
+    const myWealthElement = wealthElementMap[b.dayStem];
     
-    let baseP = 55 + (userSeed % 11); // Base 확률 55~65%
-    let bestP = 15 + (userSeed % 11); // Best 확률 15~25%
-    let worstP = 100 - baseP - bestP; // 나머지 Worst 확률
+    // 오행 텍스트(elText)에서 내담자의 재성 개수 추출
+    const elMatch = b.elText.match(new RegExp(`${myWealthElement}\\s(\\d)개`));
+    const wealthCount = elMatch ? parseInt(elMatch[1]) : 0;
+    
+    // 자산 스코어 연산 (기본점수 40점 셋팅)
+    let wealthScore = 40; 
+    
+    // 명리학적 황금비율 가중치 부여 (1~2개가 최적, 3개 이상은 과다/집착으로 감점)
+    if (wealthCount === 1) wealthScore += 25;
+    else if (wealthCount === 2) wealthScore += 35;
+    else if (wealthCount >= 3) wealthScore += 15;
+    else wealthScore -= 10; // 무재사주(재성이 없음)
+    
+    // 대운수(dn)와 고유 Seed를 활용한 미세 밸런싱
+    wealthScore += (calculatedDn % 3) * 5;
+    wealthScore += (userSeed % 11) - 5; 
 
-    // [추가 패치] 부동산 골든타임(연도) 100% 고정 로직
+    // 최종 스코어 기반 Tier 확정
+    let bestT, baseT, worstT;
+    if (wealthScore >= 80) { 
+      bestT = "SS급 (70억 이상)"; baseT = "S급 (30~70억)"; worstT = "A급 (15~30억)";
+    } else if (wealthScore >= 65) { 
+      bestT = "S급 (30~70억)"; baseT = "A급 (15~30억)"; worstT = "B급 (7~15억)";
+    } else if (wealthScore >= 45) { 
+      bestT = "A급 (15~30억)"; baseT = "B급 (7~15억)"; worstT = "C급 (7억 미만)";
+    } else { 
+      bestT = "B급 (7~15억)"; baseT = "C급 (7억 미만)"; worstT = "D급 (3억 미만)";
+    }
+
+    let baseP = 55 + (userSeed % 11); 
+    let bestP = 15 + (userSeed % 11); 
+    let worstP = 100 - baseP - bestP; 
+
+    // 부동산 골든타임(연도) 100% 고정 로직
     const currentYear = new Date().getFullYear();
-    const goldenYear = currentYear + (userSeed % 6); // 현재 연도 기준 0~5년 뒤로 절대 고정
+    const goldenYear = currentYear + (userSeed % 6);
 
     const fixedWealthData = `
     [자산 시나리오 확정 데이터 - 절대 변경 금지]
@@ -321,8 +347,12 @@
       future: `당신은 VVIP 커리어 전략가입니다. ${baseRule}
       
       [내담자가 20세 미만(${baziContext.age}세)일 경우 아래 작성]
+      ※ [엄격한 통제 지침]: 진학 가능 대학을 예측할 때 AI 특유의 허황된 명문대 남발(희망 고문)을 절대 금지합니다. 앞서 제시된 '지적 자산' 스탯을 냉정하게 반영하여, 진학 가능 대학을 'Best(포텐셜 최대 발현)'와 'Base(현실적 유지)' 두 가지 시나리오로 엄격히 분리하고 매우 보수적으로 작성하십시오.
+      
       ### 🎓 1. 두뇌 구조 및 학업 포텐셜 (표 형식)
-      ### 🎯 2. 목표 가능 최상위 대학군 및 전공 3선
+      ### 🎯 2. 현실적 진학 대학군 및 전공 시나리오
+      - **Best (포텐셜 최대 발현 시):** (목표 대학군 및 이유 1줄 요약)
+      - **Base (현재 궤도 유지 시):** (보수적으로 측정한 적정 대학군 및 이유 1줄 요약)
       ### 👨‍👩‍👧 3. 부모 양육 리스크 및 멘탈 관리 전략 (진단/리스크/솔루션)
 
       [내담자가 20세 이상(${baziContext.age}세)일 경우 아래 작성]
