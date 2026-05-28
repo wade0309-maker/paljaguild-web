@@ -261,8 +261,13 @@
     
     document.getElementById('chart-area').style.display = (tabId === 'summary') ? 'block' : 'none';
 
-    if (tabCache[tabId]) {
-      document.getElementById('tab-content').innerHTML = marked.parse(tabCache[tabId]);
+    // [아키텍트 패치] 유저 고유 키 생성 및 브라우저 캐시 확인 (원가 0원 로직)
+    const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
+    const cachedText = localStorage.getItem(cacheKey);
+
+    // 캐시가 존재하면 API 호출 없이 0.1초 만에 즉시 로드
+    if (cachedText) {
+      renderContent(cachedText, tabId);
       return;
     }
 
@@ -337,30 +342,39 @@
       });
       
       const data = await resp.json();
-      let aiText = data.content[0].text;
+      const rawAiText = data.content[0].text;
       
-      if (tabId === 'summary') {
-        let jsonStr = "";
-        const blockMatch = aiText.match(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/);
-        if (blockMatch) { jsonStr = blockMatch[0]; }
+      // [아키텍트 패치] API 원가 절감을 위해 결과물을 브라우저에 영구 캐싱
+      localStorage.setItem(cacheKey, rawAiText);
+      
+      renderContent(rawAiText, tabId);
 
-        if (jsonStr) {
-          try {
-            const j = JSON.parse(jsonStr);
-            setTimeout(() => renderChart(j.daewun_labels, j.daewun_scores), 100);
-          } catch(e) { console.warn("JSON Parse Error:", e); }
-        }
-        
-        // [패치] 본문에 불필요하게 묻어 나오는 JSON 원천 삭제 및 가독성 확보
-        aiText = aiText.replace(/```[a-z]*\n\{[\s\S]*?\}\n```/g, '');
-        aiText = aiText.replace(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/g, '');
-      }
-
-      tabCache[tabId] = aiText;
-      document.getElementById('tab-content').innerHTML = marked.parse(aiText);
     } catch (e) {
       document.getElementById('tab-content').innerHTML = "<div class='loading-tab' style='color:#ff6b6b'>서버 연결 지연. 탭을 다시 클릭해 주십시오.</div>";
     }
+  }
+
+  // [아키텍트 패치] 화면 출력 및 텍스트 정제 전담 함수 분리
+  function renderContent(rawText, tabId) {
+    let displayText = rawText;
+    
+    if (tabId === 'summary') {
+      let jsonStr = "";
+      const blockMatch = displayText.match(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/);
+      if (blockMatch) { jsonStr = blockMatch[0]; }
+
+      if (jsonStr) {
+        try {
+          const j = JSON.parse(jsonStr);
+          setTimeout(() => renderChart(j.daewun_labels, j.daewun_scores), 100);
+        } catch(e) { console.warn("JSON Parse Error:", e); }
+      }
+      
+      displayText = displayText.replace(/```[a-z]*\n\{[\s\S]*?\}\n```/g, '');
+      displayText = displayText.replace(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/g, '');
+    }
+
+    document.getElementById('tab-content').innerHTML = marked.parse(displayText);
   }
 
   function renderChart(labels, scores) {
