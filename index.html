@@ -218,12 +218,12 @@
     const seedString = `${y}${m}${d}${h}${gender}`;
     const userSeed = generateSeed(seedString);
     const fixedStatsTable = generateFixedStats(userSeed);
-    const fixedFigure = getHistoricalFigure(b.dayStem);
-
+    // 21번 줄에 있던 기존 고정 인물 로직은 삭제되었습니다.
+    
     baziContext = { 
       name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
-      fixedStatsTable, fixedFigure
-    }; 
+      fixedStatsTable
+    };
     
     document.getElementById('input-screen').style.display = 'none';
     document.getElementById('hero').style.display = 'none';
@@ -267,14 +267,13 @@
       (위 표를 절대 수정하지 말고 원본 그대로 출력할 것)
       ---
       ### 🎭 3. 내재된 본질 vs 발현된 나의 성향
-      (단 3줄로 압축. 반드시 **[본질]**, **[나의 성향]**, **[전략적 갭]** 접두어 사용)
+      (단 3줄로 압축. 반드시 **[본질]**, **[나의 성향]**, **[전략적 갭]** 접두어 사용. **[나의 성향]** 파트에는 명리적 분석으로 도출되는 내담자의 **추정 MBTI 유형**을 기호와 함께 반드시 한 줄 명시할 것)
       ---
       ### 👥 4. 운명의 도플갱어 (롤모델)
-      - **매칭 인물:** ${baziContext.fixedFigure}
-      - **명리학적 근거:** (이 인물과 내담자의 명식이 가지는 공통점과 배울 점을 2줄 이내로 서술)
+      (내담자의 사주 원국, 일간의 특성, 격국의 성향을 연산하여, 실제 역사적 인물이나 글로벌 비즈니스 리더 중 가장 결이 닮은 인물 1명을 AI가 자체적으로 매칭하십시오. 인물명과 매칭된 명리학적 근거를 2줄 이내로 서술)
       ---
       ### 🧾 5. 운명 요약 영수증 (최종 직언)
-      > 👑 메인 타이틀: (한 줄 요약)
+      > 👑 원래 나의 페르소나: (MBTI 스타일의 간략한 페르소나 타이틀 요약, 예: '철저한 재무 통제형 수장')
       > 💡 전략적 조언: (뼈를 때리는 날카로운 행동 지침 1줄)
       > 🏷️ 핵심 키워드: (#해시태그 3개)`,
 
@@ -320,12 +319,8 @@
       
       if (tabId === 'summary') {
         let jsonStr = "";
-        
-        // 정규식을 단순화하여 마크다운 파서와의 충돌을 원천 차단함
         const blockMatch = aiText.match(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/);
-        if (blockMatch) {
-            jsonStr = blockMatch[0];
-        }
+        if (blockMatch) { jsonStr = blockMatch[0]; }
 
         if (jsonStr) {
           try {
@@ -334,7 +329,7 @@
           } catch(e) { console.warn("JSON Parse Error:", e); }
         }
         
-        // 텍스트 본문에서 JSON 데이터 삭제 로직 안전 처리
+        // [패치] 본문에 불필요하게 묻어 나오는 JSON 원천 삭제 및 가독성 확보
         aiText = aiText.replace(/```[a-z]*\n\{[\s\S]*?\}\n```/g, '');
         aiText = aiText.replace(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/g, '');
       }
