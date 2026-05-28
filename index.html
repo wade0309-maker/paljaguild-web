@@ -93,7 +93,6 @@
     font-size: 1.05rem;
   }
   
-  /* 그래프 컨테이너 */
   .chart-box {
     background: var(--card-bg); border: 1px solid var(--border);
     border-radius: 12px; padding: 2rem; margin: 2rem 0; width: 100%; height: 400px;
@@ -172,6 +171,7 @@
     const date2 = Date.UTC(1900, 0, 1);
     const diffDays = Math.floor((date1 - date2) / 86400000);
     let dayIdx = (diffDays + 10) % 60;
+    if (dayIdx < 0) dayIdx += 60;
     const dayPillar = STEMS[dayIdx % 10] + BRANCHES[dayIdx % 12];
     
     let totalMinutes = hour * 60 + minute;
@@ -180,6 +180,7 @@
 
     let baziYear = (month > 2 || (month === 2 && day >= 4)) ? year : year - 1;
     let yearIdx = (baziYear - 4) % 60;
+    if (yearIdx < 0) yearIdx += 60;
     const yearPillar = STEMS[yearIdx % 10] + BRANCHES[yearIdx % 12];
 
     let bm = month; if (day < termDays[month]) bm--; if (bm <= 0) bm += 12;
@@ -252,42 +253,116 @@
       const bChars = b.year + b.month + b.day + b.hour;
       let el = {'木':0, '火':0, '土':0, '金':0, '水':0};
       for (let c of bChars) { if(ELEMENT_MAP[c]) el[ELEMENT_MAP[c]]++; }
-      const elText = `木 ${el['木']}, 火 ${el['火']}, 土 ${el['土']}, 金 ${el['金']}, 水 ${el['水']}`;
+      const elText = `木 ${el['木']}개, 火 ${el['火']}개, 土 ${el['土']}개, 金 ${el['金']}개, 水 ${el['水']}개`;
 
       const GEM_PROMPT = `
 당신은 최고위급 명리 전략 컨설턴트입니다.
 
+[출력 및 디자인 절대 규칙]
+1. 어떠한 형태의 도입부 인사말이나 서론도 작성하지 마십시오.
+2. [0] JSON Data는 반드시 마크다운 코드블록(\`\`\`json ... \`\`\`)으로 감싸서 가장 먼저 출력하십시오.
+3. 육각형 능력치 점수는 반드시 "0~100점 만점" 기준으로 작성하십시오.
+4. 서술형 섹션은 반드시 글머리 기호(-)를 사용하여 줄바꿈을 적용하십시오.
+5. 3단 논법 서술 시, 반드시 접두어(**[결론]:**, **[근거]:**, **[예시]:**)를 붙여 각 줄을 띄워 쓰십시오.
+
 [OUTPUT 구조 0~13]
-[0] JSON Data (반드시 마크다운 코드블록 안 JSON만 출력): 
+
+[0] JSON Data
 \`\`\`json
 {"daewun_labels": ["${dn}세", "${dn+10}세", "${dn+20}세", "${dn+30}세", "${dn+40}세", "${dn+50}세", "${dn+60}세", "${dn+70}세"], "daewun_scores": [50, 65, 80, 95, 85, 70, 60, 65]}
 \`\`\`
-[1] 명식 검증 (표)
-[2] 3중 육각형 (Worst/Base/Best 점수 표)
-[4] 본질 페르소나 (3단 논법)
-[7] 재산 수준 (표)
-[9-1] 배우자 전략 (3단 논법)
-[9-2] 승진 및 권력운 (3단 논법)
+
+[1] 명식 검증
+| 항목 | 내용 |
+|---|---|
+| 확정 8글자 명식 | ${b.year} ${b.month} ${b.day} ${b.hour} |
+| 오행 비율 | ${elText} (수정 금지) |
+| 격국 | (내용) |
+| 용희기신 | (내용) |
+
+[2] 3중 육각형 능력치
+| 능력치 항목 | Worst 점수 (0~100) | Base 점수 (0~100) | Best 점수 (0~100) |
+|---|---|---|---|
+| (6개 항목 작성) | | | |
+
+[3] 가족 통합 대시보드: 생략
+[4] 본질과 현실 페르소나 (반드시 3단 논법 및 줄바꿈)
+[5] 네이밍 시너지: 자원오행 처방 (글머리 기호 사용)
+[6] 운명의 도플갱어: 평행이론 인물 (글머리 기호 사용)
+
+[7] 인생 시뮬레이션 및 재산 수준
+<div class="tier-legend">
+**[참고: 대한민국 금융 통계 기반 자산 Tier 지표]**<br>
+- **SS급 (상위 0.5%)**: 순자산 70억~100억 원 이상 (초고액 자산가)<br>
+- **S급 (상위 1~5%)**: 순자산 30억~70억 원 내외 (강남권 자가)<br>
+- **A급 (상위 6~15%)**: 순자산 15억~30억 원 내외 (수도권 주요 입지)<br>
+- **B급 (상위 30%)**: 순자산 7억~15억 원 내외 (대한민국 중산층 기준)<br>
+- **C급 (그 외)**: 7억 미만
+</div>
+
+※ AI 계리적 확률 연산 엔진 적용 지시: 
+대상자의 사주 원국을 바탕으로 아래 로직에 따라 Best/Base/Worst 확률을 도출하십시오. (합계 100%)
+- 기본값: Best 15% / Base 70% / Worst 15%
+- 재물/잠재력 우수 시: Best 최대 +15%p 증가 (Base 차감)
+- 리스크 방어력 우수 시: Worst 최대 -10%p 감소 (Base 편입)
+
+| 시나리오 | 예상 자산 Tier (SS/S/A/B/C) | 발생 확률(%) | 예상 자산 규모 | 달성 가능한 사회적 위치 |
+|---|---|---|---|---|
+| Best | | (AI 도출 확률)% | | |
+| Base | | (AI 도출 확률)% | | |
+| Worst | | (AI 도출 확률)% | | |
+* 가장 강력한 부동산(문서운) 취득 타이밍: (서술)
+
+[8] 학업 포텐셜: 생략
+[9] 부모운의 현실 및 관계 리스크 (글머리 기호 사용)
+[9-1] 배우자 및 연애 전략 (3단 논법)
+[9-2] 승진 및 권력 전략 (3단 논법)
 [9-3] 건강운 및 체질 전략 (3단 논법)
-[10] 인생 대운 심층 서사 (${dn}세부터 88세 말년까지 10년 단위 8단계 서술)
-[11] 월별 Cash Flow (표)
-[13] 요약 영수증 (인용구)
+
+[10] 10년 대운 심층 서사 (아래 나이 단위 필수)
+- **${dn}세 ~ ${dn+9}세**: (내용)
+- **${dn+10}세 ~ ${dn+19}세**: (내용)
+- **${dn+20}세 ~ ${dn+29}세**: (내용)
+- **${dn+30}세 ~ ${dn+39}세**: (내용)
+- **${dn+40}세 ~ ${dn+49}세**: (내용)
+- **${dn+50}세 ~ ${dn+59}세**: (내용)
+- **${dn+60}세 ~ ${dn+69}세**: (내용)
+- **${dn+70}세 ~ ${dn+79}세**: (내용)
+
+[11] 단기 자산 흐름도
+| 월별 | 자산 흐름 예측 | 재무적 액션 플랜 |
+|---|---|---|
+| ... | ... | ... |
+
+[12] Executive Summary: 향후 3개월 실행 과제 3선
+
+[13] 운명 요약 영수증
+(단 1개의 인용구(>) 안에 아래 4줄을 모아서 작성할 것)
+> 👑 페르소나: [타이틀]
+> 💰 자산 Tier: [SS급 등]
+> 💡 핵심 조언: [한 줄]
+> 🏷️ [해시태그 3개]
 `;
 
+      const baziDataText = `[내담자 정보]\n이름: ${name}\n성별: ${gender==='M'?'남성':'여성'}\n생년월일시: ${rawY}년 ${rawM}월 ${rawD}일 ${rawH}시 (양력)\n\n[확정 명식 8글자 및 대운수]\n명식: ${b.year} ${b.month} ${b.day} ${b.hour}\n대운수: ${dn}\n오행 비율: ${elText}`;
+
+      // [핵심 해결] 백엔드가 요구하는 baziData와 systemPrompt를 정확히 분리해서 전송합니다. (422 에러 원인 해결)
       const resp = await fetch('https://saju-backend-3vgw.onrender.com/api/llm', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          baziData: `이름: ${name}, 성별: ${gender==='M'?'남':'여'}, 명식: ${bChars}, 대운수: ${dn}, 오행: ${elText}\n\n${GEM_PROMPT}`
+          baziData: baziDataText,
+          systemPrompt: GEM_PROMPT
         })
       });
 
-      if (!resp.ok) throw new Error(`서버 응답 오류: ${resp.status}`);
+      if (!resp.ok) {
+        throw new Error(`서버 응답 오류 (코드: ${resp.status})`);
+      }
 
       const data = await resp.json();
       let aiRaw = data.content[0].text;
 
-      // [핵심 패치] AI가 그래프 데이터를 망쳐도 앱이 다운되지 않도록 철통 방어
       try {
         let jsonStr = "";
         const jsonBlockMatch = aiRaw.match(/```json\n([\s\S]*?)\n```/);
@@ -304,10 +379,9 @@
             renderChart(j.daewun_labels, j.daewun_scores);
         }
       } catch (jsonError) {
-        console.warn("AI JSON 포맷 오류로 그래프 렌더링을 생략합니다.", jsonError);
+        console.warn("AI JSON 파싱 오류", jsonError);
       }
 
-      // 화면 전환 및 마크다운 렌더링
       aiRaw = aiRaw.replace(/```json[\s\S]*?```/g, '').trim();
       aiRaw = aiRaw.replace(/-{4,}/g, '---');
       
@@ -319,7 +393,8 @@
       document.getElementById('report-content').innerHTML = marked.parse(aiRaw);
 
     } catch (e) {
-      err.innerText = "구글 AI 서버 한도 초과 또는 일시적 오류입니다. 15초 후 다시 시도해주세요.";
+      err.innerText = "데이터 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+      console.error(e);
     } finally {
       btn.innerHTML = '👑 프리미엄 리포트 발급 (그래프 포함)';
       btn.disabled = false;
