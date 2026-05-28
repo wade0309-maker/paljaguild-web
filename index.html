@@ -131,7 +131,33 @@
       <div class="form-group">
         <label>태어난 시간 (모를 경우 12시 00분)</label>
         <div class="grid-2">
-          <select id="f-hour"><option value="" disabled selected>시 (Hour)</option></select>
+          <select id="f-hour">
+            <option value="" disabled selected>시 (Hour)</option>
+            <option value="0">0시 (자시)</option>
+            <option value="1">1시 (축시)</option>
+            <option value="2">2시 (축시)</option>
+            <option value="3">3시 (인시)</option>
+            <option value="4">4시 (인시)</option>
+            <option value="5">5시 (묘시)</option>
+            <option value="6">6시 (묘시)</option>
+            <option value="7">7시 (진시)</option>
+            <option value="8">8시 (진시)</option>
+            <option value="9">9시 (사시)</option>
+            <option value="10">10시 (사시)</option>
+            <option value="11">11시 (오시)</option>
+            <option value="12">12시 (오시)</option>
+            <option value="13">13시 (미시)</option>
+            <option value="14">14시 (미시)</option>
+            <option value="15">15시 (신시)</option>
+            <option value="16">16시 (신시)</option>
+            <option value="17">17시 (유시)</option>
+            <option value="18">18시 (유시)</option>
+            <option value="19">19시 (술시)</option>
+            <option value="20">20시 (술시)</option>
+            <option value="21">21시 (해시)</option>
+            <option value="22">22시 (해시)</option>
+            <option value="23">23시 (자시)</option>
+          </select>
           <input type="number" id="f-minute" placeholder="분 (Minute)" min="0" max="59" value="0">
         </div>
       </div>
@@ -154,12 +180,7 @@
   </div>
 
 <script>
-  const hourSelect = document.getElementById('f-hour');
-  for(let i=0; i<24; i++) {
-    const opt = document.createElement('option');
-    opt.value = i; opt.textContent = `${i}시 (${i < 12 ? '오전' : '오후'})`;
-    hourSelect.appendChild(opt);
-  }
+  // [수석 아키텍트 패치] 불필요한 자바스크립트 시간 생성 루프 삭제 완료
 
   const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
   const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
@@ -241,7 +262,7 @@
     err.innerText = "";
     
     const btn = document.querySelector('.btn-blue');
-    btn.innerHTML = '⏳ GEM 2.0 인생 전략 연산 중...';
+    btn.innerHTML = '⏳ GEM 2.5 Pro 인생 전략 연산 중...';
     btn.disabled = true;
 
     try {
@@ -262,7 +283,7 @@
 1. 어떠한 형태의 도입부 인사말이나 서론도 작성하지 마십시오.
 2. {토큰 제한 방지} 리포트가 중간에 끊기지 않도록, 장황한 서술형 문장을 엄격히 금지합니다. 분석 내용은 '표(Table)'와 '핵심 개조식(Bullet points)' 위주로 정보 밀도를 압축하십시오.
 3. {레이아웃 정돈} 각 분석 항목이 넘어갈 때마다 반드시 마크다운 제목(###)과 구분선(---)을 사용하여 시각적으로 깔끔하게 분리하십시오.
-4. {JSON 후방 배치} 차트 렌더링용 JSON Data는 반드시 전체 보고서의 텍스트 분석이 모두 끝난 **[문서의 제일 마지막(최하단)]**에 마크다운 코드블록(```json ... ```)으로 출력하십시오.
+4. {JSON 후방 배치} 차트 렌더링용 JSON Data는 반드시 전체 보고서의 텍스트 분석이 모두 끝난 **[문서의 제일 마지막(최하단)]**에 마크다운 코드블록(\`\`\`json ... \`\`\`)으로 출력하십시오.
 5. 육각형 능력치 점수는 반드시 "0~100점 만점" 기준으로 작성하십시오.
 6. 서술형 섹션은 반드시 글머리 기호(-)를 사용하여 줄바꿈을 적용하십시오.
 7. 3단 논법 서술 시, 반드시 접두어(**[결론]:**, **[근거]:**, **[예시]:**)를 붙여 각 줄을 띄워 쓰십시오.
@@ -348,7 +369,6 @@
 
       const baziDataText = `[내담자 정보]\n이름: ${name}\n성별: ${gender==='M'?'남성':'여성'}\n생년월일시: ${rawY}년 ${rawM}월 ${rawD}일 ${rawH}시 (양력)\n\n[확정 명식 8글자 및 대운수]\n명식: ${b.year} ${b.month} ${b.day} ${b.hour}\n대운수: ${dn}\n오행 비율: ${elText}`;
 
-      // [핵심 해결] 백엔드가 요구하는 baziData와 systemPrompt를 정확히 분리해서 전송합니다. (422 에러 원인 해결)
       const resp = await fetch('https://saju-backend-3vgw.onrender.com/api/llm', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
