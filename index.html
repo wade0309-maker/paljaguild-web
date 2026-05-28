@@ -71,8 +71,10 @@
     border-radius: 12px; padding: 2.5rem; font-size: 0.98rem; line-height: 1.8;
     color: #e0e0e0; margin-top: 1.5rem; text-align: left;
   }
+  .markdown-body p { margin-bottom: 1.2rem; }
+  .markdown-body li { margin-bottom: 0.8rem; }
   .markdown-body h2, .markdown-body h3 {
-    color: var(--gold); margin-top: 2.5rem; margin-bottom: 1.2rem;
+    color: var(--gold); margin-top: 3rem; margin-bottom: 1.2rem;
     border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; font-size: 1.3rem;
   }
   .markdown-body strong { color: var(--gold); font-weight: 700; }
@@ -84,15 +86,25 @@
   }
   .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 0.8rem; text-align: center; vertical-align: middle; }
   .markdown-body th { background-color: rgba(212, 175, 55, 0.15); color: var(--gold); font-weight: 700; }
-  .markdown-body ul, .markdown-body ol { padding-left: 1.5rem; margin-bottom: 1.5rem; }
   
-  /* 영수증(인용구) UI 최적화 */
   .markdown-body blockquote { 
     border-left: 4px solid var(--gold); padding: 1.5rem 2rem; color: #fff; 
-    background: rgba(212, 175, 55, 0.1); margin: 2rem 0; font-style: normal;
+    background: rgba(212, 175, 55, 0.1); margin: 2.5rem 0; font-style: normal;
     white-space: pre-wrap; line-height: 2.2; border-radius: 0 8px 8px 0;
     font-size: 1.05rem; letter-spacing: 0.02em;
   }
+  
+  /* 자산 지표 안내 박스 스타일 */
+  .tier-legend {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px dashed var(--border);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: #bbb;
+  }
+  .tier-legend strong { color: var(--gold); }
 
 </style>
 </head>
@@ -199,7 +211,6 @@
     return { year: yearPillar, month: monthPillar, day: dayPillar, hour: hourPillar, yearStemIdx: yearStemIdx };
   }
 
-  // [수정 완료] 문자열 에러를 막기 위한 엄격한 파라미터 타입 지정
   function getDaewunNumber(year, month, day, gender, yearStemIdx) {
     const isYangYear = (yearStemIdx % 2 === 0);
     const isMale = (gender === 'M');
@@ -236,7 +247,6 @@
   }
 
   async function handlePremiumReport() {
-    // [수정 완료] 입력 시점부터 무조건 Integer(정수)로 변환하여 에러 원천 차단
     const rawYear = document.getElementById('f-year').value;
     const rawMonth = document.getElementById('f-month').value;
     const rawDay = document.getElementById('f-day').value;
@@ -270,14 +280,18 @@
       const exactBazi = getExactBazi(year, month, day, hour, minute);
       const daewunNum = getDaewunNumber(year, month, day, gender, exactBazi.yearStemIdx);
 
-      // [수정 완료] AI가 절대로 양식을 벗어나지 못하도록 표 형태(Markdown) 하드코딩 주입
+      // [핵심 업데이트] 자산 Tier 지표를 HTML/CSS 친화적 블록으로 선행 강제 출력
       const GEM_PROMPT = `
 당신은 최고위급 명리 전략 컨설턴트입니다.
-제공된 [확정 명식 8글자]와 [정밀 대운수]를 100% 신뢰하여 분석을 진행하십시오.
 
-[절대 규칙]
-1. AI 임의의 형식 변경을 엄격히 금지합니다. 지정된 표 형식을 문자 그대로 복사해서 내용만 채우십시오.
-2. 상투적 인사말 금지, 단호한 보고서 어투 유지.
+[출력 및 디자인 절대 규칙]
+1. 줄글을 절대 금지합니다. 서술형 섹션은 반드시 글머리 기호(-)를 사용하여 항목별로 줄바꿈을 적용하십시오.
+2. 3단 논법 서술 시, 반드시 아래와 같이 접두어를 붙여 각 줄을 띄워 쓰십시오.
+   - **[결론]**: (내용)
+   - **[근거]**: (내용)
+   - **[예시]**: (내용)
+3. [7] 섹션을 출력할 때, 표를 그리기 전에 반드시 아래 명시된 <대한민국 금융 통계 기반 자산 Tier 지표> 내용을 그대로 복사하여 먼저 출력해야 합니다.
+4. 표 내부의 '예상 자산 Tier' 열에는 오직 'SS급', 'S급', 'A급', 'B급', 'C급' 단어만 사용하십시오.
 
 [OUTPUT 구조 0~13]
 
@@ -287,27 +301,31 @@
 | 항목 | 내용 |
 |---|---|
 | 확정 8글자 명식 | ${exactBazi.year} ${exactBazi.month} ${exactBazi.day} ${exactBazi.hour} |
-| 오행 비율 | (내용 작성) |
-| 격국 | (내용 작성) |
-| 용희기신 | (내용 작성) |
+| 오행 비율 | (내용) |
+| 격국 | (내용) |
+| 용희기신 | (내용) |
 
 [2] 3중 육각형 능력치
-| 능력치 항목 | Worst 시나리오 점수 | Base 시나리오 점수 | Best 시나리오 점수 |
+| 능력치 항목 | Worst 점수 | Base 점수 | Best 점수 |
 |---|---|---|---|
-| 리더십 및 권력 | | | |
-| 재물 관리 능력 | | | |
-| 대인 관계 및 인맥 | | | |
-| 건강 및 활력 | | | |
-| 리스크 방어력 | | | |
-| 잠재성 및 직관력 | | | |
+| (6개 항목 작성) | | | |
 
 [3] 가족 통합 대시보드: 생략
-[4] 본질과 현실 페르소나: 3단 논법 기질 분석
-[5] 네이밍 시너지: 자원오행 처방
-[6] 운명의 도플갱어: 평행이론 인물
+[4] 본질과 현실 페르소나 (반드시 3단 논법 및 줄바꿈)
+[5] 네이밍 시너지: 자원오행 처방 (글머리 기호 사용)
+[6] 운명의 도플갱어: 평행이론 인물 (글머리 기호 사용)
 
 [7] 인생 시뮬레이션 및 재산 수준
-| 시나리오 | 예상 자산 Tier | 발생 확률(%) | 예상 자산 규모 | 달성 가능한 사회적 위치(직급/지위) |
+<div class="tier-legend">
+**[참고: 대한민국 금융 통계 기반 자산 Tier 지표]**<br>
+- **SS급 (상위 0.5%)**: 순자산 70억~100억 원 이상 (초고액 자산가, 강남 핵심지 건물 및 막대한 금융자산)<br>
+- **S급 (상위 1~5%)**: 순자산 30억~70억 원 내외 (대한민국 상위 1% 컷오프 약 32억 원, 강남권 자가 및 안정적 투자 수익)<br>
+- **A급 (상위 6~15%)**: 순자산 15억~30억 원 내외 (수도권 주요 입지 및 마용성 자가 보유)<br>
+- **B급 (상위 30%)**: 순자산 7억~15억 원 내외 (대한민국 중산층 기준, 수도권 일반 자가 및 노후 대비 완료)<br>
+- **C급 (그 외)**: 7억 미만 (현상 유지 및 부채 방어)
+</div>
+
+| 시나리오 | 예상 자산 Tier (SS/S/A/B/C) | 발생 확률(%) | 예상 자산 규모 | 달성 가능한 사회적 위치(직급/지위) |
 |---|---|---|---|---|
 | Best | | | | |
 | Base | | | | |
@@ -315,30 +333,29 @@
 * 가장 강력한 부동산(문서운) 취득 타이밍: (서술)
 
 [8] 학업 포텐셜: 생략
-[9] 부모운의 현실 및 관계 리스크
-[9-1] 배우자 및 연애 전략 (3단 논법 서술)
-[9-2] 승진 및 권력 전략 (3단 논법 서술)
+[9] 부모운의 현실 및 관계 리스크 (글머리 기호 사용)
+[9-1] 배우자 및 연애 전략 (3단 논법)
+[9-2] 승진 및 권력 전략 (3단 논법)
 
-[10] 10년 대운 심층 서사
-(반드시 아래 나이 형식을 지켜 서술할 것)
-- ${daewunNum}세 ~ ${daewunNum+9}세: (내용)
-- ${daewunNum+10}세 ~ ${daewunNum+19}세: (내용)
-- ${daewunNum+20}세 ~ ${daewunNum+29}세: (내용)
-- ${daewunNum+30}세 ~ ${daewunNum+39}세: (내용)
+[10] 10년 대운 심층 서사 (아래 나이 단위 필수)
+- **${daewunNum}세 ~ ${daewunNum+9}세**: (내용)
+- **${daewunNum+10}세 ~ ${daewunNum+19}세**: (내용)
+- **${daewunNum+20}세 ~ ${daewunNum+29}세**: (내용)
+- **${daewunNum+30}세 ~ ${daewunNum+39}세**: (내용)
 
 [11] 단기 자산 흐름도
 | 월별 | 자산 흐름 예측 | 재무적 액션 플랜 |
 |---|---|---|
 | ... | ... | ... |
 
-[12] Executive Summary: 향후 3개월 실행 과제
+[12] Executive Summary: 향후 3개월 실행 과제 3선
 
 [13] 운명 요약 영수증
-(반드시 아래 4줄을 복사하여 단 1개의 인용구(>) 안에 모두 작성할 것)
+(단 1개의 인용구(>) 안에 아래 4줄을 모아서 작성할 것)
 > 👑 페르소나: [페르소나 타이틀]
-> 💰 자산 Tier: [최종 자산 Tier]
+> 💰 자산 Tier: [최종 자산 Tier (SS급 등)]
 > 💡 핵심 조언: [뼈 때리는 조언 한 줄]
-> 🏷️ [해시태그1] [해시태그2] [해시태그3]
+> 🏷️ [해시태그 3개]
 `;
 
       const baziDataText = `[내담자 정보]\n이름: ${name}\n성별: ${genderText}\n생년월일시: ${year}년 ${month}월 ${day}일 ${hour}시 ${minute}분 (양력)\n\n[확정 명식 8글자 및 대운수 - 임의 수정 절대 금지]\n년주: ${exactBazi.year}\n월주: ${exactBazi.month}\n일주: ${exactBazi.day}\n시주: ${exactBazi.hour}\n대운수: ${daewunNum}\n\n[명령]\n${GEM_PROMPT}`;
