@@ -218,11 +218,27 @@
     const seedString = `${y}${m}${d}${h}${gender}`;
     const userSeed = generateSeed(seedString);
     const fixedStatsTable = generateFixedStats(userSeed);
-    // 21번 줄에 있던 기존 고정 인물 로직은 삭제되었습니다.
+
+    // [아키텍트 패치] 자산 등급(Tier)과 확률(%) 100% 고정 로직 추가
+    const randWealth = userSeed % 100;
+    // 85% 확률로 Base는 B급, 15% 확률로 Base가 A급이 되도록 현실적 고정
+    let baseT = (randWealth > 85) ? "A급 (15~30억)" : "B급 (7~15억)";
+    let bestT = (baseT.includes("A급")) ? ((randWealth > 95) ? "SS급 (70억 이상)" : "S급 (30~70억)") : "A급 (15~30억)";
+    let worstT = (baseT.includes("A급")) ? "B급 (7~15억)" : "C급 (7억 미만)";
     
+    let baseP = 55 + (userSeed % 11); // Base 확률 55~65%
+    let bestP = 15 + (userSeed % 11); // Best 확률 15~25%
+    let worstP = 100 - baseP - bestP; // 나머지 Worst 확률
+
+    const fixedWealthData = `
+    [자산 시나리오 확정 데이터 - 절대 변경 금지]
+    - Best: 등급(${bestT}), 확률(${bestP}%)
+    - Base: 등급(${baseT}), 확률(${baseP}%)
+    - Worst: 등급(${worstT}), 확률(${worstP}%)`;
+
     baziContext = { 
       name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
-      fixedStatsTable
+      fixedStatsTable, fixedWealthData 
     };
     
     document.getElementById('input-screen').style.display = 'none';
@@ -278,11 +294,12 @@
       > 🏷️ 핵심 키워드: (#해시태그 3개)`,
 
       wealth: `당신은 최고위급 금융 명리 분석가입니다. ${baseRule}
-      ※ [절대 규칙]: AI의 허황된 자산 뻥튀기를 금지합니다. 명식이 상위 1%가 아니라면 Base 시나리오는 대한민국 중산층 기준인 B등급(7억~15억) 또는 A등급(15억~30억)으로 철저히 현실적으로 고정하십시오. SS급(70억 이상) 남발을 금지합니다.
+      
+      ${baziContext.fixedWealthData}
       
       ---
       ### 📈 1. 생애 자산 Tier 시뮬레이션
-      (내담자 오행 비율에 기반하여 SS/S/A/B/C 등급 중 Best/Base/Worst 도달 확률(%)과 예상 자산 규모를 표로 제시)
+      (위 [자산 시나리오 확정 데이터]에 명시된 등급과 확률(%)을 토씨 하나 틀리지 말고 100% 그대로 표에 기재하십시오. AI는 오직 내담자의 사주를 분석하여 각 시나리오별 달성 이유인 '핵심 동인'만 추가 작성해야 합니다.)
       * **부동산(문서운) 매입 골든타임:** (연도 및 이유 1줄 요약)
       ---
       ### 🌊 2. 10년 대운 심층 서사
