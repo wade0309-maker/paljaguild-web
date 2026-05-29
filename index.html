@@ -236,9 +236,9 @@ function getTermDay(year, month) {
 
   function generateFixedStats(seed, elCounts) {
     function elToScore(count) {
-        const map = [35, 50, 65, 78, 88];
-        return map[Math.min(count, 4)];
-    }
+    const map = [58, 68, 76, 84, 92];
+    return map[Math.min(count, 4)];
+}
 
     const stats = [
         { name: "지적 자산(학구열/분석력)", el: '水' },
