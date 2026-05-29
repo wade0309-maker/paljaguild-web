@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>팔자길드 - 프리미엄 전략 컨설팅</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+  
+  :root { --bg-dark: #0f0f11; --card-bg: #1a1a1c; --text-main: #f5f0e8; --text-muted: #88888b; --gold: #d4af37; --blue-btn: #1a5c9e; --border: #333336; --input-bg: #131314; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(circle at 50% 0%, #2a2a2e 0%, transparent 60%); overflow-x: hidden; }
+  
+  .hero-section { text-align: center; margin: 3rem 0 2rem; padding: 0 1rem; }
+  .hero-section h1 { font-family: 'Noto Serif KR', serif; font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .gold-text { color: var(--gold); }
+  .hero-section p { color: var(--text-muted); font-size: 0.95rem; }
+  
+  .input-container { width: 100%; max-width: 500px; padding: 0 1.2rem; margin-bottom: 4rem; }
+  .input-card { background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 2rem 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  
+  .form-group { margin-bottom: 1.5rem; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem; font-weight: 500; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  
+  input, select { width: 100%; background-color: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); padding: 0.9rem 0.8rem; border-radius: 8px; outline: none; font-size: 0.95rem; }
+  input:focus, select:focus { border-color: var(--gold); }
+  
+  .toggle-group { display: flex; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .toggle-group label { flex: 1; text-align: center; padding: 0.9rem 0; cursor: pointer; color: var(--text-muted); font-size: 0.95rem; }
+  .toggle-group input { display: none; }
+  .toggle-group input:checked + label { background-color: var(--border); color: var(--text-main); font-weight: 600; }
+  
+  .btn-blue { width: 100%; padding: 1.1rem; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; background-color: var(--blue-btn); color: white; margin-top: 1.5rem; font-size: 1.05rem; transition: 0.2s; }
+  .btn-blue:hover { opacity: 0.9; }
+  
+  #result-screen { display: none; width: 100%; max-width: 850px; padding: 0 1.2rem 4rem; overflow-x: hidden; }
+  .tab-container { display: flex; gap: 6px; margin-bottom: 2rem; background: var(--input-bg); padding: 6px; border-radius: 12px; border: 1px solid var(--border); }
+  .tab-btn { flex: 1; padding: 14px 5px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+  .tab-btn.active { background: var(--border); color: var(--gold); }
+  
+  .markdown-body { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.5rem; font-size: 0.95rem; line-height: 1.8; color: #e0e0e0; min-height: 300px; word-break: break-word; }
+  .markdown-body table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; border-collapse: collapse; margin: 1.5rem 0; background-color: var(--input-bg); border-radius: 8px; }
+  .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 10px 14px; text-align: center; vertical-align: middle; }
+  .markdown-body td { white-space: normal; min-width: 110px; }
+  .markdown-body th { background-color: rgba(212, 175, 55, 0.15); color: var(--gold); font-weight: 700; min-width: 110px; }
+  .markdown-body h3 { color: var(--gold); margin: 2.5rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; font-size: 1.3rem; }
+  .markdown-body blockquote { border-left: 4px solid var(--gold); padding: 1.2rem 1.5rem; background: rgba(212, 175, 55, 0.08); margin: 2rem 0; border-radius: 0 8px 8px 0; white-space: pre-wrap; font-size: 1rem; }
+  .markdown-body ul { list-style-type: disc; padding-left: 20px; margin: 1rem 0; }
+  .markdown-body li { margin-bottom: 6px; }
+
+  .loading-tab { text-align: center; padding: 4rem 0; color: var(--gold); font-size: 0.95rem; }
+  .chart-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; height: 350px; }
+  .tier-legend { background-color: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border); padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.85rem; color: #bbb; white-space: normal; }
+  
+  @media (min-width: 768px) {
+    .tab-btn { font-size: 0.95rem; padding: 16px; }
+    .markdown-body { padding: 3rem; font-size: 1rem; }
+    .markdown-body table { display: table; white-space: normal; }
+    .chart-box { height: 430px; padding: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero-section" id="hero">
+    <h1>팔자길드 <span class="gold-text">프리미엄</span></h1>
+    <p>금융 통계와 명리학이 결합된 당신을 위한 인생 전략</p>
+  </div>
+
+  <div class="input-container" id="input-screen">
+    <div class="input-card">
+      <div class="form-group"><label>내담자 성함</label><input type="text" id="f-name" placeholder="성함을 입력하세요"></div>
+      <div class="form-group">
+        <label>성별</label>
+        <div class="toggle-group">
+          <input type="radio" id="gender-m" name="gender" value="M"><label for="gender-m">남성</label>
+          <input type="radio" id="gender-f" name="gender" value="F" checked><label for="gender-f">여성</label>
+        </div>
+      </div>
+      <div class="form-group"><label>생년월일 (양력)</label><div class="grid-3"><input type="number" id="f-year" placeholder="YYYY"><input type="number" id="f-month" placeholder="MM"><input type="number" id="f-day" placeholder="DD"></div></div>
+      <div class="form-group">
+        <label>태어난 시간 (모를 경우 12시 00분)</label>
+        <div class="grid-2">
+          <select id="f-hour">
+            <option value="" disabled selected>시 (Hour)</option>
+            <option value="0">0시 (자시)</option><option value="1">1시 (축시)</option><option value="2">2시 (축시)</option><option value="3">3시 (인시)</option><option value="4">4시 (인시)</option><option value="5">5시 (묘시)</option><option value="6">6시 (묘시)</option><option value="7">7시 (진시)</option><option value="8">8시 (진시)</option><option value="9">9시 (사시)</option><option value="10">10시 (사시)</option><option value="11">11시 (오시)</option><option value="12">12시 (오시)</option><option value="13">13시 (미시)</option><option value="14">14시 (미시)</option><option value="15">15시 (신시)</option><option value="16">16시 (신시)</option><option value="17">17시 (유시)</option><option value="18">18시 (유시)</option><option value="19">19시 (술시)</option><option value="20">20시 (술시)</option><option value="21">21시 (해시)</option><option value="22">22시 (해시)</option><option value="23">23시 (자시)</option>
+          </select>
+          <input type="number" id="f-minute" placeholder="분 (Minute)" min="0" max="59" value="0">
+        </div>
+      </div>
+      <div class="input-group" style="margin-top: 15px;">
+        <label style="color:var(--gold); font-weight:bold; margin-bottom:8px; display:block;">관심 있는 심층 분석 주제 (1택)</label>
+        <div style="display: flex; flex-direction: column; gap: 10px; background: #2a2a2a; padding: 15px; border-radius: 10px;">
+            <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                <input type="radio" name="deepDive" value="psyche" checked style="width: auto;"> 
+                🧠 내재된 자아와 인간관계 (갈등 양상)
+            </label>
+            <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                <input type="radio" name="deepDive" value="career" style="width: auto;"> 
+                👑 직업군과 승진/권력 (관운 상한선)
+            </label>
+            <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                <input type="radio" name="deepDive" value="romance" style="width: auto;"> 
+                💍 연애운과 결혼 (파트너십 리스크)
+            </label>
+        </div>
+      </div>
+      <div id="error-msg" style="color:#ff6b6b; text-align:center; font-size:0.9rem; margin-top:1rem;"></div>
+      <button class="btn-blue" onclick="startAnalysis()">👑 프리미엄 리포트 발급</button>
+    </div>
+  </div>
+
+  <div id="result-screen">
+    <div class="tab-container">
+      <button class="tab-btn active" onclick="switchTab('summary')">종합 전략</button>
+      <button class="tab-btn" onclick="switchTab('wealth')">인생 & 자산</button>
+      <button class="tab-btn" onclick="switchTab('future')">진로 & 성과</button>
+    </div>
+    
+    <div id="chart-area" style="display:none; margin-bottom: 2.5rem;">
+      <h3 style="color:var(--gold); font-size:1.4rem; margin-bottom:0.4rem;">[Life Vision] 대운 흐름 시각화 대시보드</h3>
+      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.2rem;">※ Y축(Score)은 사주 원국과 대운의 상호작용을 금융 계리적 확률로 환산한 종합 운세 성과 지표입니다.</p>
+      <div class="chart-box"><canvas id="daewunChart"></canvas></div>
+    </div>
+
+    <div id="tab-content" class="markdown-body"></div>
+    
+    <div class="tab-container" style="margin-top: 1.5rem;">
+      <button class="tab-btn active" onclick="switchTab('summary')">종합 전략</button>
+      <button class="tab-btn" onclick="switchTab('wealth')">인생 & 자산</button>
+      <button class="tab-btn" onclick="switchTab('future')">진로 & 성과</button>
+    </div>
+  </div>
+
+<script>
+  let baziContext = {}; 
+  let currentTab = 'summary';
+
+  // ===== 절기 계산 엔진 (태양황경 기반) =====
+
+// 율리우스일 계산
+function getJulianDay(year, month, day) {
+    if (month <= 2) { year--; month += 12; }
+    const A = Math.floor(year / 100);
+    const B = 2 - A + Math.floor(A / 4);
+    return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+}
+
+// 태양황경 계산 (도 단위)
+function getSunLongitude(jd) {
+    const T = (jd - 2451545.0) / 36525.0;
+    const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+    const Mrad = M * Math.PI / 180;
+    const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mrad)
+            + (0.019993 - 0.000101 * T) * Math.sin(2 * Mrad)
+            + 0.000289 * Math.sin(3 * Mrad);
+    const sunLon = 280.46646 + 36000.76983 * T + C;
+    return ((sunLon % 360) + 360) % 360;
+}
+
+// 특정 태양황경에 도달하는 날짜 계산 (이분법)
+function getSolarTermDate(year, targetDegree) {
+    // 대략적 초기값 설정 (황경 0도 = 춘분 기준 약 3월 20일)
+    const approxDayOfYear = Math.round(targetDegree / 360 * 365.25);
+    let jd = getJulianDay(year, 1, 1) + approxDayOfYear;
+
+    // 이분법으로 정밀 계산 (오차 0.1도 이내)
+    let lo = jd - 20, hi = jd + 20;
+    for (let iter = 0; iter < 50; iter++) {
+        const mid = (lo + hi) / 2;
+        let lon = getSunLongitude(mid);
+        // 황경 경계(예: 355도→5도) 처리
+        let diff = lon - targetDegree;
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        if (Math.abs(diff) < 0.0001) break;
+        if (diff > 0) hi = mid; else lo = mid;
+    }
+    const jdResult = (lo + hi) / 2;
+
+    // 율리우스일 → 그레고리력 변환 (한국시간 KST = UTC+9 적용)
+    const jdKST = jdResult + 9/24;
+    const z = Math.floor(jdKST + 0.5);
+    const f = (jdKST + 0.5) - z;
+    let A2;
+    if (z < 2299161) {
+        A2 = z;
+    } else {
+        const alpha = Math.floor((z - 1867216.25) / 36524.25);
+        A2 = z + 1 + alpha - Math.floor(alpha / 4);
+    }
+    const B2 = A2 + 1524;
+    const C2 = Math.floor((B2 - 122.1) / 365.25);
+    const D2 = Math.floor(365.25 * C2);
+    const E2 = Math.floor((B2 - D2) / 30.6001);
+    const day2 = Math.floor(B2 - D2 - Math.floor(30.6001 * E2) + f);
+    const month2 = E2 < 14 ? E2 - 1 : E2 - 13;
+
+    return day2; // 해당 월의 절기 날짜(일)만 반환
+}
+
+// 월별 절기 황경값 (중기 기준: 명리학은 절(節)기준이므로 아래 사용)
+// 1월:소한(285), 2월:입춘(315), 3월:경칩(345), 4월:청명(15),
+// 5월:입하(45), 6월:망종(75), 7월:소서(105), 8월:입추(135),
+// 9월:백로(165), 10월:한로(195), 11월:입동(225), 12월:대설(255)
+const SOLAR_TERM_DEGREES = [0, 285, 315, 345, 15, 45, 75, 105, 135, 165, 195, 225, 255];
+
+// 특정 연도/월의 절기일 반환 (캐시 포함)
+const termDayCache = {};
+function getTermDay(year, month) {
+    const key = `${year}-${month}`;
+    if (termDayCache[key] !== undefined) return termDayCache[key];
+    const result = getSolarTermDate(year, SOLAR_TERM_DEGREES[month]);
+    termDayCache[key] = result;
+    return result;
+}
+// ===== 절기 계산 엔진 끝 =====
+  
+  const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+  const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+  const ELEMENT_MAP = {'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','亥':'水','子':'水'};
+  const termDays = [0, 6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7];
+
+  function generateSeed(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
+  }
+
+  function generateFixedStats(seed, elCounts) {
+    function elToScore(count) {
+    const map = [58, 68, 76, 84, 92];
+    return map[Math.min(count, 4)];
+}
+
+    const stats = [
+        { name: "지적 자산(학구열/분석력)", el: '水' },
+        { name: "소통/네트워킹",           el: '木' },
+        { name: "권력 지향성(리더십)",      el: '火' },
+        { name: "재무적 통제력",            el: '金' },
+        { name: "창의성/문제해결",          el: '木' },
+        { name: "위기 관리 능력",           el: '土' },
+    ];
+
+    let result = "";
+    stats.forEach((stat, index) => {
+        let base = elToScore(elCounts[stat.el] || 0);
+        let noise = ((seed + index * 13) % 11) - 5;
+        let base2 = Math.min(95, Math.max(30, base + noise));
+        let worst = Math.max(15, base2 - 8 - ((seed + index) % 8));
+        let best  = Math.min(98, base2 + 8 + ((seed + index * 3) % 8));
+        result += `| ${stat.name} | ${worst} | ${base2} | ${best} |\n`;
+    });
+    return result;
+}
+
+  function getExactBazi(year, month, day, hour, minute) {
+    const date1 = Date.UTC(year, month - 1, day);
+    const date2 = Date.UTC(1900, 0, 1);
+    const diffDays = Math.floor((date1 - date2) / 86400000);
+    let dayIdx = (diffDays + 10) % 60; if (dayIdx < 0) dayIdx += 60;
+    const dayPillar = STEMS[dayIdx % 10] + BRANCHES[dayIdx % 12];
+    
+    let totalMinutes = hour * 60 + minute;
+    let hbIdx = (totalMinutes < 30 || totalMinutes >= 1410) ? 0 : Math.floor((totalMinutes - 30) / 120) + 1;
+    const hourPillar = STEMS[((dayIdx % 5) * 2 + hbIdx) % 10] + BRANCHES[hbIdx];
+
+    let baziYear = (month > 2 || (month === 2 && day >= 4)) ? year : year - 1;
+    let yearIdx = (baziYear - 4) % 60; if (yearIdx < 0) yearIdx += 60;
+    const yearPillar = STEMS[yearIdx % 10] + BRANCHES[yearIdx % 12];
+
+    const termDayBazi = getTermDay(year, month);
+    let bm = month; if (day < termDayBazi) bm--; if (bm <= 0) bm += 12;
+// 월지: 寅(인)=2번 인덱스가 1월에 대응하도록 +2 오프셋 적용
+const monthBranchIdx = (bm + 1) % 12;
+const monthPillar = STEMS[((yearIdx % 5) * 2 + bm) % 10] + BRANCHES[monthBranchIdx];
+    
+    const chars = yearPillar + monthPillar + dayPillar + hourPillar;
+    let el = {'木':0, '火':0, '土':0, '金':0, '水':0};
+    for (let c of chars) { if(ELEMENT_MAP[c]) el[ELEMENT_MAP[c]]++; }
+    const elText = `木 ${el['木']}개, 火 ${el['火']}개, 土 ${el['土']}개, 金 ${el['金']}개, 水 ${el['水']}개`;
+
+    return { year: yearPillar, month: monthPillar, day: dayPillar, dayStem: STEMS[dayIdx % 10], hour: hourPillar, yearStemIdx: yearIdx % 10, elText: elText };
+  }
+
+  function getDaewunNumber(year, month, day, gender, yearStemIdx) {
+    const isForward = ((yearStemIdx % 2 === 0) && (gender === 'M')) || ((yearStemIdx % 2 !== 0) && (gender === 'F'));
+    let daysDiff = 0;
+    const termDayCurrent = getTermDay(year, month);
+const termDayNext = getTermDay(month === 12 ? year + 1 : year, (month % 12) + 1);
+const termDayPrev = getTermDay(month === 1 ? year - 1 : year, month === 1 ? 12 : month - 1);
+
+if (isForward) {
+    daysDiff = (day < termDayCurrent) 
+        ? (termDayCurrent - day) 
+        : (30 - day + termDayNext);
+} else {
+    daysDiff = (day >= termDayCurrent) 
+        ? (day - termDayCurrent) 
+        : (day + (30 - termDayPrev));
+}
+    let d = Math.round(daysDiff / 3);
+    return d === 0 ? 1 : d;
+  }
+
+  async function startAnalysis() {
+    const y = document.getElementById('f-year').value;
+    const m = document.getElementById('f-month').value;
+    const d = document.getElementById('f-day').value;
+    const h = document.getElementById('f-hour').value;
+    const err = document.getElementById('error-msg');
+    if(!y || !m || !d || h==="") { err.innerText = "생년월일시를 모두 입력해주세요."; return; }
+    err.innerText = "";
+
+    const name = document.getElementById('f-name').value || "내담자";
+    const gender = document.querySelector('input[name="gender"]:checked').value;
+    const deepDive = document.querySelector('input[name="deepDive"]:checked').value;
+    const b = getExactBazi(parseInt(y), parseInt(m), parseInt(d), parseInt(h), parseInt(document.getElementById('f-minute').value));
+    const age = new Date().getFullYear() - parseInt(y) + 1;
+    const calculatedDn = getDaewunNumber(parseInt(y), parseInt(m), parseInt(d), gender, b.yearStemIdx);
+
+    const seedString = `${y}${m}${d}${h}${gender}`;
+    const userSeed = generateSeed(seedString);
+    const elCounts = {'木':0,'火':0,'土':0,'金':0,'水':0};
+for (let c of (b.year + b.month + b.day + b.hour)) {
+    if (ELEMENT_MAP[c]) elCounts[ELEMENT_MAP[c]]++;
+}
+const fixedStatsTable = generateFixedStats(userSeed, elCounts);
+
+    const wealthElementMap = { '甲':'土', '乙':'土', '丙':'金', '丁':'金', '戊':'水', '己':'水', '庚':'木', '辛':'木', '壬':'火', '癸':'火' };
+    const myWealthElement = wealthElementMap[b.dayStem];
+    
+    const elMatch = b.elText.match(new RegExp(`${myWealthElement}\\s(\\d)개`));
+    const wealthCount = elMatch ? parseInt(elMatch[1]) : 0;
+    
+    let wealthScore = 40; 
+    if (wealthCount === 1) wealthScore += 25;
+    else if (wealthCount === 2) wealthScore += 35;
+    else if (wealthCount >= 3) wealthScore += 15;
+    else wealthScore -= 10; 
+    
+    wealthScore += (calculatedDn % 3) * 5;
+    wealthScore += (userSeed % 11) - 5; 
+
+    let bestT, baseT, worstT;
+    if (wealthScore >= 80) { 
+      bestT = "SS급 (70억 이상)"; baseT = "S급 (30~70억)"; worstT = "A급 (15~30억)";
+    } else if (wealthScore >= 65) { 
+      bestT = "S급 (30~70억)"; baseT = "A급 (15~30억)"; worstT = "B급 (7~15억)";
+    } else if (wealthScore >= 45) { 
+      bestT = "A급 (15~30억)"; baseT = "B급 (7~15억)"; worstT = "C급 (7억 미만)";
+    } else { 
+      bestT = "B급 (7~15억)"; baseT = "C급 (7억 미만)"; worstT = "D급 (3억 미만)";
+    }
+
+    let baseP = 55 + (userSeed % 11); 
+    let bestP = 15 + (userSeed % 11); 
+    let worstP = 100 - baseP - bestP; 
+
+    const currentYear = new Date().getFullYear();
+    const goldenYear = currentYear + (userSeed % 6);
+
+    const fixedWealthData = `
+    [자산 시나리오 확정 데이터 - 절대 변경 금지]
+    - Best: 등급(${bestT}), 확률(${bestP}%)
+    - Base: 등급(${baseT}), 확률(${baseP}%)
+    - Worst: 등급(${worstT}), 확률(${worstP}%)
+    - 부동산 골든타임 확정 연도: ${goldenYear}년`;
+
+    // ===== 대운 스코어링 엔진 (교차검증 완료 버전) =====
+const dScores = [];
+const dLabels = []; // 대운 간지 라벨용
+
+// 1. 대운 방향 결정 (양남음녀 순행, 음남양녀 역행)
+const isYangYear = (b.yearStemIdx % 2 === 0);
+const isForward = (isYangYear && gender === 'M') || (!isYangYear && gender === 'F');
+
+// 2. 월주 천간/지지 기준점
+const monthStemIdx = STEMS.indexOf(b.month[0]);
+const monthBranchIdx = BRANCHES.indexOf(b.month[1]);
+
+// 3. 일간 기준 오행 관계표 (생극제화)
+// 일간 오행 → { 재성, 관성, 인성, 식상, 비겁 } 순서로 오행 매핑
+const DAYMASTER_RELATIONS = {
+    '木': { 재성:'土', 관성:'金', 인성:'水', 식상:'火', 비겁:'木' },
+    '火': { 재성:'金', 관성:'水', 인성:'木', 식상:'土', 비겁:'火' },
+    '土': { 재성:'水', 관성:'木', 인성:'火', 식상:'金', 비겁:'土' },
+    '金': { 재성:'木', 관성:'火', 인성:'土', 식상:'水', 비겁:'金' },
+    '水': { 재성:'火', 관성:'土', 인성:'金', 식상:'木', 비겁:'水' },
+};
+
+const dayMasterElement = ELEMENT_MAP[b.dayStem];
+const rel = DAYMASTER_RELATIONS[dayMasterElement];
+
+// 4. 오행별 기본 점수 (명리학 통변성 기준)
+// 재성(재물), 관성(명예/직위), 식상(활동/표현), 인성(학습/안정), 비겁(독립/경쟁)
+const RELATION_SCORES = {
+    재성: 82,  // 재물운 강한 구간
+    관성: 72,  // 명예/직위 상승 구간
+    식상: 68,  // 활동/성과 창출 구간
+    인성: 58,  // 안정적이나 보수적 구간
+    비겁: 52,  // 독립심 강화, 경쟁 증가 구간
+};
+
+for (let i = 1; i <= 8; i++) {
+    const step = isForward ? i : -i;
+
+    // 5. 천간 계산 (버그 수정: 이전 코드에서 완전히 누락된 부분)
+    const dStemIdx = ((monthStemIdx + step) % 10 + 10) % 10;
+    const dStem = STEMS[dStemIdx];
+    const dStemElement = ELEMENT_MAP[dStem];
+
+    // 6. 지지 계산
+    const dBranchIdx = ((monthBranchIdx + step) % 12 + 12) % 12;
+    const dBranch = BRANCHES[dBranchIdx];
+    const dBranchElement = ELEMENT_MAP[dBranch];
+
+    // 7. 천간·지지 각각의 통변성 판별
+    function getRelation(element) {
+        for (const [name, el] of Object.entries(rel)) {
+            if (el === element) return name;
+        }
+        return '비겁';
+    }
+    const stemRelation = getRelation(dStemElement);
+    const branchRelation = getRelation(dBranchElement);
+
+    // 8. 천간 40% + 지지 60% 가중 평균 (지지가 실질 에너지의 근간)
+    const stemScore = RELATION_SCORES[stemRelation];
+    const branchScore = RELATION_SCORES[branchRelation];
+    const baseScore = Math.round(stemScore * 0.4 + branchScore * 0.6);
+
+    // 9. 고유 노이즈 (-8 ~ +8, 기존 ±12보다 축소하여 명리 로직 비중 강화)
+    const detailNoise = ((userSeed + i * 17) % 17) - 8;
+
+    // 10. 최종 점수 (하한 30점으로 낮춰 위험 구간 가시화)
+    dScores.push(Math.max(30, Math.min(95, baseScore + detailNoise)));
+    dLabels.push(`${dStem}${dBranch}`); // 예: 甲子, 乙丑 등
+}
+
+    baziContext = {
+    name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, 
+    dn: calculatedDn, elText: b.elText,
+    fixedStatsTable, fixedWealthData, dScores, dLabels, deepDive
+};
+    
+    document.getElementById('input-screen').style.display = 'none';
+    document.getElementById('hero').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+
+    // 4번째 심층 분석 탭 강제 렌더링 로직
+    const deepDiveLabels = { psyche: "심층: 자아/관계", career: "심층: 직업/관운", romance: "심층: 연애/결혼" };
+    const ddLabel = deepDiveLabels[deepDive];
+    const ddTabHtml = `<button class="tab-btn" id="dynamic-dd-btn" onclick="switchTab('deepdive')" style="color:#d4af37; border:1px solid #d4af37;">${ddLabel}</button>`;
+    
+    document.querySelectorAll('.tab-container').forEach(container => {
+        const existingBtn = container.querySelector('#dynamic-dd-btn');
+        if(existingBtn) existingBtn.remove();
+        container.insertAdjacentHTML('beforeend', ddTabHtml);
+    });
+    
+    await switchTab('summary');
+  }
+
+  async function switchTab(tabId) {
+    currentTab = tabId;
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll(`button[onclick="switchTab('${tabId}')"]`).forEach(btn => btn.classList.add('active'));
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    
+    document.getElementById('chart-area').style.display = (tabId === 'summary') ? 'block' : 'none';
+
+    const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
+    const cachedText = localStorage.getItem(cacheKey);
+
+    if (cachedText) {
+      renderContent(cachedText, tabId);
+      return;
+    }
+
+    document.getElementById('tab-content').innerHTML = `<div class="loading-tab">⏳ 운명의 모래시계가 당신의 전략 데이터를 연산 중입니다...</div>`;
+
+    const baseRule = "글로벌 전략 컨설팅 펌의 임원 보고서처럼 단호하고 직관적으로 작성하십시오. 형용사보다는 명사와 동사 위주로 정보 밀도를 극대화하되, [절대 규칙]: '비견, 겁재, 편재, 편관' 등 명리학 전문 한자어 사용을 엄격히 금지합니다. 사주 용어는 반드시 '조직 장악력, 현금 흐름 창출력, 리스크 감수성' 등 대중적인 비즈니스/심리학 용어로 100% 번역하여 일반인이 직관적으로 이해할 수 있게 작성하십시오.";
+
+    const deepPrompts = {
+      psyche: `### 🧠 심층 분석: 내재된 자아와 대인관계 전략
+      1. **본질적 욕구와 사회적 가면:** 내담자의 진짜 성향과 외부로 보여지는 페르소나의 차이를 극명하게 대조하십시오.
+      2. **치명적 방어기제와 갈등 패턴:** 타인과 갈등이 발생할 때 나타나는 냉소, 회피, 분노 등의 문제적 행동 패턴을 지적하십시오.
+      3. **고위직 생존을 위한 외교 전략:** 조직 내 적을 만들지 않고 주도권을 쥐기 위한 구체적인 커뮤니케이션/처세술을 제안하십시오.`,
+      
+      career: `### 👑 심층 분석: 직업군과 권력(관운) 상한선
+      1. **최적화 산업군 및 직무:** 내담자의 재능과 원가 통제력, 기획력이 가장 폭발할 수 있는 직무 환경을 구체적으로 제시하십시오.
+      2. **권력(관운)의 상한선:** 사주상 도달할 수 있는 최대 직급(예: 실무 수석, 관리자, 임원 등)에 대한 냉정한 평가를 작성하십시오.
+      3. **사내 정치 및 승진 돌파구:** 승진 누락이나 조직 내 병목 현상을 뚫고 권력을 쟁취하기 위한 핵심 정치적 행동 지침을 제공하십시오.`,
+      
+      romance: `### 💍 심층 분석: 연애와 결혼 파트너십 리스크
+      1. **관계 파탄의 근본 원인:** 내담자의 성향으로 인해 반복될 수 있는 연애/결혼 생활의 치명적 위기 요인을 분석하십시오.
+      2. **최적의 파트너 모델:** 내담자의 부족한 오행을 채워주며 재무적/정서적 시너지를 낼 수 있는 배우자의 현실적인 직업군과 성향을 정의하십시오.
+      3. **결합 및 리스크 타이밍:** 10년 이내에 파트너십을 맺기 가장 좋은 시기와, 반대로 이별수(파국)가 강하게 들어오는 위험 구간을 명시하십시오.`
+    };
+
+    // [아키텍트 패치] 완전히 정제된 프롬프트 (JSON 강제 명령 삭제 완료)
+    const prompts = {
+      summary: `당신은 VVIP 전담 수석 명리 전략가입니다. ${baseRule}
+      아래 양식에 맞춰 완벽한 마크다운 리포트를 작성하십시오.
+
+      ### 🧾 [운명의 영수증]
+      (내담자의 이름, 성별, 나이, 핵심 기운을 영수증 형태의 마크다운 표로 깔끔하게 출력할 것)
+
+      ### 📊 1. 핵심 기질 및 페르소나 (1줄 요약)
+
+      ### 📈 [핵심 역량 스코어보드]
+      (아래 제공된 확정 점수 데이터를 반드시 마크다운 표 형식으로 그대로 출력할 것. 절대 수치 변경 금지)
+      ${baziContext.fixedStatsTable}
+
+      ### 🗂️ 2. 현실 페르소나 & 도플갱어
+      (MBTI, 최적 직무, 운명의 도플갱어 인물을 마크다운 표 형식으로 묶어서 출력할 것)
+
+      ### 🗡️ 3. 치명적 강점과 약점 (비즈니스 관점)`,
+      
+      wealth: `당신은 최고위급 금융 명리 분석가입니다. ${baseRule}
+      ${baziContext.fixedWealthData}
+      ---
+      ### 💰 1. 생애 자산 Tier 시뮬레이션
+      (제공된 자산 등급과 확률 데이터를 반드시 '마크다운 표'로 시각화하여 출력하고, 달성 이유를 경제 용어로 작성할 것)
+      * **부동산 매입 골든타임:** (위 확정 연도를 기재)
+
+      ### 🌊 2. 10년 대운 심층 서사 (재무적 기회와 리스크)
+      ### 🎯 3. 단기 재무 액션 플랜 (향후 3개월)`,
+      
+      future: `당신은 VVIP 커리어 전략가입니다. ${baseRule}
+      [내담자가 20세 미만(${baziContext.age}세)일 경우]
+      ### 🎓 1. 두뇌 구조 및 학업 포텐셜
+      ### 🎯 2. 현실적 진학 대학군 시나리오 (Best / Base 엄격히 분리)
+      ### 👨‍👩‍👧 3. 부모 양육 리스크 및 멘탈 관리 전략
+      
+      [내담자가 20세 이상(${baziContext.age}세)일 경우]
+      ### 🚀 1. 단기 커리어 및 성과 쟁취 전략 (장애물과 돌파구)
+      ### 👥 2. 비즈니스 파트너 리스크 (헷징 전략)
+      ### 🏥 3. 건강 및 체질 관리 전략 (취약 장기)`,
+      
+      deepdive: `당신은 VVIP 전담 전략 컨설턴트입니다. ${baseRule}
+      ${deepPrompts[baziContext.deepDive]}`
+    };
+
+    let retries = 7; 
+    let success = false;
+
+    while (retries > 0 && !success) {
+      try {
+        const resp = await fetch('https://saju-backend-production-f933.up.railway.app/api/llm', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            baziData: `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}`,
+            systemPrompt: prompts[tabId]
+          })
+        });
+        
+        const data = await resp.json();
+
+// 응답 구조 검증 후 텍스트 추출
+if (!resp.ok) {
+    throw new Error(`HTTP_ERROR_${resp.status}`);
+}
+if (!data?.content?.[0]?.text) {
+    const errMsg = data?.error?.message || data?.candidates?.[0]?.finishReason || JSON.stringify(data);
+    throw new Error(`API_ERROR: ${errMsg}`);
+}
+const rawAiText = data.content[0].text;
+
+if (rawAiText.includes("high demand") || rawAiText.includes("overloaded")) {
+    throw new Error("Google Server High Demand");
+}
+        
+        localStorage.setItem(cacheKey, rawAiText);
+        renderContent(rawAiText, tabId);
+        success = true;
+
+      } catch (e) {
+    retries--;
+    // HTTP 4xx 에러는 재시도해도 의미 없으므로 즉시 중단
+    if (e.message.startsWith('HTTP_ERROR_4')) {
+        retries = 0;
+    }
+    if (retries === 0) {
+        const errDetail = e.message.includes('API_ERROR') ? '모델 응답 오류' : '서버 병목';
+        document.getElementById('tab-content').innerHTML = 
+            `<div class='loading-tab' style='color:#ff6b6b'>
+                현재 분석 서버에 문제가 발생했습니다. (${errDetail})<br>
+                잠시 후 탭을 다시 클릭해 주십시오.
+            </div>`;
+    } else {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+}
+    }
+  }
+
+  // [아키텍트 패치] AI에 의존하지 않는 무손실 렌더링 및 차트 직결 로직
+  function renderContent(rawText, tabId) {
+    let displayText = rawText;
+    
+    if (tabId === 'summary') {
+      // 자체 생성된 수식 데이터로 차트 엔진 다이렉트 호출
+      const labels = Array.from({length: 8}, (_, i) => 
+    `${baziContext.dn + (i * 10)}세\n${baziContext.dLabels[i] || ''}`
+);
+setTimeout(() => renderChart(labels, baziContext.dScores), 50);
+
+      // (선택) 이전 캐시에 남아있을지 모를 JSON 찌꺼기 문자열 청소
+      displayText = displayText.replace(/```[a-z]*\n\{[\s\S]*?\}\n```/g, '');
+      displayText = displayText.replace(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/g, '');
+    }
+
+    document.getElementById('tab-content').innerHTML = marked.parse(displayText);
+  }
+
+  function renderChart(labels, scores) {
+    const ctx = document.getElementById('daewunChart').getContext('2d');
+    if(window.myChart) window.myChart.destroy();
+    window.myChart = new Chart(ctx, {
+      type: 'line',
+      data: { 
+        labels: labels, 
+        datasets: [{ 
+          label: '명리 계리적 성과 지수', data: scores, borderColor: '#d4af37', tension: 0.4, fill: true, backgroundColor: 'rgba(212, 175, 55, 0.06)', borderWidth: 3, pointBackgroundColor: '#d4af37'
+        }] 
+      },
+      options: { 
+        responsive: true, maintainAspectRatio: false, 
+        scales: { 
+          y: { min: 0, max: 100, title: { display: true, text: '운세 성과도 (Score)', color: '#88888b', font: { size: 11, weight: 'bold' } }, grid: { color: '#232326' }, ticks: { color: '#888' } },
+          x: { grid: { display: false }, ticks: { color: '#888' } }
+        },
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return ` 종합 운세 지수: ${context.parsed.y}점`; } } } }
+      }
+    });
+  }
+</script>
+</body>
+</html>
