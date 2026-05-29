@@ -369,24 +369,44 @@
       ### 🏥 3. 건강 및 체질 관리 전략 (취약 장기와 발병 질환 표)`
     };
 
-    try {
-      const resp = await fetch('https://saju-backend-3vgw.onrender.com/api/llm', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          baziData: `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}`,
-          systemPrompt: prompts[tabId]
-        })
-      });
-      
-      const data = await resp.json();
-      const rawAiText = data.content[0].text;
-      
-      localStorage.setItem(cacheKey, rawAiText);
-      renderContent(rawAiText, tabId);
+    // [아키텍트 패치] 503 High Demand 에러 방어를 위한 자동 재시도(Retry) 로직
+    let retries = 3; // 최대 3회 자동 재시도
+    let success = false;
 
-    } catch (e) {
-      document.getElementById('tab-content').innerHTML = "<div class='loading-tab' style='color:#ff6b6b'>서버 연결 지연. 탭을 다시 클릭해 주십시오.</div>";
+    while (retries > 0 && !success) {
+      try {
+        const resp = await fetch('https://saju-backend-3vgw.onrender.com/api/llm', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            baziData: `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}`,
+            systemPrompt: prompts[tabId]
+          })
+        });
+        
+        const data = await resp.json();
+        const rawAiText = data.content[0].text;
+
+        // 구글 서버가 200 OK를 주면서 텍스트 안에 high demand 에러를 뱉는 경우 방어
+        if (rawAiText.includes("high demand") || rawAiText.includes("overloaded")) {
+          throw new Error("Google Server High Demand");
+        }
+        
+        // 정상 응답 시 캐싱 및 렌더링 후 루프 탈출
+        localStorage.setItem(cacheKey, rawAiText);
+        renderContent(rawAiText, tabId);
+        success = true;
+
+      } catch (e) {
+        retries--;
+        if (retries === 0) {
+          // 3회 모두 실패했을 때만 유저에게 정제된 에러 노출
+          document.getElementById('tab-content').innerHTML = "<div class='loading-tab' style='color:#ff6b6b'>현재 이용자가 집중되어 분석 서버에 병목이 발생했습니다.<br>잠시 후 탭을 다시 클릭해 주십시오.</div>";
+        } else {
+          // 실패 시 2초 대기 후 재요청 (모래시계 애니메이션은 계속 돌아감)
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
     }
   }
 
