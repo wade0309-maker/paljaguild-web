@@ -302,6 +302,20 @@
     document.getElementById('input-screen').style.display = 'none';
     document.getElementById('hero').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
+
+// [아키텍트 패치] 4번째 심층 분석 탭 강제 렌더링 로직
+    const deepDiveLabels = { psyche: "심층: 자아/관계", career: "심층: 직업/관운", romance: "심층: 연애/결혼" };
+    const ddLabel = deepDiveLabels[deepDive];
+    const ddTabHtml = `<button class="tab-btn" id="dynamic-dd-btn" onclick="switchTab('deepdive')" style="color:#d4af37; border:1px solid #d4af37;">${ddLabel}</button>`;
+    
+    // 문서 내의 모든 탭 컨테이너를 찾아서 버튼을 강제로 꽂아넣음
+    document.querySelectorAll('.tab-container').forEach(container => {
+        // 기존에 중복 생성된 심층 탭이 있다면 삭제
+        const existingBtn = container.querySelector('#dynamic-dd-btn');
+        if(existingBtn) existingBtn.remove();
+        // 새 버튼 추가
+        container.insertAdjacentHTML('beforeend', ddTabHtml);
+    });
     
     await switchTab('summary');
   }
@@ -355,19 +369,26 @@
       {"daewun_labels": ["${baziContext.dn}세", "${baziContext.dn+10}세", "${baziContext.dn+20}세", "${baziContext.dn+30}세", "${baziContext.dn+40}세", "${baziContext.dn+50}세", "${baziContext.dn+60}세", "${baziContext.dn+70}세"], "daewun_scores": [${baziContext.dScores.join(', ')}]}
       \`\`\`
       ---
+      위 JSON을 출력한 후, 아래 양식에 맞춰 완벽한 마크다운 리포트를 작성하십시오.
+
+      ### 🧾 [운명의 영수증]
+      (내담자의 이름, 성별, 나이, 핵심 기운을 영수증 형태의 마크다운 표로 깔끔하게 출력할 것)
+
       ### 📊 1. 핵심 기질 및 페르소나 (1줄 요약)
-      ### 🗡️ 2. 치명적 강점과 약점 (비즈니스 관점)
-      ### ⏳ 3. 현재 대운의 좌표 (현재 어떤 흐름의 몇% 지점을 지나고 있는지)`,
+
+      ### 🗂️ 2. 현실 페르소나 & 도플갱어
+      (MBTI, 최적 직무, 운명의 도플갱어 인물을 마크다운 표 형식으로 묶어서 출력할 것)
+
+      ### 🗡️ 3. 치명적 강점과 약점 (비즈니스 관점)`,
       
       wealth: `당신은 최고위급 금융 명리 분석가입니다. ${baseRule}
       ${baziContext.fixedWealthData}
       ---
-      ### 📈 1. 생애 자산 Tier 시뮬레이션
-      (위 데이터의 등급과 확률을 그대로 기재하고, 각 시나리오별 달성 이유를 경제 용어로 작성)
-      * **부동산(문서운) 매입 골든타임:** (위 확정 연도를 기재하고 1줄 요약)
-      ---
+      ### 💰 1. 생애 자산 Tier 시뮬레이션
+      (제공된 자산 등급과 확률 데이터를 반드시 '마크다운 표'로 시각화하여 출력하고, 달성 이유를 경제 용어로 작성할 것)
+      * **부동산 매입 골든타임:** (위 확정 연도를 기재)
+
       ### 🌊 2. 10년 대운 심층 서사 (재무적 기회와 리스크)
-      ---
       ### 🎯 3. 단기 재무 액션 플랜 (향후 3개월)`,
       
       future: `당신은 VVIP 커리어 전략가입니다. ${baseRule}
