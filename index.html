@@ -266,13 +266,45 @@
     - Worst: 등급(${worstT}), 확률(${worstP}%)
     - 부동산 골든타임 확정 연도: ${goldenYear}년`;
 
-    // [아키텍트 패치] 부드러운 곡선 차트 데이터 연산
-    const peakIdx = userSeed % 8; 
-    const dScores = Array.from({length:8}, (_, i) => {
-        const distance = Math.abs(i - peakIdx);
-        let score = 90 - (distance * 12) + ((userSeed + i) % 10);
-        return Math.max(45, Math.min(98, score)); 
-    });
+    // [아키텍트 패치] 실제 명리학 대운(大運) 흐름 반영 스코어링 엔진
+    const dScores = [];
+    
+    // 1. 대운의 방향 결정 (양남음녀 순행, 음남양녀 역행 공식)
+    const isYangYear = (b.yearStemIdx % 2 === 0);
+    const isForward = (isYangYear && gender === 'M') || (!isYangYear && gender === 'F');
+    
+    // 2. 월주(Month Pillar) 기준점 세팅
+    const monthStemIdx = STEMS.indexOf(b.month[0]);
+    const monthBranchIdx = BRANCHES.indexOf(b.month[1]);
+
+    for(let i = 1; i <= 8; i++) {
+        // 3. 실제 10년 단위 대운 지지(Branch) 오행 추출
+        let step = isForward ? i : -i;
+        let dBranchIdx = (monthBranchIdx + step + 60) % 12; // JS 음수 모듈러 방어
+        let daewunElement = ELEMENT_MAP[BRANCHES[dBranchIdx]]; // 10년 대운의 오행
+
+        // 4. 대운 오행과 내담자의 재물운(재성) 상호작용 분석
+        let baseScore = 50; 
+        
+        // 대운에 재성(돈/현금흐름)이 강력하게 들어오는 10년 구간
+        if (daewunElement === myWealthElement) {
+            baseScore = 85; 
+        } 
+        // 대운에 일간과 같은 기운(비견/겁재 - 독립/경쟁력 강화)이 들어오는 구간
+        else if (daewunElement === ELEMENT_MAP[b.dayStem]) {
+            baseScore = 65; 
+        } 
+        // 그 외의 기운 (평이한 인성, 관성, 식상 구간)
+        else {
+            baseScore = 55; 
+        }
+
+        // 5. 동일 사주 내 환경적 변수(고유 Seed)를 반영한 미세 굴곡(노이즈) 추가
+        let detailNoise = ((userSeed + i * 17) % 25) - 12; // -12 ~ +12 점수 변동
+        
+        // 최종 점수가 45점 밑으로 떨어지거나 98점을 넘지 않도록 안전망 처리
+        dScores.push(Math.max(45, Math.min(98, baseScore + detailNoise)));
+    }
 
     baziContext = {
         name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
@@ -345,6 +377,10 @@
       (내담자의 이름, 성별, 나이, 핵심 기운을 영수증 형태의 마크다운 표로 깔끔하게 출력할 것)
 
       ### 📊 1. 핵심 기질 및 페르소나 (1줄 요약)
+
+      ### 📈 [핵심 역량 스코어보드]
+      (아래 제공된 확정 점수 데이터를 반드시 마크다운 표 형식으로 그대로 출력할 것. 절대 수치 변경 금지)
+      ${baziContext.fixedStatsTable}
 
       ### 🗂️ 2. 현실 페르소나 & 도플갱어
       (MBTI, 최적 직무, 운명의 도플갱어 인물을 마크다운 표 형식으로 묶어서 출력할 것)
