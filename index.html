@@ -699,7 +699,6 @@ deepdive: `당신은 VVIP 전담 전략 컨설턴트입니다. ${baseRule}
             const resp = await fetch('https://saju-backend-production-f933.up.railway.app/api/llm', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                signal: AbortSignal.timeout(58000),
                 body: JSON.stringify({ baziData, systemPrompt: prompts[tabId] })
             });
 
