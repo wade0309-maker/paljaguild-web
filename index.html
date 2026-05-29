@@ -466,30 +466,17 @@ for (let i = 1; i <= 8; i++) {
         container.insertAdjacentHTML('beforeend', ddTabHtml);
     });
     
-    await switchTab('summary');
+    builtPrompts = null;
+['summary', 'wealth', 'future', 'deepdive'].forEach(tid => fetchAndCache(tid));
+switchTab('summary');
   }
 
-  async function switchTab(tabId) {
-    currentTab = tabId;
-    
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll(`button[onclick="switchTab('${tabId}')"]`).forEach(btn => btn.classList.add('active'));
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' }); 
-    
-    document.getElementById('chart-area').style.display = (tabId === 'summary') ? 'block' : 'none';
+  // 프롬프트 캐시 변수
+  let builtPrompts = null;
 
-    const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
-    const cachedText = localStorage.getItem(cacheKey);
-
-    if (cachedText) {
-      renderContent(cachedText, tabId);
-      return;
-    }
-
-    document.getElementById('tab-content').innerHTML = `<div class="loading-tab">⏳ 운명의 모래시계가 당신의 전략 데이터를 연산 중입니다...</div>`;
-
-    const baseRule = "글로벌 전략 컨설팅 펌의 임원 보고서처럼 단호하고 직관적으로 작성하십시오. 형용사보다는 명사와 동사 위주로 정보 밀도를 극대화하되, [절대 규칙]: '비견, 겁재, 편재, 편관' 등 명리학 전문 한자어 사용을 엄격히 금지합니다. 사주 용어는 반드시 '조직 장악력, 현금 흐름 창출력, 리스크 감수성' 등 대중적인 비즈니스/심리학 용어로 100% 번역하여 일반인이 직관적으로 이해할 수 있게 작성하십시오.";
+  function buildPrompts() {
+    if (builtPrompts) return builtPrompts;
+  const baseRule = "글로벌 전략 컨설팅 펌의 임원 보고서처럼 단호하고 직관적으로 작성하십시오. 형용사보다는 명사와 동사 위주로 정보 밀도를 극대화하되, [절대 규칙]: '비견, 겁재, 편재, 편관' 등 명리학 전문 한자어 사용을 엄격히 금지합니다. 사주 용어는 반드시 '조직 장악력, 현금 흐름 창출력, 리스크 감수성' 등 대중적인 비즈니스/심리학 용어로 100% 번역하여 일반인이 직관적으로 이해할 수 있게 작성하십시오.";
 
     const deepPrompts = {
       psyche: `### 🧠 심층 분석: 내재된 자아와 대인관계 전략
@@ -627,62 +614,74 @@ ${baziContext.age < 8 ? `
 
 ### 🏥 3. 건강 & 체질 관리
 **취약한 신체 부위** 2가지와 **지금 당장 시작해야 할 관리법**을 구체적으로 작성할 것.`}`,
-      
-      deepdive: `당신은 VVIP 전담 전략 컨설턴트입니다. ${baseRule}
-      ${deepPrompts[baziContext.deepDive]}`
-    };
 
-    let retries = 7; 
-    let success = false;
+      builtPrompts = prompts;
+    return builtPrompts;
+  }
 
-    while (retries > 0 && !success) {
-      try {
-        const resp = await fetch('https://saju-backend-production-f933.up.railway.app/api/llm', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            baziData: `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}`,
-            systemPrompt: prompts[tabId]
-          })
-        });
-        
-        const data = await resp.json();
-
-// 응답 구조 검증 후 텍스트 추출
-if (!resp.ok) {
-    throw new Error(`HTTP_ERROR_${resp.status}`);
-}
-if (!data?.content?.[0]?.text) {
-    const errMsg = data?.error?.message || data?.candidates?.[0]?.finishReason || JSON.stringify(data);
-    throw new Error(`API_ERROR: ${errMsg}`);
-}
-const rawAiText = data.content[0].text;
-
-if (rawAiText.includes("high demand") || rawAiText.includes("overloaded")) {
-    throw new Error("Google Server High Demand");
-}
-        
-        localStorage.setItem(cacheKey, rawAiText);
-        renderContent(rawAiText, tabId);
-        success = true;
-
-      } catch (e) {
-    retries--;
-    // HTTP 4xx 에러는 재시도해도 의미 없으므로 즉시 중단
-    if (e.message.startsWith('HTTP_ERROR_4')) {
-        retries = 0;
+  async function fetchAndCache(tabId) {
+    const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
+    if (localStorage.getItem(cacheKey)) {
+        if (currentTab === tabId) renderContent(localStorage.getItem(cacheKey), tabId);
+        return;
     }
-    if (retries === 0) {
-        const errDetail = e.message.includes('API_ERROR') ? '모델 응답 오류' : '서버 병목';
-        document.getElementById('tab-content').innerHTML = 
-            `<div class='loading-tab' style='color:#ff6b6b'>
-                현재 분석 서버에 문제가 발생했습니다. (${errDetail})<br>
-                잠시 후 탭을 다시 클릭해 주십시오.
-            </div>`;
+
+    const prompts = buildPrompts();
+    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}`;
+
+    let retries = 2;
+    while (retries > 0) {
+        try {
+            const resp = await fetch('https://saju-backend-production-f933.up.railway.app/api/llm', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ baziData, systemPrompt: prompts[tabId] })
+            });
+
+            if (!resp.ok) throw new Error(`HTTP_ERROR_${resp.status}`);
+            const data = await resp.json();
+            if (!data?.content?.[0]?.text) {
+                throw new Error(`API_ERROR: ${data?.error?.message || JSON.stringify(data)}`);
+            }
+
+            const rawAiText = data.content[0].text;
+            localStorage.setItem(cacheKey, rawAiText);
+            if (currentTab === tabId) renderContent(rawAiText, tabId);
+            return;
+
+        } catch (e) {
+            retries--;
+            if (e.message.startsWith('HTTP_ERROR_4')) break;
+            if (retries > 0) {
+                await new Promise(r => setTimeout(r, 2000));
+            } else if (currentTab === tabId) {
+                document.getElementById('tab-content').innerHTML =
+                    `<div class='loading-tab' style='color:#ff6b6b'>
+                        분석 서버에 문제가 발생했습니다.<br>
+                        잠시 후 탭을 다시 클릭해 주십시오.
+                    </div>`;
+            }
+        }
+    }
+  }
+  
+  function switchTab(tabId) {
+    currentTab = tabId;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll(`button[onclick="switchTab('${tabId}')"]`).forEach(btn => btn.classList.add('active'));
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('chart-area').style.display = (tabId === 'summary') ? 'block' : 'none';
+
+    const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
+    const cachedText = localStorage.getItem(cacheKey);
+
+    if (cachedText) {
+        renderContent(cachedText, tabId);
     } else {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-}
+        document.getElementById('tab-content').innerHTML =
+            `<div class="loading-tab">⏳ 운명의 모래시계가 당신의 전략 데이터를 연산 중입니다...</div>`;
     }
   }
 
