@@ -92,6 +92,23 @@
           <input type="number" id="f-minute" placeholder="분 (Minute)" min="0" max="59" value="0">
         </div>
       </div>
+      <div class="input-group" style="margin-top: 15px;">
+                <label>관심 있는 심층 분석 주제 (1택)</label>
+                <div style="display: flex; flex-direction: column; gap: 10px; background: #2a2a2a; padding: 15px; border-radius: 10px;">
+                    <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                        <input type="radio" name="deepDive" value="psyche" checked style="width: auto;"> 
+                        🧠 내재된 자아와 인간관계 (갈등 양상)
+                    </label>
+                    <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                        <input type="radio" name="deepDive" value="career" style="width: auto;"> 
+                        👑 직업군과 승진/권력 (관운 상한선)
+                    </label>
+                    <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                        <input type="radio" name="deepDive" value="romance" style="width: auto;"> 
+                        💍 연애운과 결혼 (파트너십 리스크)
+                    </label>
+                </div>
+            </div>
       <div id="error-msg" style="color:#ff6b6b; text-align:center; font-size:0.9rem; margin-top:1rem;"></div>
       <button class="btn-blue" onclick="startAnalysis()">👑 프리미엄 리포트 발급</button>
     </div>
@@ -217,6 +234,7 @@
 
     const name = document.getElementById('f-name').value || "내담자";
     const gender = document.querySelector('input[name="gender"]:checked').value;
+    const deepDive = document.querySelector('input[name="deepDive"]:checked').value;
     const b = getExactBazi(parseInt(y), parseInt(m), parseInt(d), parseInt(h), parseInt(document.getElementById('f-minute').value));
     const age = new Date().getFullYear() - parseInt(y) + 1;
     const calculatedDn = getDaewunNumber(parseInt(y), parseInt(m), parseInt(d), gender, b.yearStemIdx);
@@ -273,10 +291,10 @@
     - Worst: 등급(${worstT}), 확률(${worstP}%)
     - 부동산 골든타임 확정 연도: ${goldenYear}년`;
 
-    baziContext = { 
-      name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
-      fixedStatsTable, fixedWealthData 
-    };
+    baziContext = {
+            name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
+            fixedStatsTable, fixedWealthData, dScores, deepDive
+        };
     
     document.getElementById('input-screen').style.display = 'none';
     document.getElementById('hero').style.display = 'none';
@@ -309,64 +327,59 @@
     // [아키텍트 패치] 한자어 금지 및 현대 비즈니스 용어 번역 룰
     const baseRule = "글로벌 전략 컨설팅 펌의 임원 보고서처럼 단호하고 직관적으로 작성하십시오. 형용사보다는 명사와 동사 위주로 정보 밀도를 극대화하되, [절대 규칙]: '비견, 겁재, 편재, 편관' 등 명리학 전문 한자어 사용을 엄격히 금지합니다. 사주 용어는 반드시 '조직 장악력, 현금 흐름 창출력, 리스크 감수성' 등 대중적인 비즈니스/심리학 용어로 100% 번역하여 일반인이 직관적으로 이해할 수 있게 작성하십시오.";
 
+    // [아키텍트 패치] 선택형 심층 분석 프롬프트 정의
+    const deepPrompts = {
+      psyche: `### 🧠 심층 분석: 내재된 자아와 대인관계 전략
+      1. **본질적 욕구와 사회적 가면:** 내담자의 진짜 성향과 외부로 보여지는 페르소나의 차이를 극명하게 대조하십시오.
+      2. **치명적 방어기제와 갈등 패턴:** 타인과 갈등이 발생할 때 나타나는 냉소, 회피, 분노 등의 문제적 행동 패턴을 지적하십시오.
+      3. **고위직 생존을 위한 외교 전략:** 조직 내 적을 만들지 않고 주도권을 쥐기 위한 구체적인 커뮤니케이션/처세술을 제안하십시오.`,
+      
+      career: `### 👑 심층 분석: 직업군과 권력(관운) 상한선
+      1. **최적화 산업군 및 직무:** 내담자의 재능과 원가 통제력, 기획력이 가장 폭발할 수 있는 직무 환경을 구체적으로 제시하십시오.
+      2. **권력(관운)의 상한선:** 사주상 도달할 수 있는 최대 직급(예: 실무 수석, 관리자, 임원 등)에 대한 냉정한 평가를 작성하십시오.
+      3. **사내 정치 및 승진 돌파구:** 승진 누락이나 조직 내 병목 현상을 뚫고 권력을 쟁취하기 위한 핵심 정치적 행동 지침을 제공하십시오.`,
+      
+      romance: `### 💍 심층 분석: 연애와 결혼 파트너십 리스크
+      1. **관계 파탄의 근본 원인:** 내담자의 성향으로 인해 반복될 수 있는 연애/결혼 생활의 치명적 위기 요인을 분석하십시오.
+      2. **최적의 파트너 모델:** 내담자의 부족한 오행을 채워주며 재무적/정서적 시너지를 낼 수 있는 배우자의 현실적인 직업군과 성향을 정의하십시오.
+      3. **결합 및 리스크 타이밍:** 10년 이내에 파트너십을 맺기 가장 좋은 시기와, 반대로 이별수(파국)가 강하게 들어오는 위험 구간을 명시하십시오.`
+    };
+
     const prompts = {
       summary: `당신은 VVIP 전담 수석 명리 전략가입니다. ${baseRule}
       반드시 문서의 **제일 첫 줄**에 어떠한 인사말이나 제목 없이 순수 JSON 데이터만 출력하십시오:
       \`\`\`json
-      {"daewun_labels": ["${baziContext.dn}세", "${baziContext.dn+10}세", "${baziContext.dn+20}세", "${baziContext.dn+30}세", "${baziContext.dn+40}세", "${baziContext.dn+50}세", "${baziContext.dn+60}세", "${baziContext.dn+70}세"], "daewun_scores": [내담자의 사주 원국과 각 10년 대운의 간지(용희기신) 상호작용을 실제 명리학적으로 엄밀히 분석하여, 운의 성과도를 40~95점 사이로 동적 평가한 8개의 점수 배열]}
+      {"daewun_labels": ["${baziContext.dn}세", "${baziContext.dn+10}세", "${baziContext.dn+20}세", "${baziContext.dn+30}세", "${baziContext.dn+40}세", "${baziContext.dn+50}세", "${baziContext.dn+60}세", "${baziContext.dn+70}세"], "daewun_scores": [${baziContext.dScores.join(', ')}]}
       \`\`\`
+      ---
+      ### 📊 1. 핵심 기질 및 페르소나 (1줄 요약)
+      ### 🗡️ 2. 치명적 강점과 약점 (비즈니스 관점)
+      ### ⏳ 3. 현재 대운의 좌표 (현재 어떤 흐름의 몇% 지점을 지나고 있는지)`,
       
-      ---
-      ### 📊 1. 명식 핵심 진단
-      (확정 명식, 오행 비율, 격국, 용희기신을 4행 2열 표로 제시)
-      ---
-      ### 🛡️ 2. 핵심 역량 다각화 지수
-      | 능력치 항목 | Worst | Base | Best |
-      |---|---|---|---|
-      ${baziContext.fixedStatsTable}
-      (위 표를 절대 수정하지 말고 원본 그대로 출력할 것)
-      ---
-      ### 🎭 3. 내재된 본질 vs 발현된 나의 성향
-      (단 3줄로 압축. 반드시 **[본질]**, **[나의 성향]**, **[전략적 갭]** 접두어 사용. **[나의 성향]** 파트에는 명리적 분석으로 도출되는 내담자의 **추정 MBTI 유형**을 기호와 함께 반드시 한 줄 명시할 것)
-      ---
-      ### 👥 4. 운명의 도플갱어 (롤모델)
-      (내담자의 사주 원국, 일간의 특성, 격국의 성향을 연산하여, 실제 역사적 인물이나 글로벌 비즈니스 리더 중 가장 결이 닮은 인물 1명을 AI가 자체적으로 매칭하십시오. 인물명과 매칭된 명리학적 근거를 2줄 이내로 서술)
-      ---
-      ### 🧾 5. 운명 요약 영수증 (최종 직언)
-      > 👑 원래 나의 페르소나: (MBTI 스타일의 간략한 페르소나 타이틀 요약)
-      > 💡 전략적 조언: (뼈를 때리는 날카로운 행동 지침 1줄)
-      > 🏷️ 핵심 키워드: (#해시태그 3개)`,
-
       wealth: `당신은 최고위급 금융 명리 분석가입니다. ${baseRule}
-      
       ${baziContext.fixedWealthData}
-      
       ---
       ### 📈 1. 생애 자산 Tier 시뮬레이션
-      (위 [자산 시나리오 확정 데이터]에 명시된 등급과 확률(%)을 토씨 하나 틀리지 말고 100% 그대로 표에 기재하십시오. 단, 각 시나리오별 달성 이유인 '핵심 동인'을 작성할 때 사주 한자어를 절대 쓰지 말고, "안정적 근로 소득의 누적", "공격적인 대체 투자 성공", "불필요한 지출 통제 실패" 등 현대 재무 관점의 쉬운 경제 용어로 작성할 것)
-      * **부동산(문서운) 매입 골든타임:** (반드시 위 확정 데이터에 주어진 연도를 기재하고, 매입 이유 역시 쉽게 풀어서 1줄 요약할 것)
+      (위 데이터의 등급과 확률을 그대로 기재하고, 각 시나리오별 달성 이유를 경제 용어로 작성)
+      * **부동산(문서운) 매입 골든타임:** (위 확정 연도를 기재하고 1줄 요약)
       ---
-      ### 🌊 2. 10년 대운 심층 서사
-      (${baziContext.dn}세부터 10년 단위 8개 대운 나열. 사주 원국과 대운의 상호작용(용신/기신)을 실제 명리학적으로 엄밀히 분석하여, 대운별 재무 기회와 리스크를 단 1줄씩 요약하되, 한자어 없이 직관적인 서사로 작성)
+      ### 🌊 2. 10년 대운 심층 서사 (재무적 기회와 리스크)
       ---
-      ### 🎯 3. 단기 재무 액션 플랜 (향후 3개월)
-      (실행해야 할 재무 행동 지침 3가지를 명확히 작성)`,
-
+      ### 🎯 3. 단기 재무 액션 플랜 (향후 3개월)`,
+      
       future: `당신은 VVIP 커리어 전략가입니다. ${baseRule}
+      [내담자가 20세 미만(${baziContext.age}세)일 경우]
+      ### 🎓 1. 두뇌 구조 및 학업 포텐셜
+      ### 🎯 2. 현실적 진학 대학군 시나리오 (Best / Base 엄격히 분리)
+      ### 👨‍👩‍👧 3. 부모 양육 리스크 및 멘탈 관리 전략
       
-      [내담자가 20세 미만(${baziContext.age}세)일 경우 아래 작성]
-      ※ [엄격한 통제 지침]: 진학 가능 대학을 예측할 때 AI 특유의 허황된 명문대 남발(희망 고문)을 절대 금지합니다. 앞서 제시된 '지적 자산' 스탯을 냉정하게 반영하여, 진학 가능 대학을 'Best(포텐셜 최대 발현)'와 'Base(현실적 유지)' 두 가지 시나리오로 엄격히 분리하고 매우 보수적으로 작성하십시오.
+      [내담자가 20세 이상(${baziContext.age}세)일 경우]
+      ### 🚀 1. 단기 커리어 및 성과 쟁취 전략 (장애물과 돌파구)
+      ### 👥 2. 비즈니스 파트너 리스크 (헷징 전략)
+      ### 🏥 3. 건강 및 체질 관리 전략 (취약 장기)`,
       
-      ### 🎓 1. 두뇌 구조 및 학업 포텐셜 (표 형식)
-      ### 🎯 2. 현실적 진학 대학군 및 전공 시나리오
-      - **Best (포텐셜 최대 발현 시):** (목표 대학군 및 이유 1줄 요약)
-      - **Base (현재 궤도 유지 시):** (보수적으로 측정한 적정 대학군 및 이유 1줄 요약)
-      ### 👨‍👩‍👧 3. 부모 양육 리스크 및 멘탈 관리 전략 (진단/리스크/솔루션)
-
-      [내담자가 20세 이상(${baziContext.age}세)일 경우 아래 작성]
-      ### 🚀 1. 승진 및 권력 쟁취 전략 (현재궤도/장애물/돌파구)
-      ### 👥 2. 배우자 및 비즈니스 파트너 리스크 (관계성/파국리스크/헷징전략)
-      ### 🏥 3. 건강 및 체질 관리 전략 (취약 장기와 발병 질환 표)`
+      deepdive: `당신은 VVIP 전담 전략 컨설턴트입니다. ${baseRule}
+      ${deepPrompts[baziContext.deepDive]}`
     };
 
     // [아키텍트 패치] 503 High Demand 에러 방어를 위한 자동 재시도(Retry) 로직
