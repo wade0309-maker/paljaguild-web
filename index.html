@@ -93,22 +93,22 @@
         </div>
       </div>
       <div class="input-group" style="margin-top: 15px;">
-                <label>관심 있는 심층 분석 주제 (1택)</label>
-                <div style="display: flex; flex-direction: column; gap: 10px; background: #2a2a2a; padding: 15px; border-radius: 10px;">
-                    <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
-                        <input type="radio" name="deepDive" value="psyche" checked style="width: auto;"> 
-                        🧠 내재된 자아와 인간관계 (갈등 양상)
-                    </label>
-                    <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
-                        <input type="radio" name="deepDive" value="career" style="width: auto;"> 
-                        👑 직업군과 승진/권력 (관운 상한선)
-                    </label>
-                    <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
-                        <input type="radio" name="deepDive" value="romance" style="width: auto;"> 
-                        💍 연애운과 결혼 (파트너십 리스크)
-                    </label>
-                </div>
-            </div>
+        <label style="color:var(--gold); font-weight:bold; margin-bottom:8px; display:block;">관심 있는 심층 분석 주제 (1택)</label>
+        <div style="display: flex; flex-direction: column; gap: 10px; background: #2a2a2a; padding: 15px; border-radius: 10px;">
+            <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                <input type="radio" name="deepDive" value="psyche" checked style="width: auto;"> 
+                🧠 내재된 자아와 인간관계 (갈등 양상)
+            </label>
+            <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                <input type="radio" name="deepDive" value="career" style="width: auto;"> 
+                👑 직업군과 승진/권력 (관운 상한선)
+            </label>
+            <label style="color: white; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                <input type="radio" name="deepDive" value="romance" style="width: auto;"> 
+                💍 연애운과 결혼 (파트너십 리스크)
+            </label>
+        </div>
+      </div>
       <div id="error-msg" style="color:#ff6b6b; text-align:center; font-size:0.9rem; margin-top:1rem;"></div>
       <button class="btn-blue" onclick="startAnalysis()">👑 프리미엄 리포트 발급</button>
     </div>
@@ -138,7 +138,6 @@
 
 <script>
   let baziContext = {}; 
-  let tabCache = { summary: "", wealth: "", future: "" };
   let currentTab = 'summary';
 
   const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
@@ -167,22 +166,6 @@
       result += `| ${stat} | ${worst} | ${base} | ${best} |\n`;
     });
     return result;
-  }
-
-  function getHistoricalFigure(dayStem) {
-    const figures = {
-      "甲": "정조대왕 (불굴의 원칙과 체제 개혁의 리더십)",
-      "乙": "유비 (유연한 인화력과 인재 포용력)",
-      "丙": "스티브 잡스 (폭발적인 열정과 혁신적 비전)",
-      "丁": "워런 버핏 (따뜻하지만 날카로운 통찰력과 안정성)",
-      "戊": "존 D. 록펠러 (굳건한 신뢰를 바탕으로 한 거대한 자산 축적)",
-      "己": "세종대왕 (현실적 실용주의와 넓은 포용력)",
-      "庚": "정주영 (어떤 난관도 뚫어내는 결단력과 돌파력)",
-      "辛": "제갈량 (예리한 분석력과 치밀한 완벽주의)",
-      "壬": "제프 베이조스 (경계를 허무는 유연함과 끝없는 확장성)",
-      "癸": "알베르트 아인슈타인 (깊은 직관과 본질을 꿰뚫는 탐구력)"
-    };
-    return figures[dayStem] || "현대적 비저너리 (균형 잡힌 통찰력)";
   }
 
   function getExactBazi(year, month, day, hour, minute) {
@@ -243,28 +226,21 @@
     const userSeed = generateSeed(seedString);
     const fixedStatsTable = generateFixedStats(userSeed);
 
-   // [아키텍트 패치 - Option B] 진짜 명리 기반 자산 스코어링 매트릭스
     const wealthElementMap = { '甲':'土', '乙':'土', '丙':'金', '丁':'金', '戊':'水', '己':'水', '庚':'木', '辛':'木', '壬':'火', '癸':'火' };
     const myWealthElement = wealthElementMap[b.dayStem];
     
-    // 오행 텍스트(elText)에서 내담자의 재성 개수 추출
     const elMatch = b.elText.match(new RegExp(`${myWealthElement}\\s(\\d)개`));
     const wealthCount = elMatch ? parseInt(elMatch[1]) : 0;
     
-    // 자산 스코어 연산 (기본점수 40점 셋팅)
     let wealthScore = 40; 
-    
-    // 명리학적 황금비율 가중치 부여 (1~2개가 최적, 3개 이상은 과다/집착으로 감점)
     if (wealthCount === 1) wealthScore += 25;
     else if (wealthCount === 2) wealthScore += 35;
     else if (wealthCount >= 3) wealthScore += 15;
-    else wealthScore -= 10; // 무재사주(재성이 없음)
+    else wealthScore -= 10; 
     
-    // 대운수(dn)와 고유 Seed를 활용한 미세 밸런싱
     wealthScore += (calculatedDn % 3) * 5;
     wealthScore += (userSeed % 11) - 5; 
 
-    // 최종 스코어 기반 Tier 확정
     let bestT, baseT, worstT;
     if (wealthScore >= 80) { 
       bestT = "SS급 (70억 이상)"; baseT = "S급 (30~70억)"; worstT = "A급 (15~30억)";
@@ -280,7 +256,6 @@
     let bestP = 15 + (userSeed % 11); 
     let worstP = 100 - baseP - bestP; 
 
-   // 부동산 골든타임(연도) 100% 고정 로직
     const currentYear = new Date().getFullYear();
     const goldenYear = currentYear + (userSeed % 6);
 
@@ -291,18 +266,13 @@
     - Worst: 등급(${worstT}), 확률(${worstP}%)
     - 부동산 골든타임 확정 연도: ${goldenYear}년`;
 
-   // [아키텍트 패치] 대운 그래프용 점수 8개 생성 로직 (부드러운 곡선 형태)
+    // [아키텍트 패치] 부드러운 곡선 차트 데이터 연산
     const peakIdx = userSeed % 8; 
     const dScores = Array.from({length:8}, (_, i) => {
-        const distance = Math.abs(i - peakIdx); // 전성기와의 거리
-        let score = 90 - (distance * 12) + ((userSeed + i) % 10); // 기본 곡선 + 자연스러운 굴곡
-        return Math.max(45, Math.min(98, score)); // 45~98점 사이 방어막
+        const distance = Math.abs(i - peakIdx);
+        let score = 90 - (distance * 12) + ((userSeed + i) % 10);
+        return Math.max(45, Math.min(98, score)); 
     });
-
-    baziContext = {
-        name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
-        fixedStatsTable, fixedWealthData, dScores, deepDive
-    };
 
     baziContext = {
         name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
@@ -313,17 +283,14 @@
     document.getElementById('hero').style.display = 'none';
     document.getElementById('result-screen').style.display = 'block';
 
-// [아키텍트 패치] 4번째 심층 분석 탭 강제 렌더링 로직
+    // 4번째 심층 분석 탭 강제 렌더링 로직
     const deepDiveLabels = { psyche: "심층: 자아/관계", career: "심층: 직업/관운", romance: "심층: 연애/결혼" };
     const ddLabel = deepDiveLabels[deepDive];
     const ddTabHtml = `<button class="tab-btn" id="dynamic-dd-btn" onclick="switchTab('deepdive')" style="color:#d4af37; border:1px solid #d4af37;">${ddLabel}</button>`;
     
-    // 문서 내의 모든 탭 컨테이너를 찾아서 버튼을 강제로 꽂아넣음
     document.querySelectorAll('.tab-container').forEach(container => {
-        // 기존에 중복 생성된 심층 탭이 있다면 삭제
         const existingBtn = container.querySelector('#dynamic-dd-btn');
         if(existingBtn) existingBtn.remove();
-        // 새 버튼 추가
         container.insertAdjacentHTML('beforeend', ddTabHtml);
     });
     
@@ -333,11 +300,10 @@
   async function switchTab(tabId) {
     currentTab = tabId;
     
-    // [아키텍트 패치] 상/하단 탭 버튼 동시 활성화 및 자동 스크롤
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll(`button[onclick="switchTab('${tabId}')"]`).forEach(btn => btn.classList.add('active'));
     
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // 탭 클릭 시 부드럽게 최상단 이동
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
     
     document.getElementById('chart-area').style.display = (tabId === 'summary') ? 'block' : 'none';
 
@@ -351,10 +317,8 @@
 
     document.getElementById('tab-content').innerHTML = `<div class="loading-tab">⏳ 운명의 모래시계가 당신의 전략 데이터를 연산 중입니다...</div>`;
 
-    // [아키텍트 패치] 한자어 금지 및 현대 비즈니스 용어 번역 룰
     const baseRule = "글로벌 전략 컨설팅 펌의 임원 보고서처럼 단호하고 직관적으로 작성하십시오. 형용사보다는 명사와 동사 위주로 정보 밀도를 극대화하되, [절대 규칙]: '비견, 겁재, 편재, 편관' 등 명리학 전문 한자어 사용을 엄격히 금지합니다. 사주 용어는 반드시 '조직 장악력, 현금 흐름 창출력, 리스크 감수성' 등 대중적인 비즈니스/심리학 용어로 100% 번역하여 일반인이 직관적으로 이해할 수 있게 작성하십시오.";
 
-    // [아키텍트 패치] 선택형 심층 분석 프롬프트 정의
     const deepPrompts = {
       psyche: `### 🧠 심층 분석: 내재된 자아와 대인관계 전략
       1. **본질적 욕구와 사회적 가면:** 내담자의 진짜 성향과 외부로 보여지는 페르소나의 차이를 극명하게 대조하십시오.
@@ -372,6 +336,7 @@
       3. **결합 및 리스크 타이밍:** 10년 이내에 파트너십을 맺기 가장 좋은 시기와, 반대로 이별수(파국)가 강하게 들어오는 위험 구간을 명시하십시오.`
     };
 
+    // [아키텍트 패치] 완전히 정제된 프롬프트 (JSON 강제 명령 삭제 완료)
     const prompts = {
       summary: `당신은 VVIP 전담 수석 명리 전략가입니다. ${baseRule}
       아래 양식에 맞춰 완벽한 마크다운 리포트를 작성하십시오.
@@ -411,8 +376,7 @@
       ${deepPrompts[baziContext.deepDive]}`
     };
 
-    // [아키텍트 패치] 503 High Demand 에러 방어를 위한 자동 재시도(Retry) 로직
-    let retries = 7; // 최대 7회 자동 재시도
+    let retries = 7; 
     let success = false;
 
     while (retries > 0 && !success) {
@@ -429,12 +393,10 @@
         const data = await resp.json();
         const rawAiText = data.content[0].text;
 
-        // 구글 서버가 200 OK를 주면서 텍스트 안에 high demand 에러를 뱉는 경우 방어
         if (rawAiText.includes("high demand") || rawAiText.includes("overloaded")) {
           throw new Error("Google Server High Demand");
         }
         
-        // 정상 응답 시 캐싱 및 렌더링 후 루프 탈출
         localStorage.setItem(cacheKey, rawAiText);
         renderContent(rawAiText, tabId);
         success = true;
@@ -442,32 +404,24 @@
       } catch (e) {
         retries--;
         if (retries === 0) {
-          // 3회 모두 실패했을 때만 유저에게 정제된 에러 노출
           document.getElementById('tab-content').innerHTML = "<div class='loading-tab' style='color:#ff6b6b'>현재 이용자가 집중되어 분석 서버에 병목이 발생했습니다.<br>잠시 후 탭을 다시 클릭해 주십시오.</div>";
         } else {
-          // 실패 시 2초 대기 후 재요청 (모래시계 애니메이션은 계속 돌아감)
           await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
     }
   }
 
-  // [아키텍트 패치] 화면 출력 및 텍스트 정제 전담 함수 분리
+  // [아키텍트 패치] AI에 의존하지 않는 무손실 렌더링 및 차트 직결 로직
   function renderContent(rawText, tabId) {
     let displayText = rawText;
     
     if (tabId === 'summary') {
-      let jsonStr = "";
-      const blockMatch = displayText.match(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/);
-      if (blockMatch) { jsonStr = blockMatch[0]; }
+      // 자체 생성된 수식 데이터로 차트 엔진 다이렉트 호출
+      const labels = Array.from({length: 8}, (_, i) => `${baziContext.dn + (i * 10)}세`);
+      setTimeout(() => renderChart(labels, baziContext.dScores), 50);
 
-      if (jsonStr) {
-        try {
-          const j = JSON.parse(jsonStr);
-          setTimeout(() => renderChart(j.daewun_labels, j.daewun_scores), 100);
-        } catch(e) { console.warn("JSON Parse Error:", e); }
-      }
-      
+      // (선택) 이전 캐시에 남아있을지 모를 JSON 찌꺼기 문자열 청소
       displayText = displayText.replace(/```[a-z]*\n\{[\s\S]*?\}\n```/g, '');
       displayText = displayText.replace(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/g, '');
     }
