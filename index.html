@@ -279,8 +279,7 @@ function getTermDay(year, month) {
     const termDayBazi = getTermDay(year, month);
     let bm = month; if (day < termDayBazi) bm--; if (bm <= 0) bm += 12;
 // 월지: 寅(인)=2번 인덱스가 1월에 대응하도록 +2 오프셋 적용
-const monthBranchIdx = (bm + 1) % 12;
-const monthPillar = STEMS[((yearIdx % 5) * 2 + bm) % 10] + BRANCHES[monthBranchIdx];
+const monthPillar = STEMS[((yearIdx % 5) * 2 + bm) % 10] + BRANCHES[bm % 12];
     
     const chars = yearPillar + monthPillar + dayPillar + hourPillar;
     let el = {'木':0, '火':0, '土':0, '金':0, '水':0};
