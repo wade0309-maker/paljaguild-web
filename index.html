@@ -511,7 +511,10 @@ switchTab('summary');
 - 불필요한 반복 표현과 군더더기 어미("~하시기 바랍니다", "~할 것으로 사료됩니다") 제거.
 - 핵심 키워드는 **굵게** 표시. 각 섹션은 굵은 핵심 요약 한 줄로 시작할 것.
 - 어려운 전문용어 사용 시 괄호 안에 쉬운 설명을 붙일 것. 예: 리스크 헷징(위험 분산)
+- 체크박스(`- [ ]`, `- [x]`) 사용 절대 금지. 목록은 반드시 숫자(1. 2. 3.) 또는 불릿(•)으로만 작성할 것.
 - [절대 금지]: '비견, 겁재, 편재, 편관' 등 명리 한자어 사용 금지. 반드시 '경쟁 에너지, 재물 흐름' 등 직관적 한국어로 번역할 것.`;
+    
+    
 
     const deepPrompts = {
       psyche: `### 🧠 심층 분석: 내재된 자아와 대인관계 전략
@@ -757,7 +760,9 @@ setTimeout(() => renderChart(labels, baziContext.dScores), 50);
       // (선택) 이전 캐시에 남아있을지 모를 JSON 찌꺼기 문자열 청소
       displayText = displayText.replace(/```[a-z]*\n\{[\s\S]*?\}\n```/g, '');
       displayText = displayText.replace(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/g, '');
-      displayText = displayText.replace(/- \[[ x]\] /g, '• '); //
+      displayText = displayText.replace(/- \[[ x]\] /g, '• ');
+      displayText = displayText.replace(/\n\s*□/g, '');
+      displayText = displayText.replace(/□/g, '');
     }
 
     document.getElementById('tab-content').innerHTML = marked.parse(displayText);
