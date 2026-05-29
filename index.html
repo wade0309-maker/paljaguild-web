@@ -291,8 +291,18 @@
     - Worst: 등급(${worstT}), 확률(${worstP}%)
     - 부동산 골든타임 확정 연도: ${goldenYear}년`;
 
-   // [아키텍트 패치] 대운 그래프용 점수 8개 생성 로직 (누락되었던 코드)
-    const dScores = Array.from({length:8}, (_, i) => 40 + ((userSeed + i*23) % 55));
+   // [아키텍트 패치] 대운 그래프용 점수 8개 생성 로직 (부드러운 곡선 형태)
+    const peakIdx = userSeed % 8; 
+    const dScores = Array.from({length:8}, (_, i) => {
+        const distance = Math.abs(i - peakIdx); // 전성기와의 거리
+        let score = 90 - (distance * 12) + ((userSeed + i) % 10); // 기본 곡선 + 자연스러운 굴곡
+        return Math.max(45, Math.min(98, score)); // 45~98점 사이 방어막
+    });
+
+    baziContext = {
+        name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
+        fixedStatsTable, fixedWealthData, dScores, deepDive
+    };
 
     baziContext = {
         name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
@@ -364,12 +374,7 @@
 
     const prompts = {
       summary: `당신은 VVIP 전담 수석 명리 전략가입니다. ${baseRule}
-      반드시 문서의 **제일 첫 줄**에 어떠한 인사말이나 제목 없이 순수 JSON 데이터만 출력하십시오:
-      \`\`\`json
-      {"daewun_labels": ["${baziContext.dn}세", "${baziContext.dn+10}세", "${baziContext.dn+20}세", "${baziContext.dn+30}세", "${baziContext.dn+40}세", "${baziContext.dn+50}세", "${baziContext.dn+60}세", "${baziContext.dn+70}세"], "daewun_scores": [${baziContext.dScores.join(', ')}]}
-      \`\`\`
-      ---
-      위 JSON을 출력한 후, 아래 양식에 맞춰 완벽한 마크다운 리포트를 작성하십시오.
+      아래 양식에 맞춰 완벽한 마크다운 리포트를 작성하십시오.
 
       ### 🧾 [운명의 영수증]
       (내담자의 이름, 성별, 나이, 핵심 기운을 영수증 형태의 마크다운 표로 깔끔하게 출력할 것)
