@@ -291,10 +291,13 @@
     - Worst: 등급(${worstT}), 확률(${worstP}%)
     - 부동산 골든타임 확정 연도: ${goldenYear}년`;
 
+   // [아키텍트 패치] 대운 그래프용 점수 8개 생성 로직 (누락되었던 코드)
+    const dScores = Array.from({length:8}, (_, i) => 40 + ((userSeed + i*23) % 55));
+
     baziContext = {
-            name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
-            fixedStatsTable, fixedWealthData, dScores, deepDive
-        };
+        name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`, dn: calculatedDn, elText: b.elText,
+        fixedStatsTable, fixedWealthData, dScores, deepDive
+    };
     
     document.getElementById('input-screen').style.display = 'none';
     document.getElementById('hero').style.display = 'none';
