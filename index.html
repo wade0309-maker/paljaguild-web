@@ -339,29 +339,59 @@ const fixedStatsTable = generateFixedStats(userSeed, elCounts);
     const elMatch = b.elText.match(new RegExp(`${myWealthElement}\\s(\\d)개`));
     const wealthCount = elMatch ? parseInt(elMatch[1]) : 0;
     
-    let wealthScore = 40; 
-    if (wealthCount === 1) wealthScore += 25;
-    else if (wealthCount === 2) wealthScore += 35;
-    else if (wealthCount >= 3) wealthScore += 15;
-    else wealthScore -= 10; 
-    
-    wealthScore += (calculatedDn % 3) * 5;
-    wealthScore += (userSeed % 11) - 5; 
+// 신강/신약 판단 (재산 계산용 별도 선언)
+    const wREL = {
+        '木': { 재성:'土', 관성:'金', 인성:'水', 식상:'火', 비겁:'木' },
+        '火': { 재성:'金', 관성:'水', 인성:'木', 식상:'土', 비겁:'火' },
+        '土': { 재성:'水', 관성:'木', 인성:'火', 식상:'金', 비겁:'土' },
+        '金': { 재성:'木', 관성:'火', 인성:'土', 식상:'水', 비겁:'金' },
+        '水': { 재성:'火', 관성:'土', 인성:'金', 식상:'木', 비겁:'水' },
+    }[ELEMENT_MAP[b.dayStem]];
 
-    let bestT, baseT, worstT;
-    if (wealthScore >= 80) { 
-      bestT = "SS급 (70억 이상)"; baseT = "S급 (30~70억)"; worstT = "A급 (15~30억)";
-    } else if (wealthScore >= 65) { 
-      bestT = "S급 (30~70억)"; baseT = "A급 (15~30억)"; worstT = "B급 (7~15억)";
-    } else if (wealthScore >= 45) { 
-      bestT = "A급 (15~30억)"; baseT = "B급 (7~15억)"; worstT = "C급 (7억 미만)";
-    } else { 
-      bestT = "B급 (7~15억)"; baseT = "C급 (7억 미만)"; worstT = "D급 (3억 미만)";
-    }
+    const 비겁수 = elCounts[wREL.비겁] || 0;
+    const 인성수 = elCounts[wREL.인성] || 0;
+    const 재성수 = elCounts[wREL.재성] || 0;
+    const 관성수 = elCounts[wREL.관성] || 0;
+    const 식상수 = elCounts[wREL.식상] || 0;
 
-    let baseP = 55 + (userSeed % 11); 
-    let bestP = 15 + (userSeed % 11); 
-    let worstP = 100 - baseP - bestP; 
+    const isStrong = (비겁수 + 인성수) >= (재성수 + 관성수);
+
+    let tierShift = 0;
+
+    // ① 신강/신약 × 재성 조합
+    if (isStrong && 재성수 >= 1 && 재성수 <= 2) tierShift += 2;
+    else if (isStrong && 재성수 === 0 && 식상수 >= 1) tierShift += 1;
+    else if (isStrong && 재성수 >= 3) tierShift += 0;
+    else if (!isStrong && 재성수 >= 2) tierShift -= 1;
+    else if (!isStrong && 재성수 === 0) tierShift -= 1;
+
+    // ② 식상 보정
+    if (식상수 >= 2) tierShift += 1;
+
+    // ③ 대운수 보정
+    if (calculatedDn <= 3) tierShift += 1;
+    else if (calculatedDn >= 8) tierShift -= 1;
+
+    // 미세 노이즈
+    tierShift += ((userSeed % 3) - 1);
+
+    // B급(index 2) = 한국 금융기관 중위값 50% 기준점
+    const tiers = [
+        'D급 (3억 미만)',
+        'C급 (3~7억)',
+        'B급 (7~15억)',
+        'A급 (15~30억)',
+        'S급 (30~70억)',
+        'SS급 (70억 이상)'
+    ];
+    const baseIdx = Math.max(0, Math.min(4, 2 + tierShift));
+    const baseT = tiers[baseIdx];
+    const bestT = tiers[Math.min(5, baseIdx + 1)];
+    const worstT = tiers[Math.max(0, baseIdx - 1)];
+
+    let baseP = 50 + (isStrong ? 3 : -3) + ((userSeed % 7) - 3);
+    let bestP = 25 + ((userSeed % 6));
+    let worstP = 100 - baseP - bestP;
 
     const currentYear = new Date().getFullYear();
     const goldenYear = currentYear + (userSeed % 6);
@@ -371,7 +401,8 @@ const fixedStatsTable = generateFixedStats(userSeed, elCounts);
     - Best: 등급(${bestT}), 확률(${bestP}%)
     - Base: 등급(${baseT}), 확률(${baseP}%)
     - Worst: 등급(${worstT}), 확률(${worstP}%)
-    - 부동산 골든타임 확정 연도: ${goldenYear}년`;
+    - 부동산 골든타임 확정 연도: ${goldenYear}년
+    - 산출 근거: ${isStrong ? '신강' : '신약'}, 재성 ${재성수}개, 식상 ${식상수}개`;
 
     // ===== 대운 스코어링 엔진 (교차검증 완료 버전) =====
 const dScores = [];
@@ -506,7 +537,24 @@ switchTab('summary');
       아래 양식에 맞춰 완벽한 마크다운 리포트를 작성하십시오.
 
       ### 🧾 [운명의 영수증]
-      (내담자의 이름, 성별, 나이, 핵심 기운을 영수증 형태의 마크다운 표로 깔끔하게 출력할 것)
+      아래 형식을 반드시 그대로 따를 것.
+
+      **✨ 나의 운명 유형**
+      (일간 오행 기반 2~4자 유형명을 만들 것. 예: "황금 전략가", "흑수 몽상가", "청목 개척자")
+
+      | 항목 | 내용 |
+      |---|---|
+      | 이름 | |
+      | 성별/나이 | |
+      | 운명 유형 | (위에서 만든 유형명) |
+      | 핵심 기운 | (오행 중 가장 강한 기운을 직관적 언어로) |
+      | 한줄 운명 | (이 사람의 인생을 20자 이내로 정의. 강렬하고 기억에 남게) |
+
+      **🔑 나를 정의하는 키워드 3개**
+      (각각 2~4자, 쉼표로 구분. 예: 실행력, 고독한 승부사, 늦게 피는 꽃)
+
+      **📱 SNS 공유 태그**
+      (한국어 해시태그 5개. 예: #기토일간 #황금전략가 #늦게피는꽃 #사주MBTI #운명의영수증)`,
 
       ### 📊 1. 핵심 기질 및 페르소나 (1줄 요약)
 
@@ -522,9 +570,11 @@ switchTab('summary');
       wealth: `당신은 최고위급 금융 명리 분석가입니다. ${baseRule}
       ${baziContext.fixedWealthData}
       ---
-      ### 💰 1. 생애 자산 Tier 시뮬레이션
+     ### 💰 1. 생애 자산 Tier 시뮬레이션
       (제공된 자산 등급과 확률 데이터를 반드시 '마크다운 표'로 시각화하여 출력하고, 달성 이유를 경제 용어로 작성할 것)
       * **부동산 매입 골든타임:** (위 확정 연도를 기재)
+      표 하단에 반드시 아래 문구를 이탤릭체로 출력할 것:
+      *본 시나리오는 통계청·금융기관 발표 한국 가구 순자산 중위값(B급, 7~15억)을 50% 확률 기준점으로 설정하고, 개인 사주의 신강/신약 구조·재물 오행 강도·식상 창출력·대운 흐름을 반영하여 산출한 참고 지표입니다.*
 
       ### 🌊 2. 10년 대운 심층 서사 (재무적 기회와 리스크)
       ### 🎯 3. 단기 재무 액션 플랜 (향후 3개월)`,
