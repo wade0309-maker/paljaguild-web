@@ -370,7 +370,7 @@
     };
 
     // [아키텍트 패치] 503 High Demand 에러 방어를 위한 자동 재시도(Retry) 로직
-    let retries = 3; // 최대 3회 자동 재시도
+    let retries = 7; // 최대 7회 자동 재시도
     let success = false;
 
     while (retries > 0 && !success) {
