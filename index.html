@@ -496,7 +496,10 @@ for (let i = 1; i <= 8; i++) {
     });
     
     builtPrompts = null;
-['summary', 'wealth', 'future', 'deepdive'].forEach(tid => fetchAndCache(tid));
+fetchAndCache('summary');
+setTimeout(() => fetchAndCache('wealth'), 5000);
+setTimeout(() => fetchAndCache('future'), 10000);
+setTimeout(() => fetchAndCache('deepdive'), 15000);
 switchTab('summary');
   }
 
