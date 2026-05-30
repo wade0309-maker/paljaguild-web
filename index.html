@@ -568,6 +568,8 @@ switchTab('summary');
   비겁 → 경쟁 에너지/독립 추진력
 - 어려운 용어 뒤 괄호 설명 필수. 예: 리스크 헷징(위험 분산)
 - 체크박스("- [ ]") 절대 금지. 목록은 숫자(1. 2. 3.) 또는 •로만.
+- 식단·음식·영양제 관련 조언 절대 금지. 건강 조언은 운동·생활습관·의료 검진으로만 제시.
+- 한자·한자어(신강, 신약, 오행 한자 표기 등) 출력 절대 금지. 반드시 한글로만 작성.
 - 지시된 모든 섹션과 표를 빠짐없이 완성. 생략 절대 금지.`;
     
     
@@ -644,8 +646,10 @@ switchTab('summary');
 
       ### 📊 1. 핵심 기질 및 페르소나 (1줄 요약)
 
-      ### 📈 [핵심 역량 스코어보드]
-      (아래 제공된 확정 점수 데이터를 반드시 마크다운 표 형식으로 그대로 출력할 것. 절대 수치 변경 금지)
+     ### 📈 [핵심 역량 스코어보드]
+      아래 데이터를 반드시 아래 형식 그대로 출력할 것. 컬럼명·수치 변경 절대 금지.
+      | 역량 | 최저 | 평균 | 최고 |
+      |---|---|---|---|
       ${baziContext.fixedStatsTable}
 
       ### 🗂️ 2. 현실 페르소나 & 도플갱어
@@ -775,7 +779,7 @@ if (cached) {
 }
 
     const prompts = buildPrompts();
-    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl}, 신강여부:${baziContext.isStrong?'신강':'신약'}, 통변성:${baziContext.통변성}, 12신살:${baziContext.sinssal}, 현재연도:${new Date().getFullYear()}년`;
+    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl === '木' ? '나무(木)에너지' : baziContext.dayMasterEl === '火' ? '불(火)에너지' : baziContext.dayMasterEl === '土' ? '흙(土)에너지' : baziContext.dayMasterEl === '金' ? '쇠(金)에너지' : '물(水)에너지'}, 신강여부:${baziContext.isStrong?'신강':'신약'}, 통변성:${baziContext.통변성}, 12신살:${baziContext.sinssal}, 현재연도:${new Date().getFullYear()}년`;
     
     let retries = 2;
     while (retries > 0) {
@@ -852,6 +856,7 @@ setTimeout(() => renderChart(labels, baziContext.dScores), 50);
       displayText = displayText.replace(/□/g, '');
       displayText = displayText.replace(/~~(.+?)~~/g, '$1');
     }
+    displayText = displayText.replace(/~~(.+?)~~/gs, '$1');
 
     document.getElementById('tab-content').innerHTML = marked.parse(displayText);
   }
