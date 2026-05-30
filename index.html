@@ -685,10 +685,15 @@ deepdive: `당신은 VVIP 전담 전략 컨설턴트입니다. ${baseRule}
 
   async function fetchAndCache(tabId) {
     const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
-    if (localStorage.getItem(cacheKey)) {
-        if (currentTab === tabId) renderContent(localStorage.getItem(cacheKey), tabId);
+const cached = localStorage.getItem(cacheKey);
+if (cached) {
+    if (cached.includes('서버 내부 연산 실패') || cached.includes('API_ERROR')) {
+        localStorage.removeItem(cacheKey);
+    } else {
+        if (currentTab === tabId) renderContent(cached, tabId);
         return;
     }
+}
 
     const prompts = buildPrompts();
     const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}`;
