@@ -301,7 +301,7 @@ function getTermDay(year, month) {
     const dayPillar = STEMS[dayIdx % 10] + BRANCHES[dayIdx % 12];
     
     let totalMinutes = hour * 60 + minute;
-    let hbIdx = (totalMinutes < 30 || totalMinutes >= 1410) ? 0 : Math.floor((totalMinutes - 30) / 120) + 1;
+    let hbIdx = (totalMinutes < 30 || totalMinutes >= 1410) ? 0 : Math.floor((totalMinutes - 90) / 120) + 1;
     const hourPillar = STEMS[((dayIdx % 5) * 2 + hbIdx) % 10] + BRANCHES[hbIdx];
 
     let baziYear = (month > 2 || (month === 2 && day >= 4)) ? year : year - 1;
