@@ -854,8 +854,10 @@ setTimeout(() => renderChart(labels, baziContext.dScores), 50);
       displayText = displayText.replace(/- \[[ x]\] /g, '• ');
       displayText = displayText.replace(/\n\s*□/g, '');
       displayText = displayText.replace(/□/g, '');
+      displayText = displayText.replace(/(\d)\s*~+\s*(\d)/g, '$1-$2'); 
       displayText = displayText.replace(/~~(.+?)~~/g, '$1');
     }
+    displayText = displayText.replace(/(\d)\s*~+\s*(\d)/g, '$1-$2'); 
     displayText = displayText.replace(/~~(.+?)~~/gs, '$1');
 
     document.getElementById('tab-content').innerHTML = marked.parse(displayText);
