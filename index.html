@@ -775,7 +775,7 @@ if (cached) {
 }
 
     const prompts = buildPrompts();
-    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl}, 신강여부:${baziContext.isStrong?'신강':'신약'}, 통변성:${baziContext.통변성}, 12신살:${baziContext.sinssal}`;
+    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl}, 신강여부:${baziContext.isStrong?'신강':'신약'}, 통변성:${baziContext.통변성}, 12신살:${baziContext.sinssal}, 현재연도:${new Date().getFullYear()}년`;
     
     let retries = 2;
     while (retries > 0) {
