@@ -463,20 +463,10 @@ const DAYMASTER_RELATIONS = {
 const dayMasterElement = ELEMENT_MAP[b.dayStem];
 const rel = DAYMASTER_RELATIONS[dayMasterElement];
 
-// 4. 오행별 기본 점수 (명리학 통변성 기준)
-// 재성(재물), 관성(명예/직위), 식상(활동/표현), 인성(학습/안정), 비겁(독립/경쟁)
-const RELATION_SCORES = {
-    재성: 82,  // 재물운 강한 구간
-    관성: 72,  // 명예/직위 상승 구간
-    식상: 68,  // 활동/성과 창출 구간
-    인성: 58,  // 안정적이나 보수적 구간
-    비겁: 52,  // 독립심 강화, 경쟁 증가 구간
-};
-
 for (let i = 1; i <= 8; i++) {
     const step = isForward ? i : -i;
 
-    // 5. 천간 계산 (버그 수정: 이전 코드에서 완전히 누락된 부분)
+    // 5. 천간 계산
     const dStemIdx = ((monthStemIdx + step) % 10 + 10) % 10;
     const dStem = STEMS[dStemIdx];
     const dStemElement = ELEMENT_MAP[dStem];
@@ -486,7 +476,7 @@ for (let i = 1; i <= 8; i++) {
     const dBranch = BRANCHES[dBranchIdx];
     const dBranchElement = ELEMENT_MAP[dBranch];
 
-    // 7. 천간·지지 각각의 통변성 판별
+    // 7. 통변성 판별
     function getRelation(element) {
         for (const [name, el] of Object.entries(rel)) {
             if (el === element) return name;
@@ -496,17 +486,25 @@ for (let i = 1; i <= 8; i++) {
     const stemRelation = getRelation(dStemElement);
     const branchRelation = getRelation(dBranchElement);
 
-    // 8. 천간 40% + 지지 60% 가중 평균 (지지가 실질 에너지의 근간)
-    const stemScore = RELATION_SCORES[stemRelation];
-    const branchScore = RELATION_SCORES[branchRelation];
+    // 8. 신강/신약 기반 용희신/기구신 스코어링
+    let stemScore = 0;
+    let branchScore = 0;
+    if (isStrong) {
+        const SCORE_MAP = { 재성: 90, 관성: 85, 식상: 75, 비겁: 40, 인성: 30 };
+        stemScore = SCORE_MAP[stemRelation];
+        branchScore = SCORE_MAP[branchRelation];
+    } else {
+        const SCORE_MAP = { 인성: 90, 비겁: 85, 식상: 45, 관성: 35, 재성: 30 };
+        stemScore = SCORE_MAP[stemRelation];
+        branchScore = SCORE_MAP[branchRelation];
+    }
+
+    // 9. 천간 40% + 지지 60% 가중 평균
     const baseScore = Math.round(stemScore * 0.4 + branchScore * 0.6);
 
-    // 9. 고유 노이즈 (-8 ~ +8, 기존 ±12보다 축소하여 명리 로직 비중 강화)
-    const detailNoise = ((userSeed + i * 17) % 17) - 8;
-
-    // 10. 최종 점수 (하한 30점으로 낮춰 위험 구간 가시화)
-    dScores.push(Math.max(30, Math.min(95, baseScore + detailNoise)));
-    dLabels.push(`${dStem}${dBranch}`); // 예: 甲子, 乙丑 등
+    // 10. 최종 점수 확정 (상하한 보정)
+    dScores.push(Math.max(25, Math.min(95, baseScore)));
+    dLabels.push(`${dStem}${dBranch}`);
 }
 
     baziContext = {
