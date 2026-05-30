@@ -225,6 +225,38 @@ function getTermDay(year, month) {
   const ELEMENT_MAP = {'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','亥':'水','子':'水'};
   const termDays = [0, 6, 4, 6, 5, 6, 6, 7, 8, 8, 8, 7, 7];
 
+  // ===== 12신살 계산 엔진 =====
+  const SINSSAL_BRANCHES = [
+      ['巳','午','未','申','酉','戌','亥','子','丑','寅','卯','辰'],  // 신자진 그룹
+      ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'],  // 사유축 그룹
+      ['亥','子','丑','寅','卯','辰','巳','午','未','申','酉','戌'],  // 인오술 그룹
+      ['申','酉','戌','亥','子','丑','寅','卯','辰','巳','午','未'],  // 해묘미 그룹
+  ];
+  const SINSSAL_GROUP = {'申':0,'子':0,'辰':0,'巳':1,'酉':1,'丑':1,'寅':2,'午':2,'戌':2,'亥':3,'卯':3,'未':3};
+  const SINSSAL_NAMES = ['겁살','재살','천살','지살','년살(도화)','월살','망신살','장성살','반안살','역마살','육해살','화개살'];
+  const SINSSAL_SHOW = ['겁살','년살(도화)','망신살','역마살','화개살']; // 상업적으로 의미있는 살만
+
+  function getSinssal(yearBranch, targetBranch) {
+      const group = SINSSAL_GROUP[yearBranch];
+      if (group === undefined) return null;
+      const idx = SINSSAL_BRANCHES[group].indexOf(targetBranch);
+      if (idx === -1) return null;
+      return SINSSAL_NAMES[idx];
+  }
+
+  function calcAllSinssal(yearBranch, pillars) {
+      const labels = ['월지','일지','시지'];
+      const result = [];
+      pillars.forEach((branch, i) => {
+          const sal = getSinssal(yearBranch, branch);
+          if (sal && SINSSAL_SHOW.includes(sal)) {
+              result.push(`${labels[i]}:${sal}`);
+          }
+      });
+      return result.length > 0 ? result.join(', ') : '없음';
+  }
+  // ===== 12신살 계산 엔진 끝 =====
+
   function generateSeed(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -483,7 +515,8 @@ for (let i = 1; i <= 8; i++) {
     fixedStatsTable, fixedWealthData, dScores, dLabels, deepDive,
     dayMasterEl: ELEMENT_MAP[b.dayStem],
     isStrong,
-    통변성: `관성 ${관성수}개, 재성 ${재성수}개, 식상 ${식상수}개, 인성 ${인성수}개, 비겁 ${비겁수}개`
+    통변성: `관성 ${관성수}개, 재성 ${재성수}개, 식상 ${식상수}개, 인성 ${인성수}개, 비겁 ${비겁수}개`,
+    sinssal: calcAllSinssal(b.year[1], [b.month[1], b.day[1], b.hour[1]])
 };
     
     document.getElementById('input-screen').style.display = 'none';
@@ -716,7 +749,7 @@ if (cached) {
 }
 
     const prompts = buildPrompts();
-    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl}, 신강여부:${baziContext.isStrong?'신강':'신약'}, 통변성:${baziContext.통변성}`;
+    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl}, 신강여부:${baziContext.isStrong?'신강':'신약'}, 통변성:${baziContext.통변성}, 12신살:${baziContext.sinssal}`;
     
     let retries = 2;
     while (retries > 0) {
