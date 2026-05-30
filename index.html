@@ -363,7 +363,9 @@ const fixedStatsTable = generateFixedStats(userSeed, elCounts);
     if (isStrong && 재성수 >= 1 && 재성수 <= 2) tierShift += 2;
     else if (isStrong && 재성수 === 0 && 식상수 >= 1) tierShift += 1;
     else if (isStrong && 재성수 >= 3) tierShift += 0;
-    else if (!isStrong && 재성수 >= 2) tierShift -= 1;
+    else if (!isStrong && 재성수 >= 2) {
+    if (식상수 >= 1) tierShift += 0;  // 식상생재 → 중립
+    else tierShift -= 1;
     else if (!isStrong && 재성수 === 0) tierShift -= 1;
 
     // ② 식상 보정
