@@ -62,6 +62,26 @@
     .markdown-body table { display: table; white-space: normal; }
     .chart-box { height: 430px; padding: 2rem; }
   }
+ .concern-input { width: 100%; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); padding: 0.9rem 0.8rem; border-radius: 8px; outline: none; font-size: 0.9rem; resize: none; height: 70px; margin-top: 6px; }
+ .concern-input:focus { border-color: var(--gold); }
+ .interest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+ .interest-btn { background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 10px 8px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; text-align: center; transition: 0.2s; }
+ .interest-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.08); }
+
+/* 운명 카드 */
+  .destiny-card { background: linear-gradient(135deg, #1a1a1c 0%, #2a2a2e 100%); border: 1px solid var(--gold); border-radius: 20px; padding: 2rem 1.5rem; margin-bottom: 2rem; text-align: center; position: relative; overflow: hidden; }
+  .destiny-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 60%); pointer-events: none; }
+  .character-img { width: 120px; height: 120px; object-fit: contain; margin: 0 auto 1rem; display: block; border-radius: 50%; border: 2px solid var(--gold); background: rgba(212,175,55,0.05); }
+  .character-placeholder { width: 120px; height: 120px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid var(--gold); background: rgba(212,175,55,0.05); font-size: 3rem; }
+  .destiny-type { font-size: 1.5rem; font-weight: 700; color: var(--gold); margin-bottom: 0.3rem; }
+  .character-class { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.2rem; letter-spacing: 2px; }
+  .destiny-divider { width: 60px; height: 1px; background: var(--gold); margin: 1rem auto; opacity: 0.4; }
+  .destiny-keywords { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .destiny-keyword { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); color: var(--gold); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+  .destiny-quote { font-size: 0.95rem; color: var(--text-main); line-height: 1.6; font-style: italic; margin-bottom: 1.2rem; padding: 0 1rem; }
+  .share-btn { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+  .share-btn:hover { background: rgba(212,175,55,0.1); }  
+
 </style>
 </head>
 <body>
@@ -109,6 +129,38 @@
             </label>
         </div>
       </div>
+      <!-- 현재 직무 -->
+      <div class="form-group" style="margin-top:1.2rem;">
+        <label style="color:var(--gold); font-weight:bold;">현재 직업/직무</label>
+        <select id="f-job" style="margin-top:6px;">
+          <option value="">선택해주세요 (선택사항)</option>
+          <option value="직장인(사원/대리급)">직장인 — 사원/대리급</option>
+          <option value="직장인(과장/차장급)">직장인 — 과장/차장급</option>
+          <option value="직장인(부장/임원급)">직장인 — 부장/임원급</option>
+          <option value="사업가/대표">사업가/대표</option>
+          <option value="전문직(의사/변호사/회계사 등)">전문직</option>
+          <option value="프리랜서/크리에이터">프리랜서/크리에이터</option>
+          <option value="전업주부">전업주부</option>
+          <option value="취업준비생/학생">취업준비생/학생</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+
+      <!-- 관심사 -->
+      <div class="form-group">
+        <label style="color:var(--gold); font-weight:bold;">지금 가장 관심 있는 것 (최대 2개)</label>
+        <div class="interest-grid" id="interest-grid">
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="승진/커리어">📈 승진/커리어</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="창업/사업확장">🚀 창업/사업확장</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="부동산 투자">🏠 부동산 투자</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="자녀교육">🎓 자녀교육</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="결혼/연애">💍 결혼/연애</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="재테크/자산증식">💰 재테크/자산증식</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="건강관리">🏥 건강관리</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="이직/전직">🔄 이직/전직</button>
+        </div>
+      </div>
+
       <div id="error-msg" style="color:#ff6b6b; text-align:center; font-size:0.9rem; margin-top:1rem;"></div>
       <button class="btn-blue" onclick="startAnalysis()">👑 프리미엄 리포트 발급</button>
     </div>
@@ -119,12 +171,6 @@
       <button class="tab-btn active" onclick="switchTab('summary')">종합 전략</button>
       <button class="tab-btn" onclick="switchTab('wealth')">인생 & 자산</button>
       <button class="tab-btn" onclick="switchTab('future')">진로 & 성과</button>
-    </div>
-    
-    <div id="chart-area" style="display:none; margin-bottom: 2.5rem;">
-      <h3 style="color:var(--gold); font-size:1.4rem; margin-bottom:0.4rem;">[Life Vision] 대운 흐름 시각화 대시보드</h3>
-      <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.2rem;">※ Y축(Score)은 사주 원국과 대운의 상호작용을 사주 에너지 흐름 지수로 표현한 종합 운세 성과 지표입니다.</p>
-      <div class="chart-box"><canvas id="daewunChart"></canvas></div>
     </div>
 
     <div id="tab-content" class="markdown-body"></div>
@@ -257,6 +303,60 @@ function getTermDay(year, month) {
   }
   // ===== 12신살 계산 엔진 끝 =====
 
+// ===== 캐릭터 판별 엔진 =====
+  function getCharacterClass(tb) {
+    const {관성수, 재성수, 식상수, 인성수, 비겁수} = tb;
+    if (관성수 >= 2 && 비겁수 >= 2) return { key: 'warrior', name: '⚔️ 전사형 지배자', emoji: '⚔️' };
+    if (관성수 >= 2)                 return { key: 'king',    name: '👑 왕형 리더',    emoji: '👑' };
+    if (재성수 >= 2 && 식상수 >= 1)  return { key: 'merchant',name: '💰 상인형 전략가', emoji: '💰' };
+    if (인성수 >= 2 && 식상수 >= 1)  return { key: 'sage',    name: '🔮 현자형 참모',  emoji: '🔮' };
+    if (비겁수 >= 2 && 식상수 >= 2)  return { key: 'rogue',   name: '🗡️ 전략가형',    emoji: '🗡️' };
+    if (식상수 >= 2)                 return { key: 'artist',  name: '🎨 예술가형',     emoji: '🎨' };
+    if (인성수 >= 2)                 return { key: 'priest',  name: '✨ 사제형',       emoji: '✨' };
+    return                                  { key: 'wanderer',name: '🌊 방랑자형',     emoji: '🌊' };
+  }
+
+  function renderDestinyCard(rawText) {
+    // AI 출력에서 카드 요소 추출
+    const typeMatch = rawText.match(/나의 운명 유형["""]?\s*["""]?(.+?)["""]?[\n\r]/);
+    const keywordMatch = rawText.match(/키워드 3개\*?\*?\s*(.+?)[\n\r]/);
+    const quoteMatch = rawText.match(/한줄 운명[^|]*\|\s*(.+?)\s*\|/);
+    const hashtagMatch = rawText.match(/SNS 공유 태그[^#]*(#[^\n\r]+)/);
+
+    const destinyType = typeMatch ? typeMatch[1].trim() : baziContext.name + '의 운명';
+    const keywords = keywordMatch ? keywordMatch[1].split(/[,，、]/).map(k => k.trim()).slice(0, 3) : [];
+    const quote = quoteMatch ? quoteMatch[1].trim() : '';
+    const hashtags = hashtagMatch ? hashtagMatch[1].trim() : '';
+
+    const character = getCharacterClass(baziContext.tbNumbers || {관성수:0,재성수:0,식상수:0,인성수:0,비겁수:0});
+
+    // 캐릭터 이미지 (준비되면 img 태그로 교체)
+    const imgHtml = `<div class="character-placeholder">${character.emoji}</div>`;
+
+    const keywordsHtml = keywords.map(k => `<span class="destiny-keyword">${k}</span>`).join('');
+    const shareText = `${destinyType} | ${keywords.join(' ')} | ${hashtags}`;
+
+    return `
+<div class="destiny-card">
+  ${imgHtml}
+  <div class="destiny-type">${destinyType}</div>
+  <div class="character-class">${character.name}</div>
+  <div class="destiny-divider"></div>
+  <div class="destiny-keywords">${keywordsHtml}</div>
+  <div class="destiny-quote">"${quote}"</div>
+  <button class="share-btn" onclick="shareDestiny('${encodeURIComponent(shareText)}')">📱 SNS 공유하기</button>
+</div>`;
+  }
+
+  function shareDestiny(encodedText) {
+    const text = decodeURIComponent(encodedText);
+    if (navigator.share) {
+        navigator.share({ title: '팔자길드 운명 분석', text: text, url: window.location.href });
+    } else {
+        navigator.clipboard.writeText(text).then(() => alert('클립보드에 복사됐습니다!'));
+    }
+  }
+  
   function generateSeed(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -301,7 +401,7 @@ function getTermDay(year, month) {
     const dayPillar = STEMS[dayIdx % 10] + BRANCHES[dayIdx % 12];
     
     let totalMinutes = hour * 60 + minute;
-    let hbIdx = (totalMinutes < 30 || totalMinutes >= 1410) ? 0 : Math.floor((totalMinutes - 90) / 120) + 1;
+    let hbIdx = (totalMinutes < 90 || totalMinutes >= 1410) ? 0 : Math.floor((totalMinutes - 90) / 120) + 1;
     const hourPillar = STEMS[((dayIdx % 5) * 2 + hbIdx) % 10] + BRANCHES[hbIdx];
 
     let baziYear = (month > 2 || (month === 2 && day >= 4)) ? year : year - 1;
@@ -341,6 +441,19 @@ if (isForward) {
     return d === 0 ? 1 : d;
   }
 
+  function toggleInterest(btn) {
+    const selected = document.querySelectorAll('.interest-btn.selected');
+    if (btn.classList.contains('selected')) {
+        btn.classList.remove('selected');
+    } else {
+        if (selected.length >= 2) {
+            alert('최대 2개까지 선택 가능합니다.');
+            return;
+        }
+        btn.classList.add('selected');
+    }
+  }
+
   async function startAnalysis() {
     localStorage.clear();
     const y = document.getElementById('f-year').value;
@@ -354,6 +467,8 @@ if (isForward) {
     const name = document.getElementById('f-name').value || "내담자";
     const gender = document.querySelector('input[name="gender"]:checked').value;
     const deepDive = document.querySelector('input[name="deepDive"]:checked').value;
+    const userJob = document.getElementById('f-job').value || '미입력';
+    const userInterests = Array.from(document.querySelectorAll('.interest-btn.selected')).map(b => b.dataset.value).join(', ') || '미입력';
     const b = getExactBazi(parseInt(y), parseInt(m), parseInt(d), parseInt(h), parseInt(document.getElementById('f-minute').value));
     const age = new Date().getFullYear() - parseInt(y) + 1;
     const calculatedDn = getDaewunNumber(parseInt(y), parseInt(m), parseInt(d), gender, b.yearStemIdx);
@@ -514,7 +629,10 @@ for (let i = 1; i <= 8; i++) {
     dayMasterEl: ELEMENT_MAP[b.dayStem],
     isStrong,
     통변성: `조직장악력 ${관성수}개, 재물에너지 ${재성수}개, 실행력 ${식상수}개, 학습력 ${인성수}개, 경쟁에너지 ${비겁수}개`,
-    sinssal: calcAllSinssal(b.year[1], [b.month[1], b.day[1], b.hour[1]])
+    tbNumbers: { 관성수, 재성수, 식상수, 인성수, 비겁수 },
+    sinssal: calcAllSinssal(b.year[1], [b.month[1], b.day[1], b.hour[1]]),
+    userJob,        // ← 추가
+    userInterests,  // ← 추가
 };
     
     document.getElementById('input-screen').style.display = 'none';
@@ -570,6 +688,7 @@ switchTab('summary');
 - 체크박스("- [ ]") 절대 금지. 목록은 숫자(1. 2. 3.) 또는 •로만.
 - 식단·음식·영양제 관련 조언 절대 금지. 건강 조언은 운동·생활습관·의료 검진으로만 제시.
 - 한자·한자어(신강, 신약, 오행 한자 표기 등) 출력 절대 금지. 반드시 한글로만 작성.
+- 현재직무/관심사가 '미입력'인 경우 해당 항목은 완전히 무시하고 사주 구조만으로 분석할 것.
 - 지시된 모든 섹션과 표를 빠짐없이 완성. 생략 절대 금지.`;
     
     
@@ -794,7 +913,7 @@ if (cached) {
 }
 
     const prompts = buildPrompts();
-    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl === '木' ? '나무(木)에너지' : baziContext.dayMasterEl === '火' ? '불(火)에너지' : baziContext.dayMasterEl === '土' ? '흙(土)에너지' : baziContext.dayMasterEl === '金' ? '쇠(金)에너지' : '물(水)에너지'}, 신강여부:${baziContext.isStrong?'신강':'신약'}, 통변성:${baziContext.통변성}, 12신살:${baziContext.sinssal}, 현재연도:${new Date().getFullYear()}년`;
+    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl === '木' ? '나무(木)에너지' : baziContext.dayMasterEl === '火' ? '불(火)에너지' : baziContext.dayMasterEl === '土' ? '흙(土)에너지' : baziContext.dayMasterEl === '金' ? '쇠(金)에너지' : '물(水)에너지'}, 신강여부:${baziContext.isStrong?'신강':'신약'}, 통변성:${baziContext.통변성}, 12신살:${baziContext.sinssal}, 현재연도:${new Date().getFullYear()}년, 현재직무:${baziContext.userJob}, 관심사:${baziContext.userInterests}`;
     
     let retries = 2;
     while (retries > 0) {
@@ -839,7 +958,6 @@ if (cached) {
     document.querySelectorAll(`button[onclick="switchTab('${tabId}')"]`).forEach(btn => btn.classList.add('active'));
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.getElementById('chart-area').style.display = (tabId === 'summary') ? 'block' : 'none';
 
     const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
     const cachedText = localStorage.getItem(cacheKey);
@@ -857,12 +975,9 @@ if (cached) {
     let displayText = rawText;
     
     if (tabId === 'summary') {
-      // 자체 생성된 수식 데이터로 차트 엔진 다이렉트 호출
-      const labels = Array.from({length: 8}, (_, i) => 
-    `${baziContext.dn + (i * 10)}세\n${baziContext.dLabels[i] || ''}`
-);
-setTimeout(() => renderChart(labels, baziContext.dScores), 50);
-
+      // 카드 먼저 렌더링
+        const cardHtml = renderDestinyCard(rawText);
+             
       // (선택) 이전 캐시에 남아있을지 모를 JSON 찌꺼기 문자열 청소
       displayText = displayText.replace(/```[a-z]*\n\{[\s\S]*?\}\n```/g, '');
       displayText = displayText.replace(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/g, '');
@@ -871,10 +986,12 @@ setTimeout(() => renderChart(labels, baziContext.dScores), 50);
       displayText = displayText.replace(/□/g, '');
       displayText = displayText.replace(/(\d)\s*~+\s*(\d)/g, '$1-$2'); 
       displayText = displayText.replace(/~~(.+?)~~/g, '$1');
+      document.getElementById('tab-content').innerHTML = cardHtml + marked.parse(displayText);
+// (마지막 줄만 이렇게 변경, return 추가)
+return;
     }
     displayText = displayText.replace(/(\d)\s*~+\s*(\d)/g, '$1-$2'); 
     displayText = displayText.replace(/~~(.+?)~~/gs, '$1');
-
     document.getElementById('tab-content').innerHTML = marked.parse(displayText);
   }
 
