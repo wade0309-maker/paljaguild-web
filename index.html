@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>팔자길드 - 프리미엄 전략 컨설팅</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+  
+  :root { --bg-dark: #0f0f11; --card-bg: #1a1a1c; --text-main: #f5f0e8; --text-muted: #88888b; --gold: #d4af37; --blue-btn: #1a5c9e; --border: #333336; --input-bg: #131314; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(circle at 50% 0%, #2a2a2e 0%, transparent 60%); overflow-x: hidden; }
+  
+  .hero-section { text-align: center; margin: 3rem 0 2rem; padding: 0 1rem; }
+  .hero-section h1 { font-family: 'Noto Serif KR', serif; font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .gold-text { color: var(--gold); }
+  .hero-section p { color: var(--text-muted); font-size: 0.95rem; }
+  
+  .input-container { width: 100%; max-width: 500px; padding: 0 1.2rem; margin-bottom: 4rem; }
+  .input-card { background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 2rem 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  
+  .form-group { margin-bottom: 1.5rem; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem; font-weight: 500; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  
+  input, select { width: 100%; background-color: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); padding: 0.9rem 0.8rem; border-radius: 8px; outline: none; font-size: 0.95rem; }
+  input:focus, select:focus { border-color: var(--gold); }
+  
+  .toggle-group { display: flex; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .toggle-group label { flex: 1; text-align: center; padding: 0.9rem 0; cursor: pointer; color: var(--text-muted); font-size: 0.95rem; }
+  .toggle-group input { display: none; }
+  .toggle-group input:checked + label { background-color: var(--border); color: var(--text-main); font-weight: 600; }
+  
+  .btn-blue { width: 100%; padding: 1.1rem; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; background-color: var(--blue-btn); color: white; margin-top: 1.5rem; font-size: 1.05rem; transition: 0.2s; }
+  .btn-blue:hover { opacity: 0.9; }
+  
+  #result-screen { display: none; width: 100%; max-width: 850px; padding: 0 1.2rem 4rem; overflow-x: hidden; }
+  .tab-container { display: flex; gap: 6px; margin-bottom: 2rem; background: var(--input-bg); padding: 6px; border-radius: 12px; border: 1px solid var(--border); }
+  .tab-btn { flex: 1; padding: 14px 5px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+  .tab-btn.active { background: var(--border); color: var(--gold); }
+  
+  .markdown-body { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem 1.5rem; font-size: 1rem; line-height: 2; color: #e8e8e8; min-height: 300px; word-break: break-word; }
+  .markdown-body p { margin-bottom: 1.2rem; }
+  .markdown-body table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; border-collapse: collapse; margin: 1.8rem 0; background-color: var(--input-bg); border-radius: 8px; }
+  .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 12px 16px; text-align: center; vertical-align: middle; }
+  .markdown-body td { white-space: normal; min-width: 110px; font-size: 0.95rem; line-height: 1.7; }
+  .markdown-body th { background-color: rgba(212, 175, 55, 0.15); color: var(--gold); font-weight: 700; min-width: 110px; }
+  .markdown-body h3 { color: var(--gold); margin: 3rem 0 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 8px; font-size: 1.2rem; }
+  .markdown-body h4 { color: #ccc; margin: 1.8rem 0 0.8rem; font-size: 1rem; }
+  .markdown-body blockquote { border-left: 4px solid var(--gold); padding: 1.2rem 1.5rem; background: rgba(212, 175, 55, 0.08); margin: 2rem 0; border-radius: 0 8px 8px 0; white-space: pre-wrap; font-size: 0.95rem; line-height: 1.8; }
+  .markdown-body ul { list-style-type: disc; padding-left: 22px; margin: 1rem 0 1.5rem; }
+  .markdown-body ol { padding-left: 22px; margin: 1rem 0 1.5rem; }
+  .markdown-body li { margin-bottom: 10px; line-height: 1.8; }
+  .markdown-body strong { color: #f0e8d0; }
+  .markdown-body hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  .loading-tab { text-align: center; padding: 4rem 0; color: var(--gold); font-size: 0.95rem; }
+
+  /* 모래시계 애니메이션 */
+  .hourglass-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; padding: 3rem 0; }
+  .hourglass { font-size: 2.8rem; animation: hg-flip 2s ease-in-out infinite; display: inline-block; filter: drop-shadow(0 0 8px rgba(212,175,55,0.5)); }
+  @keyframes hg-flip {
+    0%   { transform: rotate(0deg);   }
+    40%  { transform: rotate(0deg);   }
+    50%  { transform: rotate(180deg); }
+    90%  { transform: rotate(180deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .hourglass-text { color: var(--gold); font-size: 0.95rem; letter-spacing: 0.05em; }
+  .hourglass-sub  { color: var(--text-muted); font-size: 0.8rem; margin-top: 0.3rem; }
+  .chart-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; height: 350px; }
+  .tier-legend { background-color: rgba(255, 255, 255, 0.03); border: 1px dashed var(--border); padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.85rem; color: #bbb; white-space: normal; }
+  
+  @media (min-width: 768px) {
+    .tab-btn { font-size: 0.95rem; padding: 16px; }
+    .markdown-body { padding: 3rem 3.5rem; font-size: 1.05rem; line-height: 2.1; }
+    .markdown-body h3 { font-size: 1.3rem; margin: 3.5rem 0 1.4rem; }
+    .markdown-body li { margin-bottom: 12px; }
+    .markdown-body table { display: table; white-space: normal; }
+    .chart-box { height: 430px; padding: 2rem; }
+  }
+ .concern-input { width: 100%; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); padding: 0.9rem 0.8rem; border-radius: 8px; outline: none; font-size: 0.9rem; resize: none; height: 70px; margin-top: 6px; }
+ .concern-input:focus { border-color: var(--gold); }
+ .interest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+ .interest-btn { background: var(--input-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 10px 8px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; text-align: center; transition: 0.2s; }
+ .interest-btn.selected { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.08); }
+
+/* 운명 카드 */
+  .destiny-card { background: linear-gradient(135deg, #1a1a1c 0%, #2a2a2e 100%); border: 1px solid var(--gold); border-radius: 20px; padding: 2rem 1.5rem; margin-bottom: 2rem; text-align: center; position: relative; overflow: hidden; }
+  .destiny-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 60%); pointer-events: none; }
+  .character-img { width: 160px; height: 160px; object-fit: cover; object-position: center top; margin: 0 auto 1rem; display: block; border-radius: 16px; border: 2px solid var(--gold); background: rgba(212,175,55,0.05); }
+  .character-placeholder { width: 160px; height: 160px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; border-radius: 16px; border: 2px solid var(--gold); background: rgba(212,175,55,0.05); font-size: 3.5rem; }
+  .destiny-type { font-size: 1.5rem; font-weight: 700; color: var(--gold); margin-bottom: 0.3rem; }
+  .character-class { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.2rem; letter-spacing: 2px; }
+  .destiny-divider { width: 60px; height: 1px; background: var(--gold); margin: 1rem auto; opacity: 0.4; }
+  .destiny-keywords { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .destiny-keyword { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); color: var(--gold); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+  .destiny-quote { font-size: 0.95rem; color: var(--text-main); line-height: 1.6; font-style: italic; margin-bottom: 1.2rem; padding: 0 1rem; }
+  .share-btn { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+  .share-btn:hover { background: rgba(212,175,55,0.1); }  
+
+</style>
+</head>
+<body>
+
+  <div class="hero-section" id="hero">
+    <h1>팔자길드 <span class="gold-text">프리미엄</span></h1>
+    <p>금융 통계와 명리학이 결합된 당신을 위한 인생 전략</p>
+  </div>
+
+  <div class="input-container" id="input-screen">
+    <div class="input-card">
+      <div class="form-group"><label>내담자 성함</label><input type="text" id="f-name" placeholder="성함을 입력하세요"></div>
+      <div class="form-group">
+        <label>성별</label>
+        <div class="toggle-group">
+          <input type="radio" id="gender-m" name="gender" value="M"><label for="gender-m">남성</label>
+          <input type="radio" id="gender-f" name="gender" value="F" checked><label for="gender-f">여성</label>
+        </div>
+      </div>
+      <div class="form-group"><label>생년월일 (양력)</label><div class="grid-3"><input type="number" id="f-year" placeholder="YYYY"><input type="number" id="f-month" placeholder="MM"><input type="number" id="f-day" placeholder="DD"></div></div>
+      <div class="form-group">
+        <label>태어난 시간 (모를 경우 12시 00분)</label>
+        <div class="grid-2">
+          <select id="f-hour">
+            <option value="" disabled selected>시 (Hour)</option>
+            <option value="0">0시 (자시)</option><option value="1">1시 (축시)</option><option value="2">2시 (축시)</option><option value="3">3시 (인시)</option><option value="4">4시 (인시)</option><option value="5">5시 (묘시)</option><option value="6">6시 (묘시)</option><option value="7">7시 (진시)</option><option value="8">8시 (진시)</option><option value="9">9시 (사시)</option><option value="10">10시 (사시)</option><option value="11">11시 (오시)</option><option value="12">12시 (오시)</option><option value="13">13시 (미시)</option><option value="14">14시 (미시)</option><option value="15">15시 (신시)</option><option value="16">16시 (신시)</option><option value="17">17시 (유시)</option><option value="18">18시 (유시)</option><option value="19">19시 (술시)</option><option value="20">20시 (술시)</option><option value="21">21시 (해시)</option><option value="22">22시 (해시)</option><option value="23">23시 (자시)</option>
+          </select>
+          <input type="number" id="f-minute" placeholder="분 (Minute)" min="0" max="59" value="0">
+        </div>
+        <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+          <label style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">자시(子時) 기준</label>
+          <select id="f-zashi-mode" style="font-size:12px; padding:4px 8px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--border); border-radius:6px;">
+            <option value="2330" selected>23:30 기준 (권장)</option>
+            <option value="2300">23:00 기준</option>
+          </select>
+        </div>
+      </div>
+      <!-- 현재 직무 -->
+      <div class="form-group" style="margin-top:1.2rem;">
+        <label style="color:var(--gold); font-weight:bold;">현재 직업/직무</label>
+        <select id="f-job" style="margin-top:6px;">
+          <option value="">선택해주세요 (선택사항)</option>
+          <option value="직장인(사원/대리급)">직장인 — 사원/대리급</option>
+          <option value="직장인(과장/차장급)">직장인 — 과장/차장급</option>
+          <option value="직장인(부장/임원급)">직장인 — 부장/임원급</option>
+          <option value="사업가/대표">사업가/대표</option>
+          <option value="전문직(의사/변호사/회계사 등)">전문직</option>
+          <option value="공무원(일반직)">공무원 — 일반직</option>
+          <option value="공공기관/공기업">공공기관/공기업</option>
+          <option value="교육직(교사/교수 등)">교육직 — 교사/교수</option>
+          <option value="프리랜서/크리에이터">프리랜서/크리에이터</option>
+          <option value="전업주부">전업주부</option>
+          <option value="취업준비생/학생">취업준비생/학생</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+
+      <!-- 관심사 -->
+      <div class="form-group">
+        <label style="color:var(--gold); font-weight:bold;">지금 가장 관심 있는 것 (최대 2개)</label>
+        <div class="interest-grid" id="interest-grid">
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="승진/커리어">📈 승진/커리어</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="창업/사업확장">🚀 창업/사업확장</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="부동산 투자">🏠 부동산 투자</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="자녀/가족">👶 자녀/가족</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="결혼/연애">💍 결혼/연애</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="재테크/자산증식">💰 재테크/자산증식</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="건강관리">🏥 건강관리</button>
+          <button type="button" class="interest-btn" onclick="toggleInterest(this)" data-value="이직/전직">🔄 이직/전직</button>
+        </div>
+      </div>
+
+      <div id="error-msg" style="color:#ff6b6b; text-align:center; font-size:0.9rem; margin-top:1rem;"></div>
+      <button class="btn-blue" onclick="startAnalysis()">👑 프리미엄 리포트 발급</button>
+    </div>
+  </div>
+
+  <div id="result-screen">
+    <div class="tab-container" id="tab-top"></div>
+    <div id="tab-content" class="markdown-body"></div>
+    <div class="tab-container" id="tab-bottom" style="margin-top: 1.5rem;"></div>
+  </div>
+
+<script>
+  let baziContext = {}; 
+  let currentTab = 'summary';
+
+  // ===== 절기 계산 엔진 (절입 시각 반환 버전) =====
+
+  function getJulianDay(year, month, day, hour = 0, minute = 0, second = 0) {
+    if (month <= 2) { year--; month += 12; }
+    const A = Math.floor(year / 100);
+    const B = 2 - A + Math.floor(A / 4);
+    const dayFraction = (hour + minute / 60 + second / 3600) / 24;
+    return Math.floor(365.25 * (year + 4716))
+         + Math.floor(30.6001 * (month + 1))
+         + day + dayFraction + B - 1524.5;
+  }
+
+  function getSunLongitude(jd) {
+    const T = (jd - 2451545.0) / 36525.0;
+    const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+    const M  = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+    const Mrad = M * Math.PI / 180;
+    const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mrad)
+            + (0.019993 - 0.000101 * T) * Math.sin(2 * Mrad)
+            + 0.000289 * Math.sin(3 * Mrad);
+    return (((L0 + C) % 360) + 360) % 360;
+  }
+
+  function julianDayToUTCDate(jd) {
+    let Z = Math.floor(jd + 0.5), F = (jd + 0.5) - Z;
+    let A = Z;
+    if (Z >= 2299161) {
+      const alpha = Math.floor((Z - 1867216.25) / 36524.25);
+      A = Z + 1 + alpha - Math.floor(alpha / 4);
+    }
+    const B = A + 1524, C = Math.floor((B - 122.1) / 365.25);
+    const D = Math.floor(365.25 * C), E = Math.floor((B - D) / 30.6001);
+    let day   = B - D - Math.floor(30.6001 * E) + F;
+    let month = (E < 14) ? E - 1 : E - 13;
+    let year  = (month > 2) ? C - 4716 : C - 4715;
+    const dayInt = Math.floor(day);
+    const totalSec = Math.round((day - dayInt) * 86400);
+    return new Date(Date.UTC(year, month - 1, dayInt,
+      Math.floor(totalSec / 3600),
+      Math.floor((totalSec % 3600) / 60),
+      totalSec % 60));
+  }
+
+  // KST 입력값을 UTC Date 객체로 변환
+  function makeKSTDate(year, month, day, hour = 0, minute = 0) {
+    return new Date(Date.UTC(year, month - 1, day, hour - 9, minute, 0));
+  }
+
+  // 특정 황경 도달 시각 반환 (Date 객체, UTC)
+  function getSolarTermDateTime(year, targetDegree, approxMonth) {
+    let center = getJulianDay(year, approxMonth, 15, 12, 0, 0);
+    let lo = center - 20, hi = center + 20;
+    for (let i = 0; i < 60; i++) {
+      const mid = (lo + hi) / 2;
+      let diff = getSunLongitude(mid) - targetDegree;
+      if (diff > 180) diff -= 360; if (diff < -180) diff += 360;
+      if (Math.abs(diff) < 1e-7) return julianDayToUTCDate(mid);
+      let diffLo = getSunLongitude(lo) - targetDegree;
+      if (diffLo > 180) diffLo -= 360; if (diffLo < -180) diffLo += 360;
+      if ((diffLo <= 0 && diff >= 0) || (diffLo >= 0 && diff <= 0)) hi = mid;
+      else lo = mid;
+    }
+    return julianDayToUTCDate((lo + hi) / 2);
+  }
+
+  const SOLAR_TERM_DEGREES = [0, 285, 315, 345, 15, 45, 75, 105, 135, 165, 195, 225, 255];
+  const termDateCache = {};
+
+  function getTermDateTime(year, month) {
+    const key = `${year}-${month}`;
+    if (termDateCache[key]) return termDateCache[key];
+    const dt = getSolarTermDateTime(year, SOLAR_TERM_DEGREES[month], month);
+    termDateCache[key] = dt;
+    return dt;
+  }
+
+  function formatKST(dateObj) {
+    const kst = new Date(dateObj.getTime() + 9 * 3600 * 1000);
+    const y  = kst.getUTCFullYear();
+    const mo = String(kst.getUTCMonth() + 1).padStart(2, '0');
+    const d  = String(kst.getUTCDate()).padStart(2, '0');
+    const hh = String(kst.getUTCHours()).padStart(2, '0');
+    const mm = String(kst.getUTCMinutes()).padStart(2, '0');
+    return `${y}-${mo}-${d} ${hh}:${mm} KST`;
+  }
+  // ===== 절기 계산 엔진 끝 =====
+  
+  const STEMS = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+  const BRANCHES = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+  const ELEMENT_MAP = {'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','亥':'水','子':'水'};
+
+
+  // ===== 12신살 계산 엔진 =====
+  const SINSSAL_BRANCHES = [
+      ['巳','午','未','申','酉','戌','亥','子','丑','寅','卯','辰'],  // 신자진 그룹
+      ['寅','卯','辰','巳','午','未','申','酉','戌','亥','子','丑'],  // 사유축 그룹
+      ['亥','子','丑','寅','卯','辰','巳','午','未','申','酉','戌'],  // 인오술 그룹
+      ['申','酉','戌','亥','子','丑','寅','卯','辰','巳','午','未'],  // 해묘미 그룹
+  ];
+  const SINSSAL_GROUP = {'申':0,'子':0,'辰':0,'巳':1,'酉':1,'丑':1,'寅':2,'午':2,'戌':2,'亥':3,'卯':3,'未':3};
+  const SINSSAL_NAMES = ['겁살','재살','천살','지살','년살(도화)','월살','망신살','장성살','반안살','역마살','육해살','화개살'];
+  const SINSSAL_SHOW = ['겁살','년살(도화)','망신살','역마살','화개살']; // 상업적으로 의미있는 살만
+
+  function getSinssal(yearBranch, targetBranch) {
+      const group = SINSSAL_GROUP[yearBranch];
+      if (group === undefined) return null;
+      const idx = SINSSAL_BRANCHES[group].indexOf(targetBranch);
+      if (idx === -1) return null;
+      return SINSSAL_NAMES[idx];
+  }
+
+  function calcAllSinssal(yearBranch, pillars) {
+      const labels = ['연지', '월지', '일지', '시지'];
+      const allBranches = [yearBranch, ...pillars]; // 연지 자체 포함 4기둥
+      const result = [];
+      allBranches.forEach((branch, i) => {
+          const sal = getSinssal(yearBranch, branch);
+          if (sal && SINSSAL_SHOW.includes(sal)) {
+              result.push(`${labels[i]}:${sal}`);
+          }
+      });
+      return result.length > 0 ? result.join(', ') : '없음';
+  }
+  // ===== 12신살 계산 엔진 끝 =====
+
+// ===== 캐릭터 판별 엔진 (A+B 혼합안) =====
+  function getCharacterClass(tb, isStrong) {
+    const {관성수, 재성수, 식상수, 인성수, 비겁수} = tb;
+
+    // B안: 최다 통변성 fallback용 (동점 시 신강/신약으로 tie-break)
+    const scores = { 관성수, 재성수, 식상수, 인성수, 비겁수 };
+    const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+    const topKey = sorted[0][0];
+
+    // A안: 신강/신약 연동 분기
+    if (isStrong) {
+        // 신강 → 재성·관성·식상이 용신으로 작동
+        if (관성수 >= 2 && 비겁수 >= 2) return { key: 'warrior', name: '⚔️ 전사형 지배자', emoji: '⚔️' };
+        if (관성수 >= 2)                 return { key: 'king',    name: '👑 왕형 리더',    emoji: '👑' };
+        if (재성수 >= 2 && 식상수 >= 1)  return { key: 'merchant',name: '💰 상인형 전략가', emoji: '💰' };
+        if (식상수 >= 2)                 return { key: 'artist',  name: '🎨 예술가형',     emoji: '🎨' };
+        if (비겁수 >= 2)                 return { key: 'rogue',   name: '🗡️ 전략가형',    emoji: '🗡️' };
+        if (인성수 >= 2)                 return { key: 'sage',    name: '🔮 현자형 참모',  emoji: '🔮' };
+    } else {
+        // 신약 → 인성·비겁이 용신으로 작동
+        if (인성수 >= 2 && 식상수 >= 1)  return { key: 'sage',    name: '🔮 현자형 참모',  emoji: '🔮' };
+        if (인성수 >= 2)                 return { key: 'priest',  name: '✨ 사제형',       emoji: '✨' };
+        if (비겁수 >= 2 && 식상수 >= 2)  return { key: 'rogue',   name: '🗡️ 전략가형',    emoji: '🗡️' };
+        if (비겁수 >= 2)                 return { key: 'warrior', name: '⚔️ 전사형 지배자',emoji: '⚔️' };
+        if (관성수 >= 2)                 return { key: 'king',    name: '👑 왕형 리더',    emoji: '👑' };
+        if (재성수 >= 2)                 return { key: 'merchant',name: '💰 상인형 전략가', emoji: '💰' };
+    }
+
+    // B안 fallback: 어느 조건도 안 걸리면 최다 통변성 기준
+    const fallbackMap = {
+        관성수: { key: 'king',     name: '👑 왕형 리더',     emoji: '👑' },
+        재성수: { key: 'merchant', name: '💰 상인형 전략가',  emoji: '💰' },
+        식상수: { key: 'artist',   name: '🎨 예술가형',      emoji: '🎨' },
+        인성수: { key: isStrong ? 'sage' : 'priest',
+                  name: isStrong ? '🔮 현자형 참모' : '✨ 사제형',
+                  emoji: isStrong ? '🔮' : '✨' },
+        비겁수: { key: 'rogue',    name: '🗡️ 전략가형',     emoji: '🗡️' },
+    };
+    return fallbackMap[topKey] || { key: 'wanderer', name: '🌊 방랑자형', emoji: '🌊' };
+  }
+
+  function renderDestinyCard(rawText) {
+    // AI 출력에서 카드 요소 추출
+    const typeMatch = rawText.match(/나의 운명 유형["""]?\s*["""]?(.+?)["""]?[\n\r]/);
+    const keywordMatch = rawText.match(/키워드 3개\*?\*?\s*(.+?)[\n\r]/);
+    const quoteMatch = rawText.match(/한줄 운명[^|]*\|\s*(.+?)\s*\|/);
+    const hashtagMatch = rawText.match(/SNS 공유 태그[^#]*(#[^\n\r]+)/);
+
+    const destinyType = typeMatch ? typeMatch[1].trim() : baziContext.name + '의 운명';
+    const keywords = keywordMatch ? keywordMatch[1].split(/[,，、]/).map(k => k.trim()).slice(0, 3) : [];
+    const quote = quoteMatch ? quoteMatch[1].trim() : '';
+    const hashtags = hashtagMatch ? hashtagMatch[1].trim() : '';
+
+    const character = getCharacterClass(baziContext.tbNumbers || {관성수:0,재성수:0,식상수:0,인성수:0,비겁수:0}, baziContext.isStrong || false);
+
+    // 캐릭터 이미지 (준비되면 img 태그로 교체)
+    // 성별에 따라 이미지 경로 결정 (warrior 오타 수정 포함)
+    const genderSuffix = baziContext.gender === 'M' ? 'man' : 'woman';
+    const imgUrl = `/images/characters/${character.key}_${genderSuffix}.png`;
+    const imgHtml = `<img
+      class="character-img"
+      src="${imgUrl}"
+      alt="${character.name}"
+      onerror="this.outerHTML='<div class=\\"character-placeholder\\">${character.emoji}</div>'"
+    />`;
+
+    const keywordsHtml = keywords.map(k => `<span class="destiny-keyword">${k}</span>`).join('');
+    const shareText = `${destinyType} | ${keywords.join(' ')} | ${hashtags}`;
+
+    return `
+<div class="destiny-card">
+  ${imgHtml}
+  <div class="destiny-type">${destinyType}</div>
+  <div class="character-class">${character.name}</div>
+  <div class="destiny-divider"></div>
+  <div class="destiny-keywords">${keywordsHtml}</div>
+  <div class="destiny-quote">"${quote}"</div>
+  <button class="share-btn" onclick="shareDestiny('${encodeURIComponent(shareText)}')">📱 SNS 공유하기</button>
+</div>`;
+  }
+
+  function shareDestiny(encodedText) {
+    const text = decodeURIComponent(encodedText);
+    if (navigator.share) {
+        navigator.share({ title: '팔자길드 운명 분석', text: text, url: window.location.href });
+    } else {
+        navigator.clipboard.writeText(text).then(() => alert('클립보드에 복사됐습니다!'));
+    }
+  }
+  
+  function generateSeed(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return Math.abs(hash);
+  }
+
+  function generateFixedStats(seed, elCounts) {
+    function elToScore(count) {
+    const map = [58, 68, 76, 84, 92];
+    return map[Math.min(count, 4)];
+}
+
+    const stats = [
+        { name: "지적 자산(학구열/분석력)", el: '水' },
+        { name: "소통/네트워킹",           el: '木' },
+        { name: "권력 지향성(리더십)",      el: '火' },
+        { name: "재무적 통제력",            el: '金' },
+        { name: "창의성/문제해결",          el: '木' },
+        { name: "위기 관리 능력",           el: '土' },
+    ];
+
+    let result = "";
+    stats.forEach((stat, index) => {
+        let base = elToScore(elCounts[stat.el] || 0);
+        let noise = ((seed + index * 13) % 11) - 5;
+        let base2 = Math.min(95, Math.max(30, base + noise));
+        let worst = Math.max(15, base2 - 8 - ((seed + index) % 8));
+        let best  = Math.min(98, base2 + 8 + ((seed + index * 3) % 8));
+        result += `| ${stat.name} | ${worst} | ${base2} | ${best} |\n`;
+    });
+    return result;
+}
+
+  function getHourBranchIndex(hour, minute, zashiMode = '2330') {
+    const totalMinutes = hour * 60 + minute;
+    if (zashiMode === '2300') {
+      if (totalMinutes >= 1380 || totalMinutes < 60) return 0;
+      return Math.floor((totalMinutes - 60) / 120) + 1;
+    } else {
+      if (totalMinutes >= 1410 || totalMinutes < 90) return 0;
+      return Math.floor((totalMinutes - 90) / 120) + 1;
+    }
+  }
+
+  function getExactBazi(year, month, day, hour, minute, zashiMode = '2330') {
+    const birthDate = makeKSTDate(year, month, day, hour, minute);
+
+    // 일주 계산
+    const date1 = Date.UTC(year, month - 1, day);
+    const date2 = Date.UTC(1900, 0, 1);
+    const diffDays = Math.floor((date1 - date2) / 86400000);
+    let dayIdx = (diffDays + 10) % 60; if (dayIdx < 0) dayIdx += 60;
+    const dayPillar = STEMS[dayIdx % 10] + BRANCHES[dayIdx % 12];
+
+    // 시주 계산 (자시 기준 옵션 반영)
+    const hbIdx = getHourBranchIndex(hour, minute, zashiMode);
+    const hourPillar = STEMS[((dayIdx % 5) * 2 + hbIdx) % 10] + BRANCHES[hbIdx];
+
+    // 연주: 입춘 시각 기준
+    const ipchun = getTermDateTime(year, 2);
+    let baziYear = (birthDate >= ipchun) ? year : year - 1;
+    let yearIdx = (baziYear - 4) % 60; if (yearIdx < 0) yearIdx += 60;
+    const yearPillar = STEMS[yearIdx % 10] + BRANCHES[yearIdx % 12];
+
+    // 월주: 해당 월 절기 시각 기준
+    const currentTerm = getTermDateTime(year, month);
+    let bm = month;
+    if (birthDate < currentTerm) bm--;
+    if (bm <= 0) bm += 12;
+    const baziMonthIdx = (bm - 2 + 12) % 12 + 1;
+    const monthStemIdx = ((yearIdx % 5) * 2 + baziMonthIdx + 1) % 10;
+    const monthPillar = STEMS[monthStemIdx] + BRANCHES[bm % 12];
+
+    const chars = yearPillar + monthPillar + dayPillar + hourPillar;
+    const el = {'木':0,'火':0,'土':0,'金':0,'水':0};
+    for (let c of chars) { if (ELEMENT_MAP[c]) el[ELEMENT_MAP[c]]++; }
+    const elText = `木 ${el['木']}개, 火 ${el['火']}개, 土 ${el['土']}개, 金 ${el['金']}개, 水 ${el['水']}개`;
+
+    return {
+      year: yearPillar, month: monthPillar, day: dayPillar, hour: hourPillar,
+      dayStem: STEMS[dayIdx % 10], yearStemIdx: yearIdx % 10, elText,
+      ipchunKST: formatKST(ipchun),
+      currentMonthTermKST: formatKST(currentTerm)
+    };
+  }
+
+  function getDaewunNumber(year, month, day, hour, minute, gender, yearStemIdx) {
+    const birthDate = makeKSTDate(year, month, day, hour, minute);
+    const isForward = ((yearStemIdx % 2 === 0) && gender === 'M') ||
+                      ((yearStemIdx % 2 !== 0) && gender === 'F');
+
+    const currentTerm = getTermDateTime(year, month);
+    let targetTerm;
+
+    if (isForward) {
+      if (birthDate < currentTerm) {
+        targetTerm = currentTerm;
+      } else {
+        const nextMonth = month === 12 ? 1 : month + 1;
+        const nextYear  = month === 12 ? year + 1 : year;
+        targetTerm = getTermDateTime(nextYear, nextMonth);
+      }
+    } else {
+      if (birthDate >= currentTerm) {
+        targetTerm = currentTerm;
+      } else {
+        const prevMonth = month === 1 ? 12 : month - 1;
+        const prevYear  = month === 1 ? year - 1 : year;
+        targetTerm = getTermDateTime(prevYear, prevMonth);
+      }
+    }
+
+    const diffMinutes = Math.abs((targetTerm - birthDate) / 60000);
+    let daewunAge = Math.round(diffMinutes / (3 * 24 * 60));
+    if (daewunAge === 0) daewunAge = 1;
+
+    return { daewunAge, targetTermKST: formatKST(targetTerm), diffMinutes };
+  }
+
+  function toggleInterest(btn) {
+    const selected = document.querySelectorAll('.interest-btn.selected');
+    if (btn.classList.contains('selected')) {
+        btn.classList.remove('selected');
+    } else {
+        if (selected.length >= 2) {
+            alert('최대 2개까지 선택 가능합니다.');
+            return;
+        }
+        btn.classList.add('selected');
+    }
+  }
+
+  // 팔자길드 캐시만 선택적으로 삭제
+  function clearPaljaCacheOnly() {
+    const keysToDelete = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('palja_cache_')) keysToDelete.push(k);
+    }
+    keysToDelete.forEach(k => localStorage.removeItem(k));
+  }
+
+  async function startAnalysis() {
+    // 새 분석 시작 시 이전 팔자길드 캐시만 삭제
+    clearPaljaCacheOnly();
+    const y = document.getElementById('f-year').value;
+    const m = document.getElementById('f-month').value;
+    const d = document.getElementById('f-day').value;
+    const h = document.getElementById('f-hour').value;
+    const err = document.getElementById('error-msg');
+    if(!y || !m || !d || h==="") { err.innerText = "생년월일시를 모두 입력해주세요."; return; }
+    err.innerText = "";
+
+    const name = document.getElementById('f-name').value || "내담자";
+    const gender = document.querySelector('input[name="gender"]:checked').value;
+    const userJob = document.getElementById('f-job').value || '미입력';
+    const userInterests = Array.from(document.querySelectorAll('.interest-btn.selected')).map(b => b.dataset.value).join(', ') || '미입력';
+    const minute = parseInt(document.getElementById('f-minute').value || 0);
+    const zashiMode = document.getElementById('f-zashi-mode')?.value || '2330';
+
+    const b = getExactBazi(parseInt(y), parseInt(m), parseInt(d), parseInt(h), minute, zashiMode);
+    const age = new Date().getFullYear() - parseInt(y) + 1;
+    const dnObj = getDaewunNumber(parseInt(y), parseInt(m), parseInt(d), parseInt(h), minute, gender, b.yearStemIdx);
+    const calculatedDn = dnObj.daewunAge;
+
+    const seedString = `${y}${m}${d}${h}${gender}`;
+    const userSeed = generateSeed(seedString);
+    const elCounts = {'木':0,'火':0,'土':0,'金':0,'水':0};
+for (let c of (b.year + b.month + b.day + b.hour)) {
+    if (ELEMENT_MAP[c]) elCounts[ELEMENT_MAP[c]]++;
+}
+const fixedStatsTable = generateFixedStats(userSeed, elCounts);
+
+    const wealthElementMap = { '甲':'土', '乙':'土', '丙':'金', '丁':'金', '戊':'水', '己':'水', '庚':'木', '辛':'木', '壬':'火', '癸':'火' };
+    const myWealthElement = wealthElementMap[b.dayStem];
+    
+    const elMatch = b.elText.match(new RegExp(`${myWealthElement}\\s(\\d)개`));
+    const wealthCount = elMatch ? parseInt(elMatch[1]) : 0;
+    
+    // ===== 신강/신약 판단 (통근 가중치: 천간1, 지지2, 월지3) =====
+    const wREL = {
+        '木': { 재성:'土', 관성:'金', 인성:'水', 식상:'火', 비겁:'木' },
+        '火': { 재성:'金', 관성:'水', 인성:'木', 식상:'土', 비겁:'火' },
+        '土': { 재성:'水', 관성:'木', 인성:'火', 식상:'金', 비겁:'土' },
+        '金': { 재성:'木', 관성:'火', 인성:'土', 식상:'水', 비겁:'金' },
+        '水': { 재성:'火', 관성:'土', 인성:'金', 식상:'木', 비겁:'水' },
+    }[ELEMENT_MAP[b.dayStem]];
+
+    // 8글자 위치별 가중치 배열 [연간, 연지, 월간, 월지, 일간(제외), 일지, 시간, 시지]
+    const pillarsWeighted = [
+        { char: b.year[0], w: 1 },   // 연간
+        { char: b.year[1], w: 2 },   // 연지
+        { char: b.month[0], w: 1 },  // 월간
+        { char: b.month[1], w: 3 },  // 월지 (가장 중요)
+        // 일간은 본인이므로 제외
+        { char: b.day[1], w: 2 },    // 일지
+        { char: b.hour[0], w: 1 },   // 시간
+        { char: b.hour[1], w: 2 },   // 시지
+    ];
+
+    // 통변성별 가중합 계산
+    let 비겁점수=0, 인성점수=0, 재성점수=0, 관성점수=0, 식상점수=0;
+    for (const { char, w } of pillarsWeighted) {
+        const el = ELEMENT_MAP[char];
+        if (!el) continue;
+        if (el === wREL.비겁) 비겁점수 += w;
+        else if (el === wREL.인성) 인성점수 += w;
+        else if (el === wREL.재성) 재성점수 += w;
+        else if (el === wREL.관성) 관성점수 += w;
+        else if (el === wREL.식상) 식상점수 += w;
+    }
+
+    // 오행 개수는 기존 방식 유지 (통변성 표시용)
+    const 비겁수 = elCounts[wREL.비겁] || 0;
+    const 인성수 = elCounts[wREL.인성] || 0;
+    const 재성수 = elCounts[wREL.재성] || 0;
+    const 관성수 = elCounts[wREL.관성] || 0;
+    const 식상수 = elCounts[wREL.식상] || 0;
+
+    // 신강/신약: 가중합 기반 판단
+    const 신강합 = 비겁점수 + 인성점수;
+    const 신약합 = 재성점수 + 관성점수 + 식상점수;
+    const isStrong = 신강합 >= 신약합;
+
+    // ===== 충(衝) 판별 — 세운/대운 공통 사용 =====
+    const CHUNG_PAIRS = [['子','午'],['丑','未'],['寅','申'],['卯','酉'],['辰','戌'],['巳','亥']];
+    function chungCheck(br1, br2) {
+        return CHUNG_PAIRS.some(p=>(p[0]===br1&&p[1]===br2)||(p[0]===br2&&p[1]===br1));
+    }
+
+    // ===== 세운(歲運) 연산 엔진 =====
+    function getSeunElements(year) {
+        const seunStems   = ['庚','辛','壬','癸','甲','乙','丙','丁','戊','己'];
+        const seunBranches= ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+        const sIdx = ((year - 2020) % 10 + 10) % 10;
+        const bIdx = ((year - 2020) % 12 + 12) % 12;
+        return {
+            stem: seunStems[sIdx], branch: seunBranches[bIdx],
+            stemEl: ELEMENT_MAP[seunStems[sIdx]], branchEl: ELEMENT_MAP[seunBranches[bIdx]]
+        };
+    }
+
+    // 용신 오행: 신강이면 재성이 용신, 신약이면 인성이 용신
+    const yongsinEl = isStrong ? wREL.재성 : wREL.인성;
+    const currentYear = new Date().getFullYear();
+    let goldenYear = currentYear;
+    let maxWealthScore = -999;
+
+    for (let i = 0; i < 10; i++) {
+        const loopYear = currentYear + i;
+        const seun = getSeunElements(loopYear);
+        let yearScore = 0;
+
+        // 용신 동착 가점 (천간40/지지60)
+        if (seun.stemEl === yongsinEl)      yearScore += 40;
+        if (seun.branchEl === yongsinEl)    yearScore += 60;
+        // 재성 동착 가점
+        if (seun.stemEl === wREL.재성)      yearScore += 20;
+        if (seun.branchEl === wREL.재성)    yearScore += 30;
+        // 일지 충 패널티
+        if (CHUNG_PAIRS.some(p=>(p[0]===b.day[1]&&p[1]===seun.branch)||(p[0]===seun.branch&&p[1]===b.day[1]))) {
+            yearScore -= 40;
+        }
+        if (yearScore > maxWealthScore) { maxWealthScore = yearScore; goldenYear = loopYear; }
+    }
+
+    // ===== 자산 티어 결정론적 계산 =====
+    let finalTierIdx = 2; // 기본 B급
+
+    if (isStrong) {
+        if (재성수 >= 1 && 재성수 <= 2) finalTierIdx += 2; // 신강재왕 → S급
+        else if (재성수 >= 3)           finalTierIdx += 1; // 재다신강 → A급
+        else if (식상수 >= 2)           finalTierIdx += 1; // 식상생재 포텐셜
+    } else {
+        if (재성수 >= 3)  finalTierIdx -= 1; // 재다신약 페널티
+        if (인성수 >= 2)  finalTierIdx += 1; // 인성 용신 조력
+    }
+
+    const tiers = ['D급 (3억 미만)','C급 (3~7억)','B급 (7~15억)','A급 (15~30억)','S급 (30~70억)','SS급 (70억 이상)'];
+    const tierIdx = Math.max(0, Math.min(5, finalTierIdx));
+    const baseT  = tiers[tierIdx];
+    const bestT  = tiers[Math.min(5, tierIdx + 1)];
+    const worstT = tiers[Math.max(0, tierIdx - 1)];
+    const baseP  = isStrong ? 55 : 45;
+    const bestP  = 20;
+    const worstP = 100 - baseP - bestP;
+
+    const fixedWealthData = `
+[자산 시나리오 확정 데이터 - 세운 정밀 연산 적용]
+- Best: 등급(${bestT}), 확률(${bestP}%)
+- Base: 등급(${baseT}), 확률(${baseP}%)
+- Worst: 등급(${worstT}), 확률(${worstP}%)
+- 부동산 골든타임 확정 연도: ${goldenYear}년
+- 산출 근거: 일간 에너지(${isStrong?'신강':'신약'}), 재성 ${재성수}개, 용신(${yongsinEl}), 일지충 패널티 반영`;
+
+    // ===== 대운 스코어링 엔진 (교차검증 완료 버전) =====
+const dScores = [];
+const dLabels = []; // 대운 간지 라벨용
+
+// 1. 대운 방향 결정 (양남음녀 순행, 음남양녀 역행)
+const isYangYear = (b.yearStemIdx % 2 === 0);
+const isForward = (isYangYear && gender === 'M') || (!isYangYear && gender === 'F');
+
+// 2. 월주 천간/지지 기준점
+const monthStemIdx = STEMS.indexOf(b.month[0]);
+const monthBranchIdx = BRANCHES.indexOf(b.month[1]);
+
+// 3. 일간 기준 오행 관계표 (생극제화)
+// 일간 오행 → { 재성, 관성, 인성, 식상, 비겁 } 순서로 오행 매핑
+const DAYMASTER_RELATIONS = {
+    '木': { 재성:'土', 관성:'金', 인성:'水', 식상:'火', 비겁:'木' },
+    '火': { 재성:'金', 관성:'水', 인성:'木', 식상:'土', 비겁:'火' },
+    '土': { 재성:'水', 관성:'木', 인성:'火', 식상:'金', 비겁:'土' },
+    '金': { 재성:'木', 관성:'火', 인성:'土', 식상:'水', 비겁:'金' },
+    '水': { 재성:'火', 관성:'土', 인성:'金', 식상:'木', 비겁:'水' },
+};
+
+const dayMasterElement = ELEMENT_MAP[b.dayStem];
+const rel = DAYMASTER_RELATIONS[dayMasterElement];
+
+for (let i = 1; i <= 8; i++) {
+    const step = isForward ? i : -i;
+
+    // 5. 천간 계산
+    const dStemIdx = ((monthStemIdx + step) % 10 + 10) % 10;
+    const dStem = STEMS[dStemIdx];
+    const dStemElement = ELEMENT_MAP[dStem];
+
+    // 6. 지지 계산
+    const dBranchIdx = ((monthBranchIdx + step) % 12 + 12) % 12;
+    const dBranch = BRANCHES[dBranchIdx];
+    const dBranchElement = ELEMENT_MAP[dBranch];
+
+    // 7. 통변성 판별
+    function getRelation(element) {
+        for (const [name, el] of Object.entries(rel)) {
+            if (el === element) return name;
+        }
+        return '비겁';
+    }
+    const stemRelation = getRelation(dStemElement);
+    const branchRelation = getRelation(dBranchElement);
+
+    // 8. 신강/신약 기반 용희신/기구신 스코어링
+    let stemScore = 0;
+    let branchScore = 0;
+    const SCORE_STRONG = { 재성: 90, 관성: 85, 식상: 75, 비겁: 40, 인성: 30 };
+    const SCORE_WEAK   = { 인성: 90, 비겁: 85, 식상: 45, 관성: 35, 재성: 30 };
+    const scoreMap = isStrong ? SCORE_STRONG : SCORE_WEAK;
+    stemScore   = scoreMap[stemRelation]   || 40;
+    branchScore = scoreMap[branchRelation] || 40;
+
+    // 9. 천간 40% + 지지 60% 가중 평균
+    const baseScore = Math.round(stemScore * 0.4 + branchScore * 0.6);
+
+    // 10. 충(衝) 패널티: 일지·월지와 충 발생 시 감점
+    let chungPenalty = 0;
+    if (chungCheck(b.day[1], dBranch))   chungPenalty += 25; // 일지충
+    if (chungCheck(b.month[1], dBranch)) chungPenalty += 15; // 월지충
+
+    // 11. 최종 점수 확정 (충 패널티 반영, 상하한 보정)
+    dScores.push(Math.max(20, Math.min(95, baseScore - chungPenalty)));
+    dLabels.push(`${dStem}${dBranch}`);
+}
+
+    baziContext = {
+    name, gender, age, bazi: `${b.year} ${b.month} ${b.day} ${b.hour}`,
+    dn: calculatedDn, elText: b.elText,
+    fixedStatsTable, fixedWealthData, dScores, dLabels,
+    dayMasterEl: ELEMENT_MAP[b.dayStem],
+    isStrong,
+    통변성: `조직장악력 ${관성수}개, 재물에너지 ${재성수}개, 실행력 ${식상수}개, 학습력 ${인성수}개, 경쟁에너지 ${비겁수}개`,
+    tbNumbers: { 관성수, 재성수, 식상수, 인성수, 비겁수 },
+    sinssal: calcAllSinssal(b.year[1], [b.month[1], b.day[1], b.hour[1]]),
+    userJob, userInterests,
+    calcPolicy: `절기 시각 기준 / 자시 기준 ${zashiMode === '2330' ? '23:30' : '23:00'} / 한국표준시(KST)`,
+    ipchunKST: b.ipchunKST,
+    currentMonthTermKST: b.currentMonthTermKST,
+    daewunTargetTermKST: dnObj.targetTermKST,
+};
+    
+    document.getElementById('input-screen').style.display = 'none';
+    document.getElementById('hero').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+
+    // ===== 나이별 탭 구성 동적 렌더링 =====
+    let tabDefs;
+    if (age <= 7) {
+      // 유아: 3탭
+      tabDefs = [
+        { id: 'summary', label: '종합 전략' },
+        { id: 'trait',   label: '기질 분석' },
+        { id: 'parent',  label: '부모 전략' },
+      ];
+    } else if (age <= 19) {
+      // 청소년: 4탭
+      tabDefs = [
+        { id: 'summary',     label: '종합 전략' },
+        { id: 'future',      label: '진로 & 학업' },
+        { id: 'parent',      label: '부모 전략' },
+        { id: 'deepdiag',    label: '심층: 진단', gold: true },
+      ];
+    } else {
+      // 성인: 5탭
+      tabDefs = [
+        { id: 'summary',     label: '종합 전략' },
+        { id: 'wealth',      label: '인생 & 자산' },
+        { id: 'future',      label: '진로 & 성과' },
+        { id: 'deepdiag',    label: '심층: 진단',   gold: true },
+        { id: 'deepinterest',label: '심층: 관심사', gold: true },
+      ];
+    }
+
+    // 탭 컨테이너 렌더링 함수
+    function renderTabContainers() {
+      const html = tabDefs.map(t => {
+        const goldStyle = t.gold ? ` style="color:#d4af37; border:1px solid #d4af37;"` : '';
+        return `<button class="tab-btn" data-tab="${t.id}" onclick="switchTab('${t.id}')"${goldStyle}>${t.label}</button>`;
+      }).join('');
+      document.getElementById('tab-top').innerHTML = html;
+      document.getElementById('tab-bottom').innerHTML = html;
+    }
+    renderTabContainers();
+
+    // 현재 탭 버튼 active 처리도 renderTabContainers 이후 동작하도록 switchTab 재정의
+    builtPrompts = null;
+
+    // 나이 구간에 따라 필요한 탭만 프리패치 (tabDefs에 있는 탭만 호출)
+    const tabsToFetch = tabDefs.map(t => t.id);
+    fetchAndCache('summary');
+    let delay = 5000;
+    for (const tid of tabsToFetch.filter(t => t !== 'summary')) {
+      setTimeout(() => fetchAndCache(tid), delay);
+      delay += 5000;
+    }
+    switchTab('summary');
+  }
+
+  // 프롬프트 캐시 변수
+  let builtPrompts = null;
+
+  function buildPrompts() {
+    if (builtPrompts) return builtPrompts;
+  const baseRule = `당신은 사주를 10년 넘게 공부한 친한 선배입니다.
+이 사람의 사주를 보고, 딱딱한 보고서가 아니라 진심으로 걱정하고 응원하는 선배처럼 솔직하게 이야기해 주세요.
+
+[말투 규칙]
+1. 자연스러운 한국어 문장으로 쓸 것. 명사형 종결(~함, ~임, ~필요) 절대 금지.
+   🟢 좋은 예: "지금 이 시기가 사실 굉장히 중요해. 2026년 하반기부터 흐름이 바뀌거든."
+   🔴 나쁜 예: "현 시점 대운 전환 임박. 하반기 대응 전략 수립 필요함."
+2. 리스크·기회 표현 시 인디케이터 사용:
+   🟢 기회/좋은 흐름  🟡 신중하게 볼 구간  🔴 조심해야 할 부분
+3. 한 항목당 핵심만. 길게 늘어지지 말 것.
+4. 숫자·연도·구체적 행동을 포함할 것. 막연한 표현 금지.
+
+[용어 규칙]
+- 어려운 명리 용어는 일상어로 풀어서 쓸 것:
+  관성 → 조직에서 인정받는 힘 / 승진 에너지
+  재성 → 돈과 결과물을 만드는 힘
+  식상 → 실행하고 표현하는 힘
+  인성 → 배우고 안정을 찾는 힘
+  비겁 → 혼자 밀고 나가는 힘 / 경쟁 에너지
+  신강 → 에너지가 넘치는 구조 (강하게 밀어붙일 수 있는 사주)
+  신약 → 에너지를 아껴 써야 하는 구조 (무리하면 탈이 나는 사주)
+- 꼭 전문용어를 써야 할 경우 괄호로 설명 병기. 예: 화개살(고독하게 집중하는 기운)
+- 체크박스("- [ ]") 절대 금지. 목록은 숫자(1. 2. 3.) 또는 •로만.
+- 식단·음식·영양제 조언 절대 금지. 건강 조언은 운동·생활습관·의료 검진으로만.
+- 한자 표기 출력 절대 금지. 반드시 한글로만.
+- 현재직무/관심사가 '미입력'이면 무시하고 사주 구조만으로 분석.
+- 현재시점 이전의 월(月) 내용은 절대 쓰지 말 것. 지금 이 시점부터 앞으로의 이야기만 할 것.
+- 지시된 모든 섹션 빠짐없이 완성. 생략 절대 금지.`;
+    
+    
+
+    const deepPrompts = {
+    psyche: `### 🧠 심층 분석: 내재된 자아와 대인관계 전략
+
+1. **본질적 욕구와 사회적 가면**
+진짜 내면 욕구와 외부 페르소나의 차이를 극명하게 대조할 것.
+실제 상황 예시(직장/가족/연애) 1가지 포함. 2문장 이내.
+
+2. **치명적 방어기제와 갈등 패턴**
+스트레스 상황에서 반복되는 문제 행동 1가지를 지적할 것.
+이 패턴이 인간관계에 미치는 영향과 개선 행동 지침 1가지. 2문장 이내.
+
+3. **고위직 생존 외교 전략**
+🟢 해야 할 것 3가지 / 🔴 하지 말아야 할 것 3가지를 번호 목록으로 작성.
+상사/동료/부하 각각에 대한 전략을 1줄씩 구분하여 제시.`,
+
+    career: `### 👑 심층 분석: 직업군과 권력(관운) 상한선
+
+[지침]: 직업군 판단 시 명식 전체 구조(일간·월지·격국·용신)를 종합하여 판단할 것.
+단순 통변성 개수 집계나 오행 물상(土=농업, 水=수산업 등) 해석 절대 금지.
+아래 격국별 직업 성향을 참고하되, 이 사람의 명식 고유 구조에 맞게 해석할 것.
+• 식신격 → 창작/기획/요리/교육/예술
+• 상관격 → 언론/예술/법조/혁신/기술
+• 정관격 → 공직/경영/교육/전문직
+• 편관격 → 군경/외과/스포츠/기술직/무역
+• 정재격 → 금융/회계/부동산/유통
+• 편재격 → 창업/영업/투자/미디어
+• 정인격 → 학문/연구/종교/상담/의료
+• 편인격 → 예술/철학/특수기술/심리
+
+1. **최적화 산업군 및 직무**
+격국·용신 기반으로 최적 직무 3가지 제시. 각각 명식 근거 1문장.
+
+2. **도달 가능한 권력 상한선**
+현실적 최대 직급을 냉정하게 평가할 것. (예: 팀장급/임원급/창업가)
+🔴 그 직급 도달을 막는 핵심 장벽 1가지와 돌파 조건 1가지.
+
+3. **지금 당장 실행할 승진 돌파구**
+1. (언제까지, 무엇을, 어떻게)
+2. (언제까지, 무엇을, 어떻게)
+3. (언제까지, 무엇을, 어떻게)`,
+
+    romance: `### 💍 심층 분석: 연애와 결혼 파트너십 리스크
+
+1. **반복되는 관계 위기 패턴**
+🔴 이 사람이 연애/결혼에서 반복하는 실수 1가지를 구체적 시나리오로 제시.
+근본 원인(집착/회피/통제 등) 1문장 + 개선 행동 지침 1가지.
+
+2. **최적 파트너 vs 피해야 할 유형**
+🟢 최적 파트너: 직업/성격/가치관/경제관념을 구체적으로 정의.
+🔴 피해야 할 유형: 겉으로 매력적이지만 갈등을 유발하는 유형 1가지.
+
+3. **결합 및 위험 타이밍**
+🟢 향후 10년 중 파트너십 최적 시기를 연도로 명시하고 이유 1문장.
+🔴 이별/갈등 집중 위험 구간을 연도로 명시하고 주의사항 1가지.`
+};
+
+    // [아키텍트 패치] 완전히 정제된 프롬프트 (JSON 강제 명령 삭제 완료)
+    const prompts = {
+      summary: baziContext.age >= 20
+
+      ? `당신은 사주를 10년 넘게 공부한 친한 선배입니다. ${baseRule}
+      아래 양식에 맞춰 이 사람의 사주 이야기를 써주세요.
+
+      ### 🧾 [운명 카드]
+      아래 형식을 반드시 그대로 따를 것.
+
+      **✨ 나의 운명 유형**
+      (일간 오행 기반 2~4자 유형명. 예: "흙의 축적자", "물의 탐험가", "불꽃 개척자")
+
+      | 항목 | 내용 |
+      |---|---|
+      | 이름 | |
+      | 성별/나이 | |
+      | 운명 유형 | |
+      | 핵심 기운 | (가장 강한 기운을 한 문장으로. 전문용어 없이) |
+      | 한줄 운명 | (이 사람의 인생을 20자 이내로. 강렬하고 기억에 남게) |
+
+      **🔑 나를 정의하는 키워드 3개**
+      (각각 2~4자, 쉼표로 구분)
+
+      **📱 SNS 공유 태그**
+      (한국어 해시태그 5개)
+
+      ### 💬 1. 이 사람 이야기
+      이 사주를 처음 본 선배가 "야, 너 이런 사람이더라"고 말해주듯, 4~5문장으로 이 사람의 본질을 풀어줄 것.
+      강점과 그늘을 균형 있게. 판단이 아니라 이해의 언어로. 공감되는 구체적인 상황을 1개 포함할 것.
+
+      ### 📈 [핵심 역량 스코어보드]
+      아래 데이터를 반드시 그대로 출력할 것. 수치 변경 절대 금지.
+      | 역량 | 최저 | 평균 | 최고 |
+      |---|---|---|---|
+      ${baziContext.fixedStatsTable}
+      (표 아래에 한 줄: 이 수치가 뜻하는 게 뭔지 쉽게 설명해줄 것)
+
+      ### 🗂️ 2. 이 사람의 현실 & 닮은 사람
+      MBTI는 쓰지 말 것. 아래 표 형식으로만 작성.
+      | 항목 | 내용 |
+      |---|---|
+      | 가장 잘 맞는 일 | (직무/역할 방향. 구체적으로) |
+      | 운명의 닮은꼴 | (역사적 위인 또는 유명인 1명 + 공통점 1문장) |
+      | 성공 패턴 | (이 사주가 잘 되는 전형적인 경로) |
+      | 주의 패턴 | (이 사주가 자주 빠지는 함정) |
+
+      ### 🗡️ 3. 진짜 강점과 약점
+      🔷 **이 사람만의 강점 TOP 3**: 명식 근거 포함. "당신이 남들보다 확실히 잘하는 것"을 구체적으로.
+      🔺 **조심해야 할 약점 TOP 3**: 현실에서 어떻게 드러나는지 + 어떻게 다루면 좋은지.
+
+      ### 🎯 4. 지금부터 할 것들
+      현재시점 이후의 내용만 쓸 것. 이미 지난 월(月)은 절대 포함하지 말 것.
+      🟢 **지금 잡아야 할 기회 3가지**: 각각 "언제, 무엇을, 어떻게" 형식으로.
+      🔴 **조심해야 할 신호 3가지**: 구체적 상황 + 대응 방법.
+      이 섹션 이후 추가 섹션 절대 작성 금지.`
+
+      : `당신은 아동·청소년 전문 명리 전략가입니다. ${baseRule}
+      아래 양식에 맞춰 완벽한 마크다운 리포트를 작성하십시오.
+      지시된 5개 섹션만 작성할 것. 섹션 추가·변경 절대 금지.
+      [핵심 지침] 직업·재능 분석은 통변성 개수가 아닌 명식 전체(일간·월지·격국·용신) 구조로 풀이할 것.
+
+      ### 🧾 [운명의 영수증]
+      아래 형식을 반드시 그대로 따를 것.
+
+      **✨ 이 아이의 운명 유형**
+      (일간 오행 기반 2~4자 유형명. 예: "빛나는 탐험가", "조용한 천재", "불꽃 개척자")
+
+      | 항목 | 내용 |
+      |---|---|
+      | 이름 | |
+      | 성별/나이 | |
+      | 운명 유형 | (위에서 만든 유형명) |
+      | 타고난 기운 | (오행 중 가장 강한 기운을 아이 눈높이 언어로) |
+      | 한줄 운명 | (이 아이의 인생을 20자 이내로 정의. 희망적이고 따뜻하게) |
+
+      **🔑 이 아이를 정의하는 키워드 3개**
+      (각각 2~4자, 쉼표로 구분. 예: 호기심, 따뜻한 리더, 숨은 천재)
+
+      **📱 SNS 공유 태그**
+      (한국어 해시태그 5개. 예: #우리아이사주 #빛나는탐험가 #타고난기질 #사주육아 #운명의영수증)
+
+      ### 🌟 1. 기질 유형 & 닮은 위인
+      이 아이의 기질 유형(활동형/사색형/사교형/예술형/리더형 중 1가지)을 확정하고 근거 2문장.
+      이 기질과 가장 닮은 역사적 위인 또는 유명인 1명을 제시하고 공통점 1문장.
+
+      ### 📈 2. 핵심 역량 스코어보드 (적성 기준)
+      아래 데이터를 반드시 아래 형식 그대로 출력할 것. 컬럼명·수치 변경 절대 금지.
+      | 역량 | 최저 | 평균 | 최고 |
+      |---|---|---|---|
+      ${baziContext.fixedStatsTable}
+
+      ### 💎 3. 강점 재능 & 주의할 점
+      🟢 **타고난 강점 재능 2가지**: 각각 근거 1문장 + 지금 당장 키울 수 있는 활동 1가지.
+      🔴 **주의할 점 1가지**: 이 기질의 아이가 빠지기 쉬운 함정과 부모의 대응 지침 1문장.
+
+      ### 🚀 4. 재능에 어울리는 미래 직업군
+      [지침] 명식 전체 구조(일간·월지·격국·용신)를 종합하여 판단할 것.
+      단순 오행 개수나 통변성 개수 집계 방식 절대 금지.
+
+      아래 트랙 매트릭스에서 이 아이의 명식에 가장 부합하는 트랙 1개만 선정할 것.
+      [트랙 매트릭스]
+      - 권력/규범 통제 트랙: 정관격·편관격, 관성 강함 → 법조·고위공직·국제기구 방향
+      - 생명/치유 트랙: 편인격, 인성 강함, 수·목 일간 → 의료·생명공학·심리 방향
+      - 자본/실물 장악 트랙: 정재격·편재격, 재성 강함 → 금융·투자·자산관리 방향
+      - 시스템/테크 트랙: 식신격·상관격, 식상 강함, 금·수 일간 → IT·공학·설계 방향
+      - 창조/무형자산 트랙: 식상 강함, 화·목 일간 → 크리에이티브·미디어·예술 방향
+
+      아래 양식으로 작성할 것:
+      **선택된 트랙**: (트랙명)
+      **역량의 방향**: 이 명식 구조에서 가장 빛나는 역할을 1문장으로 묘사. 특정 직업으로 단정 금지. "어떤 능력/권한/역할을 가진 사람"으로 표현할 것.
+      **명리학적 근거**: 격국과 일간 에너지가 이 트랙에 맞는 이유 2문장. 일반론 금지.
+      **참고 직업 예시** (가능성의 방향, 단정 아님): 해당 트랙 최상단 직업 2가지 예시.
+      **🟢 지금부터 준비하면 좋은 것**: 오늘부터 실천 가능한 구체적 활동 1가지.
+
+      ### 👨‍👩‍👧 5. 양육자 핵심 가이드
+      아래 3가지 항목을 반드시 모두 작성할 것. 각 항목 2문장 이내로 압축.
+      🟢 **이 아이에게 가장 효과적인 양육 방식 1가지**: 구체적 행동 지침으로 제시.
+      🔴 **절대 하지 말아야 할 것 1가지**: 이 기질에 역효과인 양육 패턴과 그 이유.
+      🟡 **지금 당장 시작할 부모 액션 1가지**: 오늘부터 실천 가능한 구체적 행동.
+      이 섹션 이후 추가 섹션 절대 작성 금지.`,
+      
+      wealth: `당신은 최고위급 금융 명리 분석가입니다. ${baseRule}
+      ${baziContext.fixedWealthData}
+      ---
+     ### 💰 1. 생애 자산 Tier 시뮬레이션
+      (제공된 자산 등급과 확률 데이터를 반드시 '마크다운 표'로 시각화하여 출력하고, 달성 이유를 경제 용어로 작성할 것)
+      * **부동산 매입 골든타임:** (위 확정 연도를 기재)
+      표 하단에 반드시 아래 문구를 이탤릭체로 출력할 것:
+      *본 시나리오는 통계청·금융기관 발표 한국 가구 순자산 중위값(B급, 7~15억)을 50% 확률 기준점으로 설정하고, 개인 사주의 신강/신약 구조·재물 오행 강도·식상 창출력·대운 흐름을 반영하여 산출한 참고 지표입니다.*
+
+      ### 🌊 2. 10년 대운 심층 서사 (재무적 기회와 리스크)
+      ### 🎯 3. 단기 재무 액션 플랜 (향후 3개월)`,
+      
+      future: `당신은 VVIP 커리어 전략가입니다.
+${baseRule}
+
+${baziContext.age < 20 ? `
+${baziContext.age < 8 ? `
+### 👶 유아기 기질 분석 (${baziContext.age}세)
+
+### 🌱 1. 타고난 기질과 발달 포텐셜
+이 아이의 기질 유형(활동형/사색형/사교형/예술형)을 분석할 것.
+강점 영역과 발달 시 주의할 점을 각각 1가지씩만 제시할 것.
+
+### 📚 2. 초기 학습 환경 설계
+기질에 맞는 학습 방식 1가지와 피해야 할 방식 1가지만 제시할 것.
+
+### 👨‍👩‍👧 3. 부모 양육 전략
+갈등 상황 1가지와 효과적인 대응법을 제시할 것.
+이 기질의 아이를 키울 때 가장 중요한 원칙 1가지를 명시할 것.
+
+### 🎯 4. 재능 방향성
+이 아이의 통변성과 오행 구성을 기반으로 가장 강하게 발현될 재능 분야 2가지를 제시할 것.
+각각 근거 1문장과 초등학교 입학 전 시작하면 좋은 활동 1가지를 함께 제시할 것.
+
+` : baziContext.age < 14 ? `
+### 📚 초등학생 전략 (${baziContext.age}세)
+
+### 🎓 1. 두뇌 구조 & 학업 포텐셜
+강점 과목과 취약 과목을 각각 2가지씩만 제시할 것.
+이 아이에게 가장 효과적인 학습 스타일 1가지를 제시할 것.
+
+### 🧭 2. 적성 방향 & 재능 계발
+통변성 기반으로 두각을 나타낼 분야(이과/문과/예체능/직업계)를 1가지만 제시하고 근거를 2문장으로 설명할 것.
+중학교 입학 전 집중해서 키워야 할 역량 2가지를 제시할 것.
+
+### 👨‍👩‍👧 3. 부모 양육 전략
+갈등 상황 1가지와 효과적인 대화법을 제시할 것.
+학습 동기 유지를 위한 핵심 원칙 1가지를 명시할 것.
+
+` : baziContext.age < 17 ? `
+### 📖 중학생 진로 전략 (${baziContext.age}세)
+
+### 🎓 1. 학업 포텐셜 & 진로 방향
+강점 과목과 취약 과목을 각각 2가지씩 제시할 것.
+이과/문과/예체능/직업계 중 가장 유리한 방향 1가지를 근거와 함께 제시할 것.
+
+### 🏫 2. 고등학교 선택 전략
+| 시나리오 | 고교 유형 | 핵심 이유 |
+|---|---|---|
+| Best | | |
+| Base | | |
+지금부터 준비해야 할 것 2가지를 제시할 것.
+
+### 👨‍👩‍👧 3. 부모 지원 전략
+이 나이대 핵심 갈등 1가지와 효과적인 대화법을 제시할 것.
+멘탈 관리를 위한 핵심 원칙 1가지를 명시할 것.
+
+` : `
+### 🎯 고등학생 대입 전략 (${baziContext.age}세)
+
+### 🎓 1. 학업 포텐셜 & 전형 전략
+강점/취약 과목 각 2가지와 정시/수시 중 유리한 전형 1가지를 제시할 것.
+
+### 🏫 2. 현실적 대입 시나리오
+[지침]: 한국 대학만 작성. 해외대/KAIST/POSTECH 절대 금지.
+- 최상위권: 서울대/연세대/고려대
+- 상위권: 성균관대/한양대/서강대/이화여대/중앙대/경희대
+- 중위권: 건국대/동국대/홍익대 및 지방 거점 국립대
+- 전문직: 의대/치대/한의대/약대/간호대
+- 기술/예체능: 특성화고/예술고 트랙
+
+| 시나리오 | 목표 대학 및 학과 | 핵심 조건 |
+|---|---|---|
+| Best (최대 노력) | | |
+| Base (현실적 목표) | | |
+
+판단 근거 2문장 작성. 지금 당장 할 것 2가지 제시.
+
+### 👨‍👩‍👧 3. 부모 지원 전략
+해야 할 것 2가지, 하지 말아야 할 것 2가지를 명확히 구분하여 작성할 것.
+`}` : `
+### 🚀 1. 커리어 돌파 전략
+[지침]: 직업군 판단 시 명식 전체 구조(일간·월지·격국·용신)를 종합하여 판단할 것.
+단순 통변성 개수 집계나 오행 물상(土=농업, 水=수산업) 해석 절대 금지.
+아래 격국별 직업 성향을 참고하되, 이 사람의 명식 고유 구조에 맞게 해석할 것.
+• 식신격 → 창작/기획/요리/교육/예술
+• 상관격 → 언론/예술/법조/혁신/기술
+• 정관격 → 공직/경영/교육/전문직
+• 편관격 → 군경/외과/스포츠/기술직/무역
+• 정재격 → 금융/회계/부동산/유통
+• 편재격 → 창업/영업/투자/미디어
+• 정인격 → 학문/연구/종교/상담/의료
+• 편인격 → 예술/철학/특수기술/심리
+
+**지금 커리어의 가장 큰 병목**을 명식 구조 근거와 함께 1줄로 정의하고 돌파구 3가지를 제시할 것.
+각각 "언제까지, 무엇을, 어떻게" 형식으로 작성할 것.
+
+### 👥 2. 파트너십 리스크
+**함께하면 안 되는 유형**과 **최적 파트너 유형**을 각각 2줄로 대조하여 작성할 것.
+
+### 🏥 3. 건강 & 체질 관리
+**취약한 신체 부위** 2가지와 **지금 시작할 관리법**을 구체적으로 작성할 것.`}`,
+
+      // ===== 심층:진단 (고정 — 사주구조 + 자아/관계) =====
+      deepdiag: `당신은 VVIP 전담 수석 명리 전략가입니다. ${baseRule}
+[핵심 지침] 명식 전체 구조(일간·월지·격국·용신)를 종합하여 판단할 것. 단순 통변성 개수나 오행 물상 해석 절대 금지.
+아래에 제공된 오행비율 데이터를 반드시 그대로 사용할 것. 자의적 재계산·수정 절대 금지.
+
+### 🔬 1. 사주 구조 핵심 진단
+이 사람의 명식을 격국·용신 기준으로 분석하여 아래 표를 완성할 것. 수치 변경 절대 금지.
+
+| 요소 | 진단 | 의미 |
+|---|---|---|
+| 일간 에너지 | | |
+| 격국 | | |
+| 신강/신약 | | |
+| 용신 | | |
+| 기신 | | |
+| 핵심 살 | ${baziContext.sinssal} | (살의 의미와 영향) |
+
+### 🧠 2. 본질적 자아와 사회적 가면
+진짜 내면 욕구와 외부 페르소나의 차이를 극명하게 대조할 것.
+실제 상황 예시(직장/가족/연애) 1가지 포함. 2문장 이내.
+
+### ⚡ 3. 치명적 방어기제와 갈등 패턴
+스트레스 상황에서 반복되는 문제 행동 1가지를 명식 근거와 함께 지적할 것.
+이 패턴이 인간관계에 미치는 영향과 개선 행동 지침 1가지. 2문장 이내.
+
+### 🗡️ 4. 고위직 생존 외교 전략
+🟢 해야 할 것 3가지 / 🔴 하지 말아야 할 것 3가지를 번호 목록으로 작성.
+상사/동료/부하 각각에 대한 전략을 1줄씩 구분하여 제시.`,
+
+      // ===== 심층:관심사 (관심사 선택 기반 개인화) =====
+      deepinterest: `당신은 VVIP 전담 전략 컨설턴트입니다. ${baseRule}
+[핵심 지침] 명식 전체 구조(일간·월지·격국·용신)를 종합하여 판단할 것.
+아래에 제공된 오행비율 데이터를 반드시 그대로 사용할 것. 자의적 재계산·수정 절대 금지.
+내담자가 선택한 관심사: ${baziContext.userInterests}
+위 관심사 항목들을 각각 하나의 섹션으로 깊이 있게 분석할 것. 섹션별 지침은 아래를 따를 것.
+
+${(baziContext.userInterests || '').includes('승진/커리어') ? `
+### 👑 심층: 직업군과 관운(官運) 상한선
+[지침] 격국·용신 기반 판단. 오행 물상 해석 절대 금지.
+• 식신격 → 창작/기획/교육/예술  • 상관격 → 언론/법조/혁신/기술
+• 정관격 → 공직/경영/전문직     • 편관격 → 군경/스포츠/기술직
+• 정재격 → 금융/회계/부동산     • 편재격 → 창업/영업/투자
+• 정인격 → 학문/연구/상담/의료  • 편인격 → 예술/철학/특수기술
+1. **최적 직업군 3가지**: 격국·용신 근거 각 1문장.
+2. **도달 가능한 권력 상한선**: 현실적 최대 직급 + 🔴 핵심 장벽 1가지.
+3. **지금 당장 할 승진 돌파구 3가지**: "언제까지, 무엇을, 어떻게" 형식.` : ''}
+
+${(baziContext.userInterests || '').includes('창업/사업확장') ? `
+### 🚀 심층: 창업·사업 확장 전략
+1. **이 명식의 사업가 적합도**: 격국·용신 기반 냉정 평가. 🟢 강점 2가지 / 🔴 치명적 약점 1가지.
+2. **최적 사업 분야**: 격국 기반 2가지. 각각 명식 근거 1문장.
+3. **사업 시작 최적 타이밍**: 대운·세운 기준 연도 명시. 🔴 절대 피해야 할 구간 1가지.` : ''}
+
+${(baziContext.userInterests || '').includes('부동산 투자') ? `
+### 🏠 심층: 부동산·재테크 타이밍
+1. **이 명식의 재물 구조**: 재성·식상 분석. 적합한 투자 스타일(안정형/공격형/분산형) 판단.
+2. **부동산 매입 최적 시기**: 대운·세운 기준 구체적 연도 명시. 근거 1문장.
+3. **🔴 절대 금지 투자 행동 2가지**: 이 명식 구조에서 손실이 집중되는 패턴.` : ''}
+
+${(baziContext.userInterests || '').includes('결혼/연애') ? `
+### 💍 심층: 연애·결혼 파트너십 리스크
+1. **반복되는 관계 위기 패턴**: 🔴 구체적 시나리오 + 근본 원인 1문장 + 개선 지침 1가지.
+2. **최적 파트너 vs 피해야 할 유형**: 직업/성격/가치관/경제관념 기준 각각 구체적으로.
+3. **결합 최적 시기 / 위험 구간**: 연도 명시 + 각각 이유 1문장.` : ''}
+
+${(baziContext.userInterests || '').includes('재테크/자산증식') ? `
+### 💰 심층: 자산 증식 로드맵
+1. **이 명식의 재무 기질**: 재성·식상 구조 분석. 월급형/투자형/사업형 중 적합 유형.
+2. **자산 증식 골든타임**: 향후 10년 중 최적 구간 연도 명시. 근거 1문장.
+3. **단기 재무 액션플랜 (향후 3개월)**: "무엇을, 언제까지, 어떻게" 3가지.` : ''}
+
+${(baziContext.userInterests || '').includes('건강관리') ? `
+### 🏥 심층: 건강·체질 관리 전략
+1. **이 명식의 취약 신체 부위 2가지**: 오행 불균형 기반 근거 포함.
+2. **현재 대운에서 집중 관리할 것**: 지금 시작할 구체적 관리법 2가지.
+3. **🔴 건강 위험 신호 타이밍**: 향후 주의해야 할 연도/구간 명시.` : ''}
+
+${(baziContext.userInterests || '').includes('이직/전직') ? `
+### 🔄 심층: 이직·전직 전략
+1. **현재 직무 적합도 진단**: 격국·용신과 현재직무 비교. 🟢 맞는 점 / 🔴 어긋나는 점.
+2. **최적 이직 타이밍**: 대운·세운 기준 구체적 연도. 🔴 이직 금지 구간.
+3. **이직 후 최적 직무 방향 2가지**: 격국 기반 근거 각 1문장.` : ''}
+
+${(baziContext.userInterests || '').includes('자녀/가족') ? `
+### 👶 심층: 자녀운·가족 관계 분석
+[지침] 식상(食傷)으로 자녀운, 육친(六親)으로 가족관계를 분석할 것.
+
+1. **자녀 인연 시기**
+식상(식신/상관) 구조를 분석하여 자녀 인연이 강한 대운·세운 연도를 구체적으로 명시.
+🟢 자녀 인연 최적 시기: 연도 + 근거 1문장.
+자녀 수 경향과 성별 성향(식신=딸 경향, 상관=아들 경향)을 명식 근거와 함께 제시.
+
+2. **자녀와의 관계 패턴**
+이 사주 구조에서 나타나는 부모 역할 스타일 1가지 (엄격형/자유형/헌신형 등).
+🔴 자녀와 갈등이 생기기 쉬운 상황 1가지와 구체적 대응법.
+
+3. **가족 관계 구조 진단**
+육친 분석 (연주=조상/초년, 월주=부모/청년, 일주=배우자/중년, 시주=자녀/말년) 기반:
+🟢 가족 내 내 역할과 포지션 1문장.
+부모운(월주 기반), 배우자운(일지 기반) 각각 1줄 핵심 평가.
+이 사람에게 가족이 어떤 에너지로 작용하는지 (힘의 원천인지, 부담인지) 명식 근거와 함께 1문장으로 정의.` : ''}
+
+${!(baziContext.userInterests || '').match(/승진|창업|부동산|결혼|재테크|건강|이직|자녀/) ? `
+### 🎯 종합 심층 분석
+관심사가 선택되지 않았습니다. 이 명식의 가장 중요한 핵심 이슈 2가지를 격국·용신 기반으로 분석할 것.
+각각 현황 진단 + 향후 3년 전략 + 즉시 실행 액션 1가지.` : ''}`,
+
+      // ===== 유아 전용: 기질 분석 탭 =====
+      trait: `당신은 영유아 기질 전문 명리 컨설턴트입니다. ${baseRule}
+
+[지침] 모든 분석은 명식 전체 구조(일간·월지·격국·용신)를 종합하여 판단할 것.
+단순 통변성 개수 집계나 오행 물상 해석 절대 금지.
+
+### 🌟 1. 타고난 기질 유형
+이 아이의 명식 구조(격국·일간·월지)를 기반으로 기질 유형(활동형/사색형/사교형/예술형/리더형)을 1가지로 확정하고, 명식 근거를 2문장으로 설명할 것.
+
+### 💡 2. 재능 발화점 TOP 3
+격국·용신 구조를 기반으로 가장 강하게 발현될 재능 분야 3가지를 제시할 것.
+각각:
+- 재능 분야명
+- 명식의 어떤 구조에서 이 재능이 나오는지 근거 1문장
+- 🟢 초등 입학 전 시작하면 좋은 구체적 활동 1가지
+
+### 🧩 3. 두뇌 발달 스타일
+🟢 이 아이가 가장 잘 흡수하는 학습 방식 2가지.
+🔴 역효과를 내는 방식 1가지와 그 이유 1문장.
+
+### ⚡ 4. 기질별 에너지 관리
+이 기질 유형이 과부하 시 보이는 신호 1가지와 해소법 1가지.
+최적의 하루 루틴 패턴을 한 줄로 제안할 것.`,
+
+      // ===== 미성년 전용: 부모 전략 탭 =====
+      parent: `당신은 VVIP 자녀교육 명리 전략가입니다. ${baseRule}
+
+[지침] 모든 분석은 명식 전체 구조(일간·월지·격국·용신)를 종합하여 판단할 것.
+단순 통변성 개수 집계나 오행 물상 해석 절대 금지.
+
+${baziContext.age <= 7 ? `
+### 👨‍👩‍👧 1. 애착 형성 & 훈육 전략
+이 아이의 격국·일간 구조에서 드러나는 기질을 바탕으로 안정적 애착을 형성하는 핵심 원칙 2가지.
+🔴 이 명식 구조의 아이에게 역효과인 훈육 방식 1가지와 대안 1가지.
+
+### 🏠 2. 가정 환경 설계
+이 아이의 용신·격국에 맞는 최적 가정 환경 요소 2가지(공간/루틴/자극 등).
+🟡 이 기질을 가진 아이를 키울 때 부모가 가장 흔히 저지르는 실수 1가지와 교정법.
+
+### 🤝 3. 또래 관계 코칭
+명식 구조상 이 아이의 또래 관계에서 예상되는 강점 1가지와 취약점 1가지.
+어린이집/유치원에서 생길 수 있는 갈등 시나리오 1가지와 부모 대응법.
+
+### 🎯 4. 초등 입학 준비 전략
+격국·용신 기반으로 초등 입학 전까지 집중 육성해야 할 역량 2가지.
+각각 명식 근거 1문장과 구체적 실행 방법 1가지씩 제시.
+` : `
+### 👨‍👩‍👧 1. 이 나이대 핵심 갈등 패턴
+${baziContext.age < 14 ? '초등학생' : baziContext.age < 17 ? '중학생' : '고등학생'} 자녀와 부모 간 갈등 유형 1가지를 이 아이의 격국·일간 구조 기반으로 구체적 시나리오로 제시.
+🟢 효과적인 대화법과 🔴 피해야 할 반응을 각각 1가지씩 명시.
+
+### 📚 2. 학습 동기 설계
+이 명식 구조상 학습 동기가 꺼지는 상황 1가지와 다시 불을 붙이는 방법 1가지.
+🟢 이 아이의 격국에 맞는 자기주도학습 환경 조성법 2가지.
+
+### 🏆 3. 재능 투자 우선순위
+격국·용신 기반으로 지금 집중 투자해야 할 역량/활동 2가지와 각각 명식 근거 1문장.
+🔴 지금은 뒤로 미뤄도 되는 것 1가지와 그 이유.
+
+### 🧭 4. 다음 전환점 대비
+${baziContext.age < 14 ? '중학교' : baziContext.age < 17 ? '고등학교' : '대학교/사회'} 진입 전 반드시 준비해야 할 것 2가지를 "언제까지, 무엇을, 어떻게" 형식으로 작성.
+`}`
+    };
+      
+      builtPrompts = prompts;
+    return builtPrompts;
+  }
+
+  async function fetchAndCache(tabId) {
+    const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
+const cached = localStorage.getItem(cacheKey);
+if (cached) {
+    if (cached.includes('서버 내부 연산 실패') || cached.includes('API_ERROR')) {
+        localStorage.removeItem(cacheKey);
+    } else {
+        if (currentTab === tabId) renderContent(cached, tabId);
+        return;
+    }
+}
+
+    const prompts = buildPrompts();
+    const baziData = `이름:${baziContext.name}, 나이:${baziContext.age}, 성별:${baziContext.gender==='M'?'남성':'여성'}, 명식:${baziContext.bazi}, 대운수:${baziContext.dn}, 오행비율:${baziContext.elText}, 일간오행:${baziContext.dayMasterEl === '木' ? '나무(木)에너지' : baziContext.dayMasterEl === '火' ? '불(火)에너지' : baziContext.dayMasterEl === '土' ? '흙(土)에너지' : baziContext.dayMasterEl === '金' ? '쇠(金)에너지' : '물(水)에너지'}, 신강여부:${baziContext.isStrong?'신강':'신약'}(참고값 — 명식 직접 검토 후 필요시 수정하여 해석), 통변성:${baziContext.통변성}, 12신살:${baziContext.sinssal}, 현재시점:${new Date().getFullYear()}년 ${new Date().getMonth()+1}월, 현재직무:${baziContext.userJob}, 관심사:${baziContext.userInterests}`;
+    
+    let retries = 2;
+    while (retries > 0) {
+        try {
+            const resp = await fetch('https://saju-backend-3vgw.onrender.com/api/llm', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ baziData, systemPrompt: prompts[tabId] })
+            });
+
+            if (!resp.ok) throw new Error(`HTTP_ERROR_${resp.status}`);
+            const data = await resp.json();
+            if (!data?.content?.[0]?.text) {
+                throw new Error(`API_ERROR: ${data?.error?.message || JSON.stringify(data)}`);
+            }
+
+            const rawAiText = data.content[0].text;
+            localStorage.setItem(cacheKey, rawAiText);
+            if (currentTab === tabId) renderContent(rawAiText, tabId);
+            return;
+
+        } catch (e) {
+            retries--;
+            if (e.message.startsWith('HTTP_ERROR_4')) break;
+            if (retries > 0) {
+                await new Promise(r => setTimeout(r, 2000));
+            } else if (currentTab === tabId) {
+                document.getElementById('tab-content').innerHTML =
+                    `<div class='loading-tab' style='color:#ff6b6b'>
+                        분석 서버에 일시적인 문제가 생겼어요.<br>
+                        탭을 다시 클릭하면 재시도됩니다.
+                    </div>`;
+            }
+        }
+    }
+  }
+  
+  function switchTab(tabId) {
+    currentTab = tabId;
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const cacheKey = `palja_cache_${baziContext.name}_${baziContext.bazi}_${tabId}`;
+    const cachedText = localStorage.getItem(cacheKey);
+
+    if (cachedText) {
+        renderContent(cachedText, tabId);
+    } else {
+        document.getElementById('tab-content').innerHTML = `
+          <div class="hourglass-wrap">
+            <span class="hourglass">⏳</span>
+            <div>
+              <div class="hourglass-text">운명을 분석하는 중입니다</div>
+              <div class="hourglass-sub">약 30초 소요됩니다. 잠시만 기다려 주세요.</div>
+            </div>
+          </div>`;
+    }
+  }
+
+  // [아키텍트 패치] AI에 의존하지 않는 무손실 렌더링 및 차트 직결 로직
+  function renderContent(rawText, tabId) {
+    let displayText = rawText;
+    
+    if (tabId === 'summary') {
+      const cardHtml = renderDestinyCard(rawText);
+      displayText = displayText.replace(/```[a-z]*\n\{[\s\S]*?\}\n```/g, '');
+      displayText = displayText.replace(/\{[\s\S]*"daewun_labels"[\s\S]*"daewun_scores"[\s\S]*\}/g, '');
+      displayText = displayText.replace(/- \[[ x]\] /g, '• ');
+      displayText = displayText.replace(/\n\s*□/g, '');
+      displayText = displayText.replace(/□/g, '');
+      displayText = displayText.replace(/(\d)\s*~+\s*(\d)/g, '$1-$2');
+      displayText = displayText.replace(/~~(.+?)~~/g, '$1');
+      document.getElementById('tab-content').innerHTML = cardHtml + marked.parse(displayText);
+
+      // 스코어보드 표 → 슬라이드 바 변환
+      transformScoreboardToSlider();
+
+      // 계산 기준 문구
+      if (baziContext.calcPolicy) {
+        const policyHtml = `<div style="margin-top:1.5rem; padding:10px 14px; background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.2); border-radius:8px; font-size:11px; color:var(--text-muted); line-height:1.7;">
+          <strong style="color:rgba(212,175,55,0.7);">📐 계산 기준</strong><br>
+          ${baziContext.calcPolicy}<br>
+          입춘 절입 시각: ${baziContext.ipchunKST} / 해당 월 절입 시각: ${baziContext.currentMonthTermKST}
+        </div>`;
+        document.getElementById('tab-content').innerHTML += policyHtml;
+      }
+      return;
+    }
+    displayText = displayText.replace(/(\d)\s*~+\s*(\d)/g, '$1-$2');
+    displayText = displayText.replace(/~~(.+?)~~/gs, '$1');
+    document.getElementById('tab-content').innerHTML = marked.parse(displayText);
+  }
+
+  // 스코어보드 표를 슬라이드 바로 변환
+  function transformScoreboardToSlider() {
+    const tables = document.getElementById('tab-content').querySelectorAll('table');
+    tables.forEach(table => {
+      const headers = [...table.querySelectorAll('th')].map(th => th.textContent.trim());
+      if (!headers.includes('최저') || !headers.includes('평균') || !headers.includes('최고')) return;
+
+      const rows = [...table.querySelectorAll('tbody tr')];
+      if (rows.length === 0) return;
+
+      let sliderHtml = `<div style="margin:1.8rem 0; background:var(--input-bg); border-radius:12px; padding:1.2rem 1.5rem; border:1px solid var(--border);">`;
+      sliderHtml += `<div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem; text-align:right;">이 사주 구조에서 발현될 수 있는 역량 범위 · <span style="color:var(--gold);">●</span> 현재 대운 기준 위치</div>`;
+
+      rows.forEach(row => {
+        const cells = [...row.querySelectorAll('td')];
+        if (cells.length < 4) return;
+        const label = cells[0].textContent.trim();
+        const low   = parseInt(cells[1].textContent.trim()) || 0;
+        const mid   = parseInt(cells[2].textContent.trim()) || 50;
+        const high  = parseInt(cells[3].textContent.trim()) || 100;
+        // 평균을 최저~최고 범위에서 퍼센트로 환산
+        const pct = Math.round(((mid - low) / (high - low)) * 100);
+
+        sliderHtml += `
+          <div style="margin-bottom:1.2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px;">
+              <span style="font-size:0.9rem; font-weight:500;">${label}</span>
+              <span style="font-size:0.8rem; color:var(--text-muted);">${low} ~ ${high}</span>
+            </div>
+            <div style="position:relative; height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:visible;">
+              <div style="position:absolute; left:0; top:0; height:100%; width:${pct}%; background:linear-gradient(90deg,rgba(212,175,55,0.3),rgba(212,175,55,0.7)); border-radius:4px;"></div>
+              <div style="position:absolute; top:50%; transform:translate(-50%,-50%); left:${pct}%; width:14px; height:14px; background:var(--gold); border-radius:50%; border:2px solid var(--bg-dark); box-shadow:0 0 6px rgba(212,175,55,0.6);"></div>
+            </div>
+          </div>`;
+      });
+      sliderHtml += `</div>`;
+
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = sliderHtml;
+      table.parentNode.replaceChild(wrapper, table);
+    });
+  }
+
+  function renderChart(labels, scores) {
+    const canvas = document.getElementById('daewunChart');
+    if (!canvas) return; // 캔버스가 없으면 조용히 종료
+    const ctx = canvas.getContext('2d');
+    if(window.myChart) window.myChart.destroy();
+    window.myChart = new Chart(ctx, {
+      type: 'line',
+      data: { 
+        labels: labels, 
+        datasets: [{ 
+          label: '명리 계리적 성과 지수', data: scores, borderColor: '#d4af37', tension: 0.4, fill: true, backgroundColor: 'rgba(212, 175, 55, 0.06)', borderWidth: 3, pointBackgroundColor: '#d4af37'
+        }] 
+      },
+      options: { 
+        responsive: true, maintainAspectRatio: false, 
+        scales: { 
+          y: { min: 0, max: 100, title: { display: true, text: '운세 성과도 (Score)', color: '#88888b', font: { size: 11, weight: 'bold' } }, grid: { color: '#232326' }, ticks: { color: '#888' } },
+          x: { grid: { display: false }, ticks: { color: '#888' } }
+        },
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return ` 종합 운세 지수: ${context.parsed.y}점`; } } } }
+      }
+    });
+  }
+</script>
+</body>
+</html>
