@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>팔자길드 — 아이 사주 카드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+:root {
+  --cream:#fdf7ee; --dark:#1e1208; --gold:#c9943a; --border:#dac098; --muted:#9e7c4c;
+  --red:#e83428; --blue:#1a6ab8; --green:#2a9a48; --yellow:#f0c020; --purple:#8a28b8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:#e8d8b8;min-height:100vh;padding:0 0 80px;}
+
+/* 네비 */
+.nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);}
+.nav-brand{font-family:'Black Han Sans',sans-serif;font-size:16px;color:var(--gold);letter-spacing:2px;}
+.nav-sub{font-size:10px;color:#888;letter-spacing:1px;margin-top:2px;}
+.nav-link{font-size:12px;color:#777;text-decoration:none;}
+
+/* 레이아웃 */
+.page{max-width:960px;margin:0 auto;padding:28px 16px;display:flex;gap:32px;align-items:flex-start;}
+
+/* 입력 패널 */
+.input-panel{flex:0 0 300px;background:var(--cream);border:2px solid var(--dark);border-radius:12px;padding:20px;position:sticky;top:20px;}
+.panel-title{font-family:'Black Han Sans',sans-serif;font-size:18px;color:var(--dark);margin-bottom:3px;}
+.panel-sub{font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.5;}
+.field{margin-bottom:12px;}
+.field-label{font-size:11px;color:var(--muted);font-weight:700;margin-bottom:4px;letter-spacing:0.5px;}
+.field input,.field select{width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;font-family:inherit;font-size:13px;color:var(--dark);}
+.field-row{display:flex;gap:6px;}
+.field-row input{flex:1;}
+.gen-btn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--dark);color:var(--gold);font-size:14px;font-weight:700;cursor:pointer;font-family:'Black Han Sans',sans-serif;letter-spacing:1px;transition:opacity 0.2s;margin-top:4px;}
+.gen-btn:hover{opacity:0.85;}
+.engine-note{margin-top:12px;padding:8px 10px;background:#fff8ee;border:1px solid #f0d898;border-radius:6px;font-size:10px;color:var(--muted);line-height:1.6;}
+
+/* 카드 패널 */
+.card-panel{flex:1;display:flex;flex-direction:column;gap:14px;}
+.empty-state{background:var(--cream);border:2px dashed var(--border);border-radius:12px;padding:50px 30px;text-align:center;color:var(--muted);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+
+/* 추천 직업 배지 */
+.recommend-wrap{display:flex;flex-direction:column;gap:6px;}
+.recommend-label{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.5px;}
+.recommend-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.rec-badge{font-size:12px;padding:5px 14px;border-radius:20px;border:1.5px solid var(--dark);background:var(--dark);color:var(--gold);font-weight:700;cursor:pointer;transition:all 0.15s;}
+.rec-badge.alt{background:var(--cream);color:var(--muted);border-color:var(--border);}
+.rec-badge:hover{opacity:0.8;}
+
+/* ===================== 잡지 카드 ===================== */
+.card-wrapper{background:var(--cream);border:2px solid var(--border);border-radius:14px;padding:14px;}
+.card-sub-label{font-size:11px;color:var(--muted);margin-bottom:8px;}
+
+#saju-card{
+  width:100%;aspect-ratio:3/4;
+  position:relative;overflow:hidden;
+  font-family:'Noto Sans KR',sans-serif;
+  background:#fdf0d8;
+}
+
+/* 배경 */
+.card-bg-wrap{position:absolute;inset:0;z-index:0;}
+.card-bg-wrap svg,.card-bg-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* 빈티지 오버레이 */
+.card-vintage-overlay{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(30,18,8,0.25) 100%),
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px);
+}
+
+/* 잡지 테두리 */
+.card-border{
+  position:absolute;inset:0;z-index:10;pointer-events:none;
+  border:6px solid var(--dark);
+  box-shadow:inset 0 0 0 2px var(--gold), inset 0 0 0 4px var(--dark);
+}
+
+/* 상단 헤더 바 */
+.card-top-bar{
+  position:absolute;top:0;left:0;right:0;z-index:8;
+  background:var(--dark);
+  padding:6px 14px 5px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.top-bar-brand{font-family:'Black Han Sans',sans-serif;font-size:clamp(11px,2.5%,15px);color:var(--gold);letter-spacing:2px;}
+.top-bar-tag{font-size:clamp(8px,1.8%,11px);color:#ccc;letter-spacing:1px;}
+.top-bar-date{font-size:clamp(8px,1.8%,11px);color:var(--gold);}
+
+/* 잡지 제목 (KIDS 스타일) */
+.card-magazine-title{
+  position:absolute;z-index:8;
+  top:8%;left:0;right:0;
+  display:flex;align-items:center;justify-content:center;gap:2px;
+  padding:0 8%;
+}
+.mag-letter{
+  font-family:'Black Han Sans',sans-serif;
+  font-size:clamp(28px,10%,56px);
+  font-weight:900;line-height:1;
+  text-shadow:3px 3px 0 rgba(0,0,0,0.4);
+  display:inline-block;
+}
+
+/* 아이 사진 영역 */
+.card-photo-zone{
+  position:absolute;z-index:5;
+  bottom:28%;left:50%;transform:translateX(-50%);
+  width:42%;aspect-ratio:1/1;
+}
+.card-photo-frame{
+  width:100%;height:100%;border-radius:50%;overflow:hidden;
+  border:4px solid #fff;
+  box-shadow:4px 4px 0 var(--dark), 0 0 0 2px var(--gold);
+  background:#e8d4b8;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(30px,8%,60px);
+}
+.card-photo-frame img{width:100%;height:100%;object-fit:cover;}
+
+/* 모서리 키워드 스티커 */
+.kw-sticker{
+  position:absolute;z-index:9;
+  font-family:'Black Han Sans',sans-serif;
+  font-size:clamp(9px,2.2%,14px);
+  font-weight:900;
+  padding:4px 10px 4px 10px;
+  border-radius:4px;
+  border:2px solid var(--dark);
+  line-height:1.2;
+  text-align:center;
+  box-shadow:2px 2px 0 rgba(0,0,0,0.3);
+  transform:rotate(-3deg);
+}
+.kw-sticker:nth-child(2){transform:rotate(3deg);}
+.kw-sticker:nth-child(3){transform:rotate(2deg);}
+.kw-sticker:nth-child(4){transform:rotate(-2deg);}
+.kw-tl{top:18%;left:3%;}
+.kw-tr{top:18%;right:3%;}
+.kw-bl{bottom:32%;left:3%;}
+.kw-br{bottom:32%;right:3%;}
+
+/* 직업 특집 배너 */
+.card-job-banner{
+  position:absolute;z-index:8;
+  bottom:26%;left:0;right:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:5px 8%;
+}
+.job-banner-inner{
+  background:var(--red);
+  color:#fff;
+  font-family:'Black Han Sans',sans-serif;
+  font-size:clamp(10px,2.5%,16px);
+  padding:4px 16px;
+  border-radius:4px;
+  border:2px solid var(--dark);
+  box-shadow:3px 3px 0 rgba(0,0,0,0.4);
+  letter-spacing:1px;
+  text-align:center;
+  white-space:nowrap;
+}
+
+/* 하단 정보 영역 */
+.card-info-zone{
+  position:absolute;z-index:8;
+  bottom:0;left:0;right:0;
+  background:var(--cream);
+  border-top:3px solid var(--dark);
+  padding:4% 5% 4%;
+}
+.card-child-name{
+  font-family:'Black Han Sans',sans-serif;
+  font-size:clamp(14px,4%,24px);
+  color:var(--dark);text-align:center;
+  margin-bottom:1.5%;
+}
+.card-meta{font-size:clamp(8px,1.8%,12px);color:var(--muted);text-align:center;margin-bottom:2%;}
+
+/* 명식 + 사주 정보 그리드 */
+.card-saju-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:2%;margin-bottom:2%;
+}
+.saju-cell{
+  background:#fff8ee;border:1.5px solid var(--dark);border-radius:4px;
+  padding:2% 3%;
+  box-shadow:1.5px 1.5px 0 rgba(0,0,0,0.2);
+}
+.saju-cell-label{font-size:clamp(7px,1.4%,10px);color:var(--muted);font-weight:700;letter-spacing:0.5px;margin-bottom:1%;}
+.saju-cell-value{font-size:clamp(9px,2%,13px);font-weight:700;color:var(--dark);font-family:'Noto Serif KR',serif;}
+
+/* 명식 알약 */
+.bazi-pills{display:flex;justify-content:center;gap:1.5%;margin-bottom:2%;}
+.bazi-pill{
+  font-family:'Noto Serif KR',serif;
+  font-size:clamp(9px,2%,13px);font-weight:700;
+  padding:1.5% 3%;border-radius:3px;
+  background:var(--dark);color:var(--gold);
+  border:1.5px solid var(--gold);
+  box-shadow:1.5px 1.5px 0 rgba(0,0,0,0.3);
+}
+
+/* 육아 팁 */
+.card-tip{
+  background:#fff0cc;border:1.5px solid var(--dark);border-radius:4px;
+  padding:2% 3%;
+  box-shadow:1.5px 1.5px 0 rgba(0,0,0,0.15);
+}
+.tip-label{font-size:clamp(7px,1.4%,10px);color:var(--red);font-weight:700;letter-spacing:1px;margin-bottom:1%;}
+.tip-text{font-size:clamp(8px,1.6%,11px);color:var(--dark);line-height:1.5;}
+
+/* CTA */
+.card-cta{display:flex;justify-content:space-between;align-items:center;margin-top:2%;padding-top:2%;border-top:1px dashed var(--border);}
+.cta-url{font-size:clamp(7px,1.3%,10px);color:var(--muted);}
+.cta-btn{font-size:clamp(7px,1.3%,10px);font-weight:700;color:var(--blue);}
+
+/* 장식 요소 */
+.deco-star{position:absolute;z-index:9;font-family:'Black Han Sans',sans-serif;}
+.deco-badge{
+  position:absolute;z-index:9;
+  border-radius:50%;border:2px solid var(--dark);
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;font-family:'Black Han Sans',sans-serif;
+  box-shadow:2px 2px 0 rgba(0,0,0,0.3);
+  line-height:1.2;
+}
+
+/* 액션 버튼 */
+.action-row{display:flex;gap:10px;}
+.action-btn{flex:1;padding:11px;border-radius:10px;border:none;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:opacity 0.15s;}
+.btn-save{background:var(--dark);color:var(--gold);}
+.btn-share{background:#fff8ee;color:var(--dark);border:1.5px solid var(--border);}
+.btn-save:hover,.btn-share:hover{opacity:0.85;}
+
+/* 엔진 결과 */
+.engine-result{background:var(--cream);border:1.5px solid var(--border);border-radius:12px;padding:16px;}
+.er-title{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1.5px;margin-bottom:10px;}
+.er-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.er-cell{background:#fff8ee;border-radius:7px;padding:9px 11px;}
+.er-label{font-size:10px;color:var(--muted);margin-bottom:2px;}
+.er-value{font-size:13px;font-weight:500;color:var(--dark);}
+
+/* 로딩 */
+.loading-overlay{display:none;position:absolute;inset:0;background:rgba(30,18,8,0.6);align-items:center;justify-content:center;border-radius:10px;z-index:20;}
+.loading-overlay.show{display:flex;}
+.spinner{width:36px;height:36px;border:3px solid rgba(201,148,58,0.3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media print {
+  @page{size:A4;margin:0;}
+  body{background:white;}
+  .nav,.input-panel,.action-row,.engine-result,.recommend-wrap{display:none!important;}
+  .page{padding:0;justify-content:center;}
+  .card-panel{width:100%;}
+  #saju-card{aspect-ratio:3/4;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div>
+    <div class="nav-brand">⚜ 팔자길드</div>
+    <div class="nav-sub">아이 사주 카드 — AI 기질 분석</div>
+  </div>
+  <a href="/" class="nav-link">← 메인으로</a>
+</nav>
+
+<div class="page">
+  <!-- 입력 패널 -->
+  <div class="input-panel">
+    <div class="panel-title">아이 정보 입력</div>
+    <div class="panel-sub">생년월일로 사주 엔진이 자동 계산해요</div>
+    <div class="field"><div class="field-label">이름</div><input type="text" id="f-name" placeholder="아이 이름"></div>
+    <div class="field"><div class="field-label">성별</div>
+      <select id="f-gender"><option value="M">남아</option><option value="F">여아</option></select>
+    </div>
+    <div class="field"><div class="field-label">생년월일</div>
+      <div class="field-row">
+        <input type="number" id="f-year" placeholder="년도" min="2000" max="2030">
+        <input type="number" id="f-month" placeholder="월" min="1" max="12" style="max-width:64px">
+        <input type="number" id="f-day" placeholder="일" min="1" max="31" style="max-width:64px">
+      </div>
+    </div>
+    <div class="field"><div class="field-label">태어난 시간 (선택)</div>
+      <select id="f-hour">
+        <option value="12">모름 (낮 12시)</option>
+        <option value="0">자시 (23:30~01:30)</option><option value="2">축시 (01:30~03:30)</option>
+        <option value="4">인시 (03:30~05:30)</option><option value="6">묘시 (05:30~07:30)</option>
+        <option value="8">진시 (07:30~09:30)</option><option value="10">사시 (09:30~11:30)</option>
+        <option value="12">오시 (11:30~13:30)</option><option value="14">미시 (13:30~15:30)</option>
+        <option value="16">신시 (15:30~17:30)</option><option value="18">유시 (17:30~19:30)</option>
+        <option value="20">술시 (19:30~21:30)</option><option value="22">해시 (21:30~23:30)</option>
+      </select>
+    </div>
+    <div class="field"><div class="field-label">아이 사진 (선택)</div>
+      <input type="file" id="f-photo" accept="image/*">
+    </div>
+    <button class="gen-btn" onclick="generateCard()">✨ 사주 카드 만들기</button>
+    <div class="engine-note">팔자길드 사주 엔진 v2<br>절기 기준 명식 · 일간 기질 · 격국 · 용신 분석</div>
+  </div>
+
+  <!-- 카드 패널 -->
+  <div class="card-panel" id="card-panel">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">📰</div>
+      <div style="font-size:15px;font-weight:700;color:var(--dark);margin-bottom:6px;">아이의 사주 잡지 커버를 만들어보세요</div>
+      <div style="font-size:12px;">레트로 잡지 스타일로 기질을 분석해드려요</div>
+    </div>
+
+    <div class="recommend-wrap" id="recommend-wrap" style="display:none">
+      <div class="recommend-label">✦ 사주 엔진 추천 직업 (탭으로 변경 가능)</div>
+      <div class="recommend-badges" id="recommend-badges"></div>
+    </div>
+
+    <div class="card-wrapper" id="card-wrapper" style="display:none">
+      <div class="card-sub-label">📱 인스타그램 공유용 (3:4 비율)</div>
+      <div id="saju-card">
+        <!-- 배경 -->
+        <div class="card-bg-wrap" id="card-bg"></div>
+        <!-- 빈티지 오버레이 -->
+        <div class="card-vintage-overlay"></div>
+        <!-- 테두리 -->
+        <div class="card-border"></div>
+        <!-- 상단 바 -->
+        <div class="card-top-bar">
+          <span class="top-bar-brand">⚜ 팔자길드</span>
+          <span class="top-bar-tag" id="top-tag">아이 사주 카드</span>
+          <span class="top-bar-date" id="top-date">2026</span>
+        </div>
+        <!-- 잡지 제목 -->
+        <div class="card-magazine-title" id="mag-title"></div>
+        <!-- 모서리 키워드 스티커 -->
+        <span class="kw-sticker kw-tl" id="kw0"></span>
+        <span class="kw-sticker kw-tr" id="kw1"></span>
+        <span class="kw-sticker kw-bl" id="kw2"></span>
+        <span class="kw-sticker kw-br" id="kw3"></span>
+        <!-- 직업 배너 -->
+        <div class="card-job-banner">
+          <div class="job-banner-inner" id="job-banner">직업 특집</div>
+        </div>
+        <!-- 아이 사진 -->
+        <div class="card-photo-zone">
+          <div class="card-photo-frame" id="child-frame">
+            <span id="child-emoji">👶</span>
+          </div>
+        </div>
+        <!-- 장식 요소들 -->
+        <div id="card-decos"></div>
+        <!-- 하단 정보 -->
+        <div class="card-info-zone">
+          <div class="card-child-name" id="c-name">—</div>
+          <div class="card-meta" id="c-meta">—</div>
+          <div class="bazi-pills" id="c-bazi"></div>
+          <div class="card-saju-grid" id="c-saju-grid"></div>
+          <div class="card-tip">
+            <div class="tip-label">💡 오늘의 육아 TIP</div>
+            <div class="tip-text" id="c-tip">—</div>
+          </div>
+          <div class="card-cta">
+            <span class="cta-url">paljaguild.vercel.app</span>
+            <span class="cta-btn">기질 더 알아보기 →</span>
+          </div>
+        </div>
+        <div class="loading-overlay" id="loading-overlay"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <div class="action-row" id="action-row" style="display:none">
+      <button class="action-btn btn-save" onclick="saveCard()">📥 이미지 저장</button>
+      <button class="action-btn btn-share" onclick="shareCard()">📤 공유하기</button>
+    </div>
+
+    <div class="engine-result" id="engine-result" style="display:none">
+      <div class="er-title">사주 엔진 분석 결과</div>
+      <div class="er-grid" id="er-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 사주 엔진 =====
+function getJulianDay(y,m,d,h=0,mi=0,s=0){if(m<=2){y--;m+=12;}const A=Math.floor(y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+(h+mi/60+s/3600)/24+B-1524.5;}
+function getSunLon(jd){const T=(jd-2451545)/36525,L0=280.46646+36000.76983*T+0.0003032*T*T,M=357.52911+35999.05029*T-0.0001537*T*T,Mr=M*Math.PI/180,C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(Mr)+(0.019993-0.000101*T)*Math.sin(2*Mr)+0.000289*Math.sin(3*Mr);return(((L0+C)%360)+360)%360;}
+function jd2utc(jd){let Z=Math.floor(jd+0.5),F=(jd+0.5)-Z,A=Z;if(Z>=2299161){const a=Math.floor((Z-1867216.25)/36524.25);A=Z+1+a-Math.floor(a/4);}const B=A+1524,C=Math.floor((B-122.1)/365.25),D=Math.floor(365.25*C),E=Math.floor((B-D)/30.6001);let d=B-D-Math.floor(30.6001*E)+F,m=(E<14)?E-1:E-13,y=(m>2)?C-4716:C-4715;const di=Math.floor(d),ts=Math.round((d-di)*86400);return new Date(Date.UTC(y,m-1,di,Math.floor(ts/3600),Math.floor((ts%3600)/60),ts%60));}
+function mkKST(y,m,d,h=0,mi=0){return new Date(Date.UTC(y,m-1,d,h-9,mi,0));}
+function getSolarTerm(y,deg,am){let lo=getJulianDay(y,am,1,0),hi=getJulianDay(y,am,28,0);for(let i=0;i<60;i++){const mid=(lo+hi)/2;let diff=getSunLon(mid)-deg;if(diff>180)diff-=360;if(diff<-180)diff+=360;if(Math.abs(diff)<1e-7)return jd2utc(mid);let dlo=getSunLon(lo)-deg;if(dlo>180)dlo-=360;if(dlo<-180)dlo+=360;(dlo<=0&&diff>=0)||(dlo>=0&&diff<=0)?hi=mid:lo=mid;}return jd2utc((lo+hi)/2);}
+const STDEGS=[0,285,315,345,15,45,75,105,135,165,195,225,255];
+const TC={};function getTerm(y,m){const k=`${y}-${m}`;if(TC[k])return TC[k];const d=getSolarTerm(y,STDEGS[m],m);TC[k]=d;return d;}
+const ST=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BR=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const EM={'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','亥':'水','子':'水'};
+const DMR={'木':{재성:'土',관성:'金',인성:'水',식상:'火',비겁:'木'},'火':{재성:'金',관성:'水',인성:'木',식상:'土',비겁:'火'},'土':{재성:'水',관성:'木',인성:'火',식상:'金',비겁:'土'},'金':{재성:'木',관성:'火',인성:'土',식상:'水',비겁:'金'},'水':{재성:'火',관성:'土',인성:'金',식상:'木',비겁:'水'}};
+const SANHE=[{b:['亥','卯','未'],e:'木'},{b:['寅','午','戌'],e:'火'},{b:['巳','酉','丑'],e:'金'},{b:['申','子','辰'],e:'水'}];
+const BANHAP=[{p:['亥','卯'],e:'木'},{p:['卯','未'],e:'木'},{p:['寅','午'],e:'火'},{p:['午','戌'],e:'火'},{p:['巳','酉'],e:'金'},{p:['酉','丑'],e:'金'},{p:['申','子'],e:'水'},{p:['子','辰'],e:'水'}];
+const BGHAP=[{b:['寅','卯','辰'],e:'木'},{b:['巳','午','未'],e:'火'},{b:['申','酉','戌'],e:'金'},{b:['亥','子','丑'],e:'水'}];
+const JOHU={'亥':{'甲':'丙','乙':'丙','丙':'戊','丁':'甲','戊':'甲','己':'丙','庚':'丁','辛':'壬','壬':'戊','癸':'丙'},'子':{'甲':'丙','乙':'丙','丙':'壬','丁':'甲','戊':'丙','己':'丙','庚':'丙','辛':'壬','壬':'戊','癸':'丙'},'丑':{'甲':'丙','乙':'丙','丙':'甲','丁':'甲','戊':'丙','己':'丙','庚':'丙','辛':'壬','壬':'丙','癸':'丙'},'巳':{'甲':'癸','乙':'癸','丙':'壬','丁':'壬','戊':'壬','己':'壬','庚':'壬','辛':'壬','壬':'壬','癸':'庚'},'午':{'甲':'癸','乙':'癸','丙':'壬','丁':'壬','戊':'壬','己':'壬','庚':'壬','辛':'壬','壬':'壬','癸':'庚'},'未':{'甲':'癸','乙':'癸','丙':'壬','丁':'壬','戊':'壬','己':'癸','庚':'壬','辛':'壬','壬':'壬','癸':'辛'}};
+const UNSUNG={'甲':{'亥':'장생','子':'목욕','丑':'관대','寅':'건록','卯':'제왕','辰':'쇠','巳':'병','午':'사','未':'묘','申':'절','酉':'태','戌':'양'},'乙':{'午':'장생','巳':'목욕','辰':'관대','卯':'건록','寅':'제왕','丑':'쇠','子':'병','亥':'사','戌':'묘','酉':'절','申':'태','未':'양'},'丙':{'寅':'장생','卯':'목욕','辰':'관대','巳':'건록','午':'제왕','未':'쇠','申':'병','酉':'사','戌':'묘','亥':'절','子':'태','丑':'양'},'丁':{'酉':'장생','申':'목욕','未':'관대','午':'건록','巳':'제왕','辰':'쇠','卯':'병','寅':'사','丑':'묘','子':'절','亥':'태','戌':'양'},'戊':{'寅':'장생','卯':'목욕','辰':'관대','巳':'건록','午':'제왕','未':'쇠','申':'병','酉':'사','戌':'묘','亥':'절','子':'태','丑':'양'},'己':{'酉':'장생','申':'목욕','未':'관대','午':'건록','巳':'제왕','辰':'쇠','卯':'병','寅':'사','丑':'묘','子':'절','亥':'태','戌':'양'},'庚':{'巳':'장생','午':'목욕','未':'관대','申':'건록','酉':'제왕','戌':'쇠','亥':'병','子':'사','丑':'묘','寅':'절','卯':'태','辰':'양'},'辛':{'子':'장생','亥':'목욕','戌':'관대','酉':'건록','申':'제왕','未':'쇠','午':'병','巳':'사','辰':'묘','卯':'절','寅':'태','丑':'양'},'壬':{'申':'장생','酉':'목욕','戌':'관대','亥':'건록','子':'제왕','丑':'쇠','寅':'병','卯':'사','辰':'묘','巳':'절','午':'태','未':'양'},'癸':{'卯':'장생','寅':'목욕','丑':'관대','子':'건록','亥':'제왕','戌':'쇠','酉':'병','申':'사','未':'묘','午':'절','巳':'태','辰':'양'}};
+
+function calcHap(branches){const b={'木':0,'火':0,'土':0,'金':0,'水':0};for(const s of SANHE)if(s.b.every(x=>branches.includes(x)))b[s.e]+=30;for(const g of BGHAP)if(g.b.every(x=>branches.includes(x)))b[g.e]+=25;for(const h of BANHAP)if(h.p.every(x=>branches.includes(x)))b[h.e]+=12;return b;}
+
+function getGeukuk(mb,ds,stems){const de=EM[ds],rel=DMR[de]||{},me=EM[mb];if(me===rel.비겁)return'건록격';if(me===rel.인성)return(['子','午','卯','酉'].includes(mb)?'정인격':'편인격');if(me===rel.재성)return(stems.filter(s=>EM[s]===rel.재성).length>=2?'편재격':'정재격');if(me===rel.관성){const jp=(ds==='甲'&&mb==='酉')||(ds==='乙'&&mb==='申')||(ds==='丙'&&mb==='子')||(ds==='丁'&&mb==='亥')||(ds==='戊'&&mb==='卯')||(ds==='己'&&mb==='寅')||(ds==='庚'&&mb==='午')||(ds==='辛'&&mb==='巳')||(ds==='壬'&&mb==='辰')||(ds==='癸'&&mb==='卯');return jp?'정관격':'편관격';}if(me===rel.식상)return'식신격';return'잡격';}
+
+function calcYongsin(ds,mb,isStrong,scores,rel){const SM={'木':['寅','卯','辰'],'火':['巳','午','未'],'土':['辰','戌','丑','未'],'金':['申','酉','戌'],'水':['亥','子','丑']};const de=EM[ds],isd=(SM[de]||[]).includes(mb);const js=(JOHU[mb]||{})[ds];if(js){const je=EM[js];if((scores[je]||0)===0)return je;}if(isStrong){if((scores[rel.비겁]||0)>=7)return rel.관성;if((scores[rel.인성]||0)>=6)return rel.재성;if(isd)return(scores[rel.식상]||0)>=3?rel.재성:rel.식상;return rel.식상;}else{if((scores[rel.관성]||0)>=7)return rel.인성;if((scores[rel.식상]||0)>=6)return rel.인성;if(!isd&&(scores[rel.재성]||0)>=5)return rel.인성;return rel.인성;}}
+
+function getExactBazi(yr,mo,dy,hr,mi=0){
+  const bKST=mkKST(yr,mo,dy,hr,mi);
+  const ip=getTerm(yr,2),pip=getTerm(yr-1,2);
+  const ySI=(bKST>=ip)?((yr-4)%10+10)%10:((yr-5)%10+10)%10;
+  const yBI=(bKST>=ip)?((yr-4)%12+12)%12:((yr-5)%12+12)%12;
+  let bm=mo,by=yr;if(bKST<getTerm(yr,mo)){bm--;if(bm<1){bm=12;by--;}}
+  const bmIdx=(bm-2+12)%12+1,mSI=(ySI%5)*2+(bmIdx-1),mBI=((bm-3+12)%12);
+  const base=new Date(Date.UTC(1900,0,1));
+  const dd=Math.floor((mkKST(yr,mo,dy,12,0)-base)/86400000);
+  const dSI=((dd+10)%10+10)%10,dBI=((dd+12)%12+12)%12;
+  const hBI=Math.floor(((hr%24)+1)/2)%12,hSI=(dSI%5)*2+hBI;
+  const chars=[ST[ySI],BR[yBI],ST[mSI%10],BR[mBI],ST[dSI],BR[dBI],ST[hSI%10],BR[hBI]];
+  const cnt={'木':0,'火':0,'土':0,'金':0,'水':0};
+  chars.forEach(c=>{if(EM[c])cnt[EM[c]]++;});
+  return{year:ST[ySI]+BR[yBI],month:ST[mSI%10]+BR[mBI],day:ST[dSI]+BR[dBI],hour:ST[hSI%10]+BR[hBI],dayStem:ST[dSI],yearStemIdx:ySI,counts:cnt,elText:Object.entries(cnt).filter(([,v])=>v>0).map(([k,v])=>`${k}${v}`).join(' ')};
+}
+
+function calcKidEng(bazi,gender){
+  const rel=DMR[EM[bazi.dayStem]]||{};
+  const allB=[bazi.year[1],bazi.month[1],bazi.day[1],bazi.hour[1]];
+  const allS=[bazi.year[0],bazi.month[0],bazi.dayStem,bazi.hour[0]];
+  const pw=[{c:bazi.year[0],w:1},{c:bazi.year[1],w:2},{c:bazi.month[0],w:1},{c:bazi.month[1],w:3},{c:bazi.day[1],w:2},{c:bazi.hour[0],w:1},{c:bazi.hour[1],w:2}];
+  let bk=0,in_=0,je=0,gw=0,si=0;
+  for(const{c,w}of pw){const e=EM[c];if(!e)continue;if(e===rel.비겁)bk+=w;else if(e===rel.인성)in_+=w;else if(e===rel.재성)je+=w;else if(e===rel.관성)gw+=w;else if(e===rel.식상)si+=w;}
+  const hb=calcHap(allB);
+  bk+=(hb[rel.비겁]||0);in_+=(hb[rel.인성]||0);je+=(hb[rel.재성]||0);gw+=(hb[rel.관성]||0);si+=(hb[rel.식상]||0);
+  const isStrong=(bk+in_)>=(je+gw+si);
+  const sc={[rel.비겁]:bk,[rel.인성]:in_,[rel.재성]:je,[rel.관성]:gw,[rel.식상]:si};
+  const yongsin=calcYongsin(bazi.dayStem,bazi.month[1],isStrong,sc,rel);
+  const geukuk=getGeukuk(bazi.month[1],bazi.dayStem,allS);
+  const unsung=(UNSUNG[bazi.dayStem]||{})[bazi.month[1]]||'평';
+  return{rel,isStrong,yongsin,geukuk,unsung,scores:{비겁:bk,인성:in_,재성:je,관성:gw,식상:si}};
+}
+
+// ===== 직업 데이터 30개 =====
+// 직업 ID → {label, icon, color, bg-theme, keywords(4)}
+const JOBS = {
+  // 리더십/경영
+  ceo:       {label:'CEO·경영인',      icon:'🏢',col:'#1a2a4a',bg:'city',kw:['리더십','전략','결단력','카리스마']},
+  politician:{label:'정치인·외교관',    icon:'🏛️',col:'#8a2020',bg:'formal',kw:['설득력','대인관계','신뢰','비전']},
+  judge:     {label:'판사·검사',        icon:'⚖️',col:'#2a3a5a',bg:'formal',kw:['정의감','논리','원칙','냉철함']},
+  // 창작/예술
+  artist:    {label:'화가·예술가',      icon:'🎨',col:'#8a2888',bg:'art',kw:['감수성','창의력','표현력','심미안']},
+  musician:  {label:'음악가·작곡가',    icon:'🎵',col:'#6030a0',bg:'music',kw:['감성','청음력','창의력','집중력']},
+  writer:    {label:'작가·소설가',      icon:'✍️',col:'#4a3820',bg:'library',kw:['상상력','문장력','관찰력','공감력']},
+  actor:     {label:'배우·연예인',      icon:'🎭',col:'#c03878',bg:'stage',kw:['표현력','감수성','끼','존재감']},
+  designer:  {label:'디자이너',         icon:'✏️',col:'#207860',bg:'art',kw:['미적감각','창의력','섬세함','트렌드']},
+  // 과학/기술
+  scientist: {label:'과학자·연구원',    icon:'🔬',col:'#0a3a6a',bg:'space',kw:['탐구심','집중력','논리','인내']},
+  engineer:  {label:'엔지니어·개발자',  icon:'💻',col:'#1a4a2a',bg:'tech',kw:['논리력','문제해결','집요함','정밀함']},
+  inventor:  {label:'발명가·특허전문가',icon:'💡',col:'#5a4000',bg:'lab',kw:['창의력','호기심','집착력','독창성']},
+  astronaut: {label:'우주비행사·항공인',icon:'🚀',col:'#0a1828',bg:'space',kw:['도전정신','체력','집중력','용기']},
+  // 의료/돌봄
+  doctor:    {label:'의사',             icon:'👨‍⚕️',col:'#1a5a8a',bg:'medical',kw:['책임감','침착함','공감력','꼼꼼함']},
+  nurse:     {label:'간호사·치료사',    icon:'💊',col:'#2a6a5a',bg:'medical',kw:['헌신','공감력','섬세함','인내']},
+  counselor: {label:'심리상담사',       icon:'🧠',col:'#6a3a7a',bg:'healing',kw:['공감력','통찰력','인내','포용력']},
+  welfare:   {label:'사회복지사',       icon:'🤝',col:'#2a6a3a',bg:'nature',kw:['배려심','봉사정신','인내','소통']},
+  // 교육/학문
+  teacher:   {label:'교사·교수',        icon:'📚',col:'#2a4a8a',bg:'library',kw:['인내','전달력','지식','열정']},
+  philosopher:{label:'철학자·사상가',   icon:'🤔',col:'#3a2a5a',bg:'library',kw:['깊은사고','통찰','독창성','인내']},
+  // 비즈니스/금융
+  trader:    {label:'사업가·CEO',       icon:'💼',col:'#4a2a10',bg:'city',kw:['추진력','결단력','사교성','야망']},
+  financial: {label:'금융인·투자가',    icon:'💰',col:'#1a3a2a',bg:'city',kw:['분석력','냉철함','판단력','수리력']},
+  marketer:  {label:'마케터·브랜더',    icon:'📊',col:'#8a3a20',bg:'stage',kw:['창의력','트렌드','설득력','열정']},
+  // 스포츠/체육
+  athlete:   {label:'운동선수',         icon:'🏆',col:'#2a5a1a',bg:'nature',kw:['체력','집중력','승부욕','도전']},
+  coach:     {label:'스포츠코치·감독',  icon:'⚽',col:'#1a4a1a',bg:'nature',kw:['리더십','관찰력','열정','전략']},
+  // 요리/식품
+  chef:      {label:'요리사·셰프',      icon:'👨‍🍳',col:'#8a3a10',bg:'warm',kw:['창의력','감각','꼼꼼함','열정']},
+  // 건축/공간
+  architect: {label:'건축가·인테리어',  icon:'🏗️',col:'#4a3a1a',bg:'formal',kw:['창의력','공간감각','정밀함','심미안']},
+  // 자연/환경
+  naturalist:{label:'생물학자·환경전문가',icon:'🌿',col:'#1a5a1a',bg:'nature',kw:['관찰력','인내','탐구심','사랑']},
+  // 미디어/콘텐츠
+  creator:   {label:'크리에이터·PD',    icon:'📸',col:'#2a1a4a',bg:'studio',kw:['표현력','트렌드','창의력','끈기']},
+  journalist:{label:'기자·언론인',      icon:'📰',col:'#2a2a2a',bg:'formal',kw:['관찰력','문장력','정의감','비판력']},
+  // 법/행정
+  lawyer:    {label:'변호사·법조인',    icon:'📜',col:'#3a2a10',bg:'formal',kw:['논리력','설득력','정의감','꼼꼼함']},
+  // 영성/철학
+  spiritual: {label:'종교인·명상가',    icon:'🙏',col:'#4a1a5a',bg:'healing',kw:['통찰력','공감','평온함','깊이']},
+  // 군/경찰
+  military:  {label:'군인·경찰',        icon:'🛡️',col:'#1a3a1a',bg:'formal',kw:['용기','원칙','체력','희생정신']},
+};
+
+// 배경 테마 SVG
+const BG_THEMES = {
+  city:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a2a4a"/><stop offset="100%" stop-color="#3a5a8a"/></linearGradient></defs><rect width="400" height="600" fill="url(#g1)"/><circle cx="340" cy="60" r="22" fill="#f8e898" opacity="0.3"/><circle cx="340" cy="60" r="16" fill="#f8e898" opacity="0.4"/><circle cx="20" cy="30" r="1.5" fill="#fff" opacity="0.8"/><circle cx="60" cy="18" r="1" fill="#fff" opacity="0.7"/><circle cx="110" cy="25" r="1.5" fill="#fff" opacity="0.9"/><circle cx="180" cy="12" r="1" fill="#fff" opacity="0.6"/><circle cx="260" cy="20" r="2" fill="#fff" opacity="0.8"/><circle cx="300" cy="40" r="1" fill="#fff" opacity="0.7"/><rect x="0" y="300" width="35" height="300" fill="#0a1828"/><rect x="28" y="260" width="28" height="340" fill="#0d2040"/><rect x="52" y="290" width="22" height="310" fill="#0a1828"/><rect x="70" y="220" width="40" height="380" fill="#102848"/><rect x="108" y="270" width="32" height="330" fill="#0a1828"/><rect x="138" y="240" width="45" height="360" fill="#0d2040"/><rect x="180" y="200" width="55" height="400" fill="#122850"/><rect x="232" y="235" width="38" height="365" fill="#0a1828"/><rect x="268" y="260" width="32" height="340" fill="#0d2040"/><rect x="298" y="225" width="46" height="375" fill="#102848"/><rect x="342" y="265" width="42" height="335" fill="#0a1828"/><rect x="80" y="232" width="5" height="5" fill="#f0d060" opacity="0.9"/><rect x="92" y="232" width="5" height="5" fill="#f0d060" opacity="0.7"/><rect x="80" y="248" width="5" height="5" fill="#f0d060" opacity="0.8"/><rect x="188" y="212" width="7" height="7" fill="#f8e080" opacity="0.9"/><rect x="202" y="212" width="7" height="7" fill="#f8e080" opacity="0.7"/><rect x="216" y="212" width="7" height="7" fill="#f8e080" opacity="0.8"/><rect x="188" y="228" width="7" height="7" fill="#f8e080" opacity="0.6"/><rect x="308" y="238" width="6" height="6" fill="#f0d060" opacity="0.8"/><rect x="322" y="238" width="6" height="6" fill="#f0d060" opacity="0.9"/><rect x="0" y="540" width="400" height="60" fill="#0a1828" opacity="0.9"/></svg>`,
+  art:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff5e8"/><stop offset="100%" stop-color="#f8e0f8"/></linearGradient></defs><rect width="400" height="600" fill="url(#g2)"/><ellipse cx="60" cy="100" rx="70" ry="60" fill="#f87060" opacity="0.3"/><ellipse cx="340" cy="80" rx="60" ry="50" fill="#6090e8" opacity="0.28"/><ellipse cx="50" cy="480" rx="65" ry="55" fill="#60c878" opacity="0.25"/><ellipse cx="360" cy="500" rx="58" ry="48" fill="#f0c040" opacity="0.3"/><ellipse cx="200" cy="50" rx="50" ry="35" fill="#b060e0" opacity="0.2"/><rect x="100" y="80" width="200" height="260" rx="5" fill="#fff" opacity="0.92"/><rect x="108" y="88" width="184" height="244" rx="3" fill="#fdf5e8"/><ellipse cx="175" cy="180" rx="48" ry="42" fill="#f87060" opacity="0.55"/><ellipse cx="210" cy="200" rx="38" ry="34" fill="#6090e8" opacity="0.5"/><ellipse cx="155" cy="210" rx="30" ry="28" fill="#f0c040" opacity="0.55"/><ellipse cx="200" cy="155" rx="25" ry="22" fill="#60c878" opacity="0.5"/><ellipse cx="225" cy="175" rx="20" ry="18" fill="#b060e0" opacity="0.45"/><line x1="100" y1="340" x2="60" y2="420" stroke="#8b6040" stroke-width="6" stroke-linecap="round"/><line x1="300" y1="340" x2="340" y2="420" stroke="#8b6040" stroke-width="6" stroke-linecap="round"/><line x1="200" y1="340" x2="200" y2="440" stroke="#8b6040" stroke-width="5" stroke-linecap="round"/><rect x="290" y="120" width="10" height="120" rx="4" fill="#8b6040" transform="rotate(30 290 120)"/><ellipse cx="324" cy="112" rx="8" ry="18" fill="#f87060" opacity="0.9" transform="rotate(30 324 112)"/><ellipse cx="60" cy="400" rx="55" ry="35" fill="#f5e8d0" opacity="0.88"/><circle cx="36" cy="388" r="12" fill="#f87060" opacity="0.9"/><circle cx="58" cy="382" r="12" fill="#f0c040" opacity="0.9"/><circle cx="80" cy="388" r="12" fill="#6090e8" opacity="0.9"/><circle cx="46" cy="408" r="12" fill="#60c878" opacity="0.9"/><circle cx="70" cy="408" r="12" fill="#b060e0" opacity="0.9"/></svg>`,
+  space:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="g3" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#1a1a4a"/><stop offset="100%" stop-color="#060614"/></radialGradient></defs><rect width="400" height="600" fill="url(#g3)"/><circle cx="20" cy="25" r="1.5" fill="#fff" opacity="0.9"/><circle cx="50" cy="60" r="1" fill="#fff" opacity="0.7"/><circle cx="80" cy="30" r="2" fill="#fff" opacity="0.8"/><circle cx="120" cy="50" r="1.5" fill="#fff" opacity="0.9"/><circle cx="160" cy="20" r="1" fill="#fff" opacity="0.6"/><circle cx="200" cy="45" r="2" fill="#fff" opacity="0.8"/><circle cx="240" cy="15" r="1.5" fill="#fff" opacity="0.9"/><circle cx="280" cy="65" r="1" fill="#fff" opacity="0.7"/><circle cx="320" cy="30" r="2" fill="#fff" opacity="0.8"/><circle cx="360" cy="50" r="1.5" fill="#fff" opacity="0.9"/><circle cx="30" cy="120" r="1" fill="#fff" opacity="0.6"/><circle cx="100" cy="90" r="1.5" fill="#fff" opacity="0.8"/><circle cx="170" cy="110" r="1" fill="#fff" opacity="0.7"/><circle cx="350" cy="100" r="1.5" fill="#fff" opacity="0.8"/><circle cx="40" cy="200" r="1" fill="#fff" opacity="0.5"/><circle cx="380" cy="160" r="1" fill="#fff" opacity="0.6"/><circle cx="300" cy="160" r="48" fill="#2a4a8a" opacity="0.9"/><circle cx="300" cy="160" r="48" fill="none" stroke="#4a7ab0" stroke-width="2" opacity="0.5"/><ellipse cx="300" cy="160" rx="72" ry="16" fill="none" stroke="#a0c0e0" stroke-width="3" opacity="0.7"/><ellipse cx="285" cy="144" rx="20" ry="12" fill="#3a6aaa" opacity="0.6"/><circle cx="68" cy="140" r="30" fill="#5a3a8a" opacity="0.85"/><ellipse cx="68" cy="140" rx="42" ry="10" fill="none" stroke="#b090e0" stroke-width="2" opacity="0.6"/><circle cx="160" cy="240" r="18" fill="#8a3a3a" opacity="0.8"/><ellipse cx="160" cy="240" rx="26" ry="6" fill="none" stroke="#e08060" stroke-width="1.5" opacity="0.6"/><polygon points="200,250 192,295 208,295" fill="#e0e8f0" opacity="0.95"/><rect x="194" y="293" width="12" height="22" rx="2" fill="#c0c8d8" opacity="0.9"/><polygon points="192,315 196,300 200,315" fill="#f05030" opacity="0.9"/><polygon points="208,315 204,300 208,315" fill="#f05030" opacity="0.9"/><ellipse cx="200" cy="322" rx="5" ry="14" fill="#f8a020" opacity="0.8"/><ellipse cx="200" cy="325" rx="3" ry="9" fill="#fff080" opacity="0.9"/><ellipse cx="200" cy="380" rx="160" ry="35" fill="none" stroke="#4060a0" stroke-width="1" stroke-dasharray="6,4" opacity="0.35"/></svg>`,
+  nature:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8e8f8"/><stop offset="55%" stop-color="#e8f4fc"/><stop offset="100%" stop-color="#a8d898"/></linearGradient></defs><rect width="400" height="600" fill="url(#g4)"/><ellipse cx="80" cy="90" rx="65" ry="28" fill="#fff" opacity="0.82"/><ellipse cx="45" cy="84" rx="42" ry="22" fill="#fff" opacity="0.78"/><ellipse cx="118" cy="82" rx="48" ry="20" fill="#fff" opacity="0.74"/><ellipse cx="290" cy="75" rx="70" ry="26" fill="#fff" opacity="0.80"/><ellipse cx="254" cy="68" rx="45" ry="20" fill="#fff" opacity="0.76"/><ellipse cx="328" cy="72" rx="50" ry="22" fill="#fff" opacity="0.73"/><ellipse cx="200" cy="600" rx="280" ry="100" fill="#6ab870"/><rect x="0" y="480" width="400" height="120" fill="#6ab870"/><circle cx="50" cy="472" r="14" fill="#f87898"/><circle cx="50" cy="472" r="8" fill="#fff080"/><line x1="50" y1="486" x2="50" y2="540" stroke="#48a048" stroke-width="4"/><circle cx="110" cy="466" r="15" fill="#f0a0d0"/><circle cx="110" cy="466" r="8" fill="#fff080"/><line x1="110" y1="481" x2="110" y2="540" stroke="#48a048" stroke-width="4"/><circle cx="170" cy="472" r="12" fill="#98d060"/><circle cx="170" cy="472" r="7" fill="#fff080"/><line x1="170" y1="484" x2="170" y2="540" stroke="#48a048" stroke-width="3"/><circle cx="240" cy="468" r="14" fill="#f87898"/><circle cx="240" cy="468" r="8" fill="#fff080"/><line x1="240" y1="482" x2="240" y2="540" stroke="#48a048" stroke-width="4"/><circle cx="310" cy="465" r="16" fill="#f0a0d0"/><circle cx="310" cy="465" r="9" fill="#fff080"/><line x1="310" y1="481" x2="310" y2="540" stroke="#48a048" stroke-width="4"/><circle cx="370" cy="470" r="13" fill="#98d060"/><circle cx="370" cy="470" r="7" fill="#fff080"/><line x1="370" y1="483" x2="370" y2="540" stroke="#48a048" stroke-width="3"/><circle cx="200" cy="250" r="12" fill="#ffdd00" opacity="0.9"/><line x1="200" y1="265" x2="200" y2="285" stroke="#6a8a40" stroke-width="8" stroke-linecap="round"/></svg>`,
+  studio:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="g5" cx="50%" cy="30%" r="60%"><stop offset="0%" stop-color="#2a1a3a"/><stop offset="100%" stop-color="#0a0818"/></radialGradient></defs><rect width="400" height="600" fill="url(#g5)"/><circle cx="200" cy="220" r="90" fill="none" stroke="#f8e060" stroke-width="10" opacity="0.6"/><circle cx="200" cy="220" r="76" fill="none" stroke="#fff8e0" stroke-width="4" opacity="0.5"/><circle cx="200" cy="220" r="62" fill="none" stroke="#f8e060" stroke-width="8" opacity="0.4"/><rect x="155" y="188" width="90" height="64" rx="10" fill="#1a1a2a" opacity="0.95"/><rect x="162" y="195" width="76" height="50" rx="5" fill="#252535"/><circle cx="200" cy="220" r="22" fill="#0a0a18"/><circle cx="200" cy="220" r="16" fill="#1a1a28"/><circle cx="200" cy="220" r="10" fill="#0a0a18"/><circle cx="200" cy="220" r="5" fill="#2a2a40"/><circle cx="204" cy="216" r="2.5" fill="#fff" opacity="0.5"/><line x1="200" y1="252" x2="200" y2="360" stroke="#4a4a5a" stroke-width="6"/><line x1="200" y1="320" x2="150" y2="400" stroke="#4a4a5a" stroke-width="5"/><line x1="200" y1="320" x2="250" y2="400" stroke="#4a4a5a" stroke-width="5"/><rect x="305" y="130" width="22" height="48" rx="11" fill="#2a2a3a"/><rect x="308" y="133" width="16" height="42" rx="8" fill="#3a3a5a"/><rect x="311" y="178" width="10" height="36" fill="#2a2a3a"/><line x1="285" y1="216" x2="335" y2="216" stroke="#2a2a3a" stroke-width="5"/><circle cx="48" cy="130" r="24" fill="#e04060" opacity="0.85"/><rect x="40" y="120" width="16" height="16" rx="4" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="48" cy="128" r="5" fill="none" stroke="#fff" stroke-width="1.5"/><circle cx="57" cy="120" r="2.5" fill="#fff"/><text x="295" y="90" font-size="24" fill="#f8e060" opacity="0.85">✦</text><text x="55" y="420" font-size="18" fill="#f8e060" opacity="0.6">✦</text><text x="340" y="320" font-size="20" fill="#f8e060" opacity="0.7">✦</text><text x="30" y="300" font-size="14" fill="#e04060" opacity="0.7">♥</text><text x="360" y="380" font-size="16" fill="#e04060" opacity="0.6">♥</text></svg>`,
+  formal:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g6" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0e8d8"/><stop offset="100%" stop-color="#e0d0b8"/></linearGradient></defs><rect width="400" height="600" fill="url(#g6)"/><rect x="0" y="0" width="400" height="8" fill="#1e1208"/><rect x="0" y="592" width="400" height="8" fill="#1e1208"/><rect x="0" y="0" width="8" height="600" fill="#1e1208"/><rect x="392" y="0" width="8" height="600" fill="#1e1208"/><rect x="16" y="16" width="368" height="568" fill="none" stroke="#c9943a" stroke-width="2"/><circle cx="200" cy="200" r="100" fill="none" stroke="#c9943a" stroke-width="1" opacity="0.3"/><circle cx="200" cy="200" r="75" fill="none" stroke="#c9943a" stroke-width="0.5" opacity="0.2"/><rect x="80" y="100" width="240" height="3" fill="#1e1208" opacity="0.15"/><rect x="80" y="500" width="240" height="3" fill="#1e1208" opacity="0.15"/><rect x="100" y="140" width="200" height="1" fill="#c9943a" opacity="0.3"/><text x="200" y="75" text-anchor="middle" font-family="serif" font-size="28" fill="#c9943a" opacity="0.5">⚜</text><text x="200" y="555" text-anchor="middle" font-family="serif" font-size="22" fill="#c9943a" opacity="0.4">⚜</text></svg>`,
+  medical:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g7" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8e8f8"/><stop offset="60%" stop-color="#e8f4fc"/><stop offset="100%" stop-color="#c8e8d8"/></linearGradient></defs><rect width="400" height="600" fill="url(#g7)"/><ellipse cx="80" cy="90" rx="65" ry="26" fill="#fff" opacity="0.82"/><ellipse cx="310" cy="80" rx="72" ry="24" fill="#fff" opacity="0.80"/><circle cx="200" cy="240" r="70" fill="#fff" opacity="0.92"/><circle cx="200" cy="240" r="70" fill="none" stroke="#e84868" stroke-width="4" opacity="0.6"/><rect x="184" y="206" width="32" height="68" rx="8" fill="#e84868" opacity="0.9"/><rect x="166" y="224" width="68" height="32" rx="8" fill="#e84868" opacity="0.9"/><path d="M145 325 Q128 348 134 368 Q140 388 158 386" fill="none" stroke="#3060a8" stroke-width="7" stroke-linecap="round"/><circle cx="158" cy="386" r="14" fill="none" stroke="#3060a8" stroke-width="5"/><circle cx="158" cy="386" r="7" fill="#3060a8" opacity="0.7"/><ellipse cx="200" cy="600" rx="260" ry="90" fill="#6ab870"/><rect x="0" y="510" width="400" height="90" fill="#6ab870"/><circle cx="60" cy="506" r="13" fill="#f87898"/><circle cx="60" cy="506" r="7" fill="#fff080"/><circle cx="340" cy="500" r="15" fill="#f0a0d0"/><circle cx="340" cy="500" r="8" fill="#fff080"/></svg>`,
+  warm:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g8" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f8e8d0"/><stop offset="100%" stop-color="#e8d0a8"/></linearGradient></defs><rect width="400" height="600" fill="url(#g8)"/><circle cx="320" cy="80" r="60" fill="#f8d080" opacity="0.35"/><circle cx="80" cy="500" r="50" fill="#f0c060" opacity="0.28"/><rect x="100" y="120" width="200" height="250" rx="8" fill="#fff9f0" opacity="0.90"/><rect x="108" y="128" width="184" height="60" rx="5" fill="#c9843a" opacity="0.70"/><text x="200" y="168" text-anchor="middle" font-family="serif" font-size="24" fill="#fff" opacity="0.9">요리 특집</text><rect x="116" y="202" width="168" height="4" rx="2" fill="#d4b890" opacity="0.5"/><rect x="116" y="214" width="148" height="4" rx="2" fill="#d4b890" opacity="0.4"/><rect x="116" y="226" width="158" height="4" rx="2" fill="#d4b890" opacity="0.38"/><circle cx="148" cy="290" r="28" fill="#f0a040" opacity="0.8"/><circle cx="200" cy="285" r="22" fill="#e05030" opacity="0.75"/><circle cx="248" cy="290" r="25" fill="#60a830" opacity="0.75"/><rect x="80" y="400" width="240" height="8" rx="3" fill="#8b6040" opacity="0.6"/></svg>`,
+  tech:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g9" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a1828"/><stop offset="100%" stop-color="#1a3a4a"/></linearGradient></defs><rect width="400" height="600" fill="url(#g9)"/><rect x="60" y="140" width="280" height="200" rx="12" fill="#1a2a3a" opacity="0.9"/><rect x="68" y="148" width="264" height="184" rx="8" fill="#0d1e2e"/><rect x="76" y="158" width="80" height="10" rx="2" fill="#30c060" opacity="0.8"/><rect x="76" y="174" width="120" height="8" rx="2" fill="#60a0e0" opacity="0.6"/><rect x="76" y="188" width="100" height="8" rx="2" fill="#60a0e0" opacity="0.5"/><rect x="96" y="188" width="60" height="8" rx="2" fill="#f0a030" opacity="0.6"/><rect x="76" y="202" width="140" height="8" rx="2" fill="#60a0e0" opacity="0.5"/><rect x="76" y="216" width="80" height="8" rx="2" fill="#30c060" opacity="0.7"/><rect x="76" y="230" width="110" height="8" rx="2" fill="#e04060" opacity="0.6"/><rect x="76" y="244" width="90" height="8" rx="2" fill="#60a0e0" opacity="0.5"/><rect x="76" y="258" width="130" height="8" rx="2" fill="#30c060" opacity="0.7"/><rect x="160" y="340" width="80" height="10" rx="3" fill="#2a3a4a"/><rect x="100" y="350" width="200" height="6" rx="2" fill="#1a2a3a" opacity="0.8"/><circle cx="50" cy="60" r="25" fill="#30c060" opacity="0.15"/><circle cx="350" cy="100" r="30" fill="#6090e8" opacity="0.12"/><circle cx="30" cy="400" r="20" fill="#f0a030" opacity="0.10"/><circle cx="370" cy="350" r="22" fill="#e04060" opacity="0.10"/><text x="300" y="60" font-size="16" fill="#30c060" opacity="0.6">&lt;/&gt;</text><text x="30" y="180" font-size="14" fill="#6090e8" opacity="0.5">{}</text><text x="355" y="250" font-size="12" fill="#f0a030" opacity="0.5">[]</text></svg>`,
+  library:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g10" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5ead8"/><stop offset="100%" stop-color="#e8d8c0"/></linearGradient></defs><rect width="400" height="600" fill="url(#g10)"/><rect x="30" y="80" width="340" height="420" rx="4" fill="#d4b880" opacity="0.2"/><rect x="30" y="100" width="340" height="20" rx="2" fill="#8b5e28" opacity="0.4"/><rect x="30" y="140" width="340" height="18" rx="2" fill="#c9843a" opacity="0.7"/><rect x="30" y="158" width="340" height="18" rx="2" fill="#8b3a1a" opacity="0.65"/><rect x="30" y="176" width="340" height="18" rx="2" fill="#1a3a6a" opacity="0.7"/><rect x="30" y="194" width="340" height="18" rx="2" fill="#2a5a2a" opacity="0.65"/><rect x="30" y="212" width="340" height="18" rx="2" fill="#6a2a6a" opacity="0.65"/><rect x="30" y="230" width="340" height="18" rx="2" fill="#c9843a" opacity="0.55"/><rect x="30" y="248" width="340" height="18" rx="2" fill="#8b5e28" opacity="0.5"/><rect x="30" y="280" width="340" height="18" rx="2" fill="#1a3a6a" opacity="0.6"/><rect x="30" y="298" width="340" height="18" rx="2" fill="#8b3a1a" opacity="0.55"/><rect x="30" y="316" width="340" height="18" rx="2" fill="#2a5a2a" opacity="0.6"/><rect x="30" y="334" width="340" height="18" rx="2" fill="#c9843a" opacity="0.6"/><circle cx="200" cy="220" r="70" fill="#fff9f0" opacity="0.88"/><text x="200" y="235" text-anchor="middle" font-family="serif" font-size="50" fill="#c9843a" opacity="0.6">📖</text></svg>`,
+  healing:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="g11" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#f8e8f8"/><stop offset="100%" stop-color="#e8d8f8"/></radialGradient></defs><rect width="400" height="600" fill="url(#g11)"/><circle cx="200" cy="200" r="120" fill="none" stroke="#b060e0" stroke-width="1.5" opacity="0.2"/><circle cx="200" cy="200" r="90" fill="none" stroke="#b060e0" stroke-width="1" opacity="0.15"/><circle cx="200" cy="200" r="60" fill="#fff" opacity="0.3"/><text x="200" y="220" text-anchor="middle" font-size="80" opacity="0.4">🌸</text><ellipse cx="50" cy="80" rx="35" ry="28" fill="#f0c8e8" opacity="0.5"/><ellipse cx="350" cy="90" rx="30" ry="24" fill="#c8e0f8" opacity="0.5"/><ellipse cx="70" cy="520" rx="40" ry="32" fill="#c8f0d8" opacity="0.45"/><ellipse cx="330" cy="530" rx="35" ry="28" fill="#f8e0c8" opacity="0.45"/><circle cx="200" cy="400" r="25" fill="#b060e0" opacity="0.15"/><circle cx="200" cy="400" r="18" fill="#b060e0" opacity="0.12"/></svg>`,
+  music:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g12" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a0a2a"/><stop offset="100%" stop-color="#2a1a4a"/></linearGradient></defs><rect width="400" height="600" fill="url(#g12)"/><text x="200" y="180" text-anchor="middle" font-size="90" opacity="0.5">🎵</text><text x="80" y="120" font-size="40" fill="#f8e060" opacity="0.35">♩</text><text x="300" y="100" font-size="50" fill="#f8e060" opacity="0.3">♪</text><text x="50" y="350" font-size="35" fill="#f8e060" opacity="0.28">♫</text><text x="330" y="300" font-size="45" fill="#f8e060" opacity="0.32">♬</text><text x="160" y="420" font-size="30" fill="#e080f0" opacity="0.35">♩</text><ellipse cx="200" cy="500" rx="180" ry="40" fill="#b060e0" opacity="0.15"/><circle cx="200" cy="500" r="60" fill="#b060e0" opacity="0.08"/></svg>`,
+  stage:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="g13" cx="50%" cy="20%" r="70%"><stop offset="0%" stop-color="#f8e060" stop-opacity="0.5"/><stop offset="100%" stop-color="#1a0808" stop-opacity="1"/></radialGradient></defs><rect width="400" height="600" fill="#1a0808"/><rect width="400" height="600" fill="url(#g13)"/><line x1="200" y1="0" x2="200" y2="200" stroke="#f8e060" stroke-width="60" stroke-opacity="0.15"/><circle cx="200" cy="40" r="30" fill="#f8e060" opacity="0.4"/><circle cx="200" cy="40" r="20" fill="#f8e060" opacity="0.6"/><rect x="0" y="480" width="400" height="120" fill="#0a0404" opacity="0.8"/><rect x="0" y="476" width="400" height="6" fill="#c9843a" opacity="0.6"/><text x="100" y="90" font-size="20" fill="#f8e060" opacity="0.4">★</text><text x="280" y="80" font-size="24" fill="#f8e060" opacity="0.35">★</text><text x="50" y="200" font-size="16" fill="#f8e060" opacity="0.3">★</text><text x="330" y="180" font-size="18" fill="#f8e060" opacity="0.28">★</text></svg>`,
+  lab:`<svg viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g14" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8f4e8"/><stop offset="100%" stop-color="#d8ecd8"/></linearGradient></defs><rect width="400" height="600" fill="url(#g14)"/><rect x="150" y="100" width="20" height="200" rx="8" fill="#90b890" opacity="0.8"/><ellipse cx="160" cy="304" rx="40" ry="20" fill="#60a860" opacity="0.6"/><rect x="158" y="230" width="4" height="46" fill="#60a860" opacity="0.7"/><ellipse cx="160" cy="276" rx="22" ry="11" fill="#409040" opacity="0.65"/><rect x="220" y="130" width="18" height="170" rx="7" fill="#90b890" opacity="0.75"/><ellipse cx="229" cy="304" rx="34" ry="16" fill="#60a860" opacity="0.55"/><rect x="230" y="80" width="18" height="130" rx="7" fill="#90b890" opacity="0.7"/><circle cx="296" cy="200" r="38" fill="#b8d8b8" opacity="0.7"/><circle cx="296" cy="200" r="26" fill="#90b890" opacity="0.65"/><circle cx="296" cy="200" r="14" fill="#60a860" opacity="0.7"/><rect x="40" y="220" width="65" height="7" rx="2" fill="#60a860" opacity="0.4"/><rect x="40" y="238" width="48" height="7" rx="2" fill="#60a860" opacity="0.3"/></svg>`,
+};
+
+// 일간 + 격국 + 용신 기반 직업 매핑 (30개)
+const STEM_JOB_MAP = {
+  '甲':{ primary:['ceo','athlete','military'],  secondary:['architect','politician','coach']},
+  '乙':{ primary:['artist','counselor','designer'], secondary:['writer','nurse','naturalist']},
+  '丙':{ primary:['actor','marketer','creator'],   secondary:['trader','journalist','coach']},
+  '丁':{ primary:['counselor','spiritual','teacher'],secondary:['musician','nurse','writer']},
+  '戊':{ primary:['judge','architect','financial'], secondary:['military','doctor','politician']},
+  '己':{ primary:['nurse','chef','welfare'],       secondary:['teacher','counselor','doctor']},
+  '庚':{ primary:['lawyer','military','engineer'],  secondary:['judge','athlete','inventor']},
+  '辛':{ primary:['designer','financial','lawyer'], secondary:['musician','inventor','doctor']},
+  '壬':{ primary:['scientist','philosopher','writer'],secondary:['inventor','journalist','astronaut']},
+  '癸':{ primary:['counselor','spiritual','artist'],  secondary:['philosopher','scientist','musician']},
+};
+
+const GEUKUK_BONUS = {
+  '편재격':'trader','정재격':'financial','식신격':'chef','편관격':'military',
+  '정관격':'judge','정인격':'teacher','편인격':'philosopher','건록격':'ceo','식신격':'creator',
+};
+
+const YONGSIN_BONUS = {
+  '木':['teacher','writer','journalist'],'火':['actor','marketer','creator'],
+  '土':['financial','architect','welfare'],'金':['lawyer','engineer','military'],
+  '水':['scientist','counselor','philosopher'],
+};
+
+// 사주 기반 직업 추천 (최대 4개)
+function getRecommendedJobs(bazi, eng) {
+  const stem = bazi.dayStem;
+  const base = STEM_JOB_MAP[stem] || STEM_JOB_MAP['甲'];
+  const bonusG = GEUKUK_BONUS[eng.geukuk] || null;
+  const bonusY = YONGSIN_BONUS[eng.yongsin] || [];
+
+  // 우선순위: 격국보너스 > primary > 용신보너스 > secondary
+  const result = [];
+  if (bonusG && !result.includes(bonusG)) result.push(bonusG);
+  for (const j of base.primary) { if (!result.includes(j) && result.length < 3) result.push(j); }
+  for (const j of bonusY) { if (!result.includes(j) && result.length < 4) result.push(j); }
+  for (const j of base.secondary) { if (!result.includes(j) && result.length < 4) result.push(j); }
+
+  return result.slice(0, 4);
+}
+
+// 일간별 기질 + 키워드 + 팁
+const TRAITS = {
+  '甲':{type:'개척형', char:'강한 의지와 목표로 세상을 개척하는 아이예요.',
+    tips:['스스로 결정하게 해주세요. 선택권이 클수록 자란답니다.','목표를 함께 세워주세요. 방향이 생기면 열정이 폭발해요.','규칙보단 이유를 설명해주세요. 납득이 되면 잘 따라요.']},
+  '乙':{type:'감성형', char:'섬세한 감수성과 유연한 적응력을 가진 아이예요.',
+    tips:['억지로 이끌기보다 옆에서 지켜봐 주세요.','좋아하는 걸 마음껏 표현하게 해주세요.','비교보다 있는 그대로를 인정해 주세요.']},
+  '丙':{type:'열정형', char:'태양처럼 밝고 에너지 넘치는 아이예요.',
+    tips:['칭찬이 최고의 연료예요. 작은 성과도 크게 인정해 주세요.','무대에 세워주세요. 주목받을 때 폭발적으로 성장해요.','에너지를 발산할 운동이나 활동을 꾸준히 시켜주세요.']},
+  '丁':{type:'헌신형', char:'촛불처럼 따뜻하고 섬세한 마음을 가진 아이예요.',
+    tips:['감정을 자주 물어봐 주세요. 표현이 서툴 수 있어요.','혼자만의 시간도 허용해 주세요. 충전이 필요해요.','작은 것에도 진심으로 감사해 주세요.']},
+  '戊':{type:'안정형', char:'산처럼 묵직하고 믿음직한 기질의 아이예요.',
+    tips:['루틴이 있을 때 가장 잘 자라요. 일관성을 유지해주세요.','급하게 바꾸기보다 천천히 설명해 주세요.','책임감을 심어주세요. 맡은 일을 끝까지 하는 기쁨을 느끼게 해주세요.']},
+  '己':{type:'포용형', char:'따뜻하고 배려심 깊은 포용력의 아이예요.',
+    tips:['자기 의견을 표현하도록 격려해 주세요.','친구 관계를 잘 살펴주세요. 챙겨주다 상처받기 쉬워요.','"네가 소중해"를 자주 표현해 주세요.']},
+  '庚':{type:'원칙형', char:'정직하고 결단력 있는 강인한 기질의 아이예요.',
+    tips:['규칙을 납득할 수 있게 설명해 주세요.','도전 과제를 주세요. 어려울수록 더 빛나는 아이예요.','감정 표현을 자연스럽게 허용해주세요.']},
+  '辛':{type:'완벽형', char:'예리하고 섬세한 완벽주의 기질의 아이예요.',
+    tips:['틀려도 괜찮다고 자주 말해주세요.','디테일을 칭찬해 주세요. 작은 것도 소중히 여겨요.','완벽하지 않아도 충분히 훌륭하다는 걸 알려주세요.']},
+  '壬':{type:'탐구형', char:'깊은 지혜와 넓은 시야를 가진 탐구하는 아이예요.',
+    tips:['"왜?"라는 질문에 충분히 답해주세요. 그게 과학의 시작이에요.','책과 자연을 많이 접하게 해주세요.','다양한 경험을 시켜주세요. 상상력이 폭발해요.']},
+  '癸':{type:'직관형', char:'섬세한 직관과 창의적인 내면 세계를 가진 아이예요.',
+    tips:['아이 속도를 믿어주세요. 천천히 피어나요.','조용한 환경이 있어야 잘 자라요.','감정을 일기나 그림으로 표현하게 해주세요.']},
+};
+
+// 잡지 타이틀 컬러 (직업 테마별)
+const TITLE_COLORS = {
+  ceo:'#f0c020,#e83428,#1a6ab8,#2a9a48'.split(','),
+  artist:'#f87060,#b060e0,#6090e8,#f0c040'.split(','),
+  scientist:'#60a0e0,#f8e060,#60c878,#e08040'.split(','),
+  doctor:'#e84868,#3060a8,#60c878,#f0c040'.split(','),
+  musician:'#f8e060,#b060e0,#60c878,#e04060'.split(','),
+  default:'#e83428,#1a6ab8,#f0c020,#2a9a48'.split(','),
+};
+
+// 스티커 색상 팔레트
+const STICKER_PALETTES = {
+  ceo:[['#f0c020','#1e1208'],['#e83428','#fff'],['#1a6ab8','#fff'],['#2a9a48','#fff']],
+  artist:[['#f87060','#fff'],['#b060e0','#fff'],['#6090e8','#fff'],['#f0c040','#1e1208']],
+  scientist:[['#0a1828','#60e0f8'],['#f8e060','#0a1828'],['#60c878','#fff'],['#e04060','#fff']],
+  doctor:[['#e84868','#fff'],['#3060a8','#fff'],['#60c878','#fff'],['#f0c040','#1e1208']],
+  default:[['#e83428','#fff'],['#1a6ab8','#fff'],['#f0c020','#1e1208'],['#2a9a48','#fff']],
+};
+
+// ===== 상태 =====
+let state = {bazi:null,eng:null,trait:null,name:'',gender:'M',year:2020,age:0,jobId:'ceo',recommendedJobs:[],photoUrl:null};
+
+function generateCard() {
+  const name   = document.getElementById('f-name').value.trim() || '우리 아이';
+  const gender = document.getElementById('f-gender').value;
+  const year   = parseInt(document.getElementById('f-year').value);
+  const month  = parseInt(document.getElementById('f-month').value);
+  const day    = parseInt(document.getElementById('f-day').value);
+  const hour   = parseInt(document.getElementById('f-hour').value);
+  if (!year||!month||!day) { showToast('생년월일을 입력해주세요.',true); return; }
+
+  const bazi  = getExactBazi(year,month,day,hour);
+  const eng   = calcKidEng(bazi,gender);
+  const trait = TRAITS[bazi.dayStem] || TRAITS['甲'];
+  const age   = new Date().getFullYear() - year;
+  const recs  = getRecommendedJobs(bazi, eng);
+  const jobId = recs[0] || 'ceo';
+
+  state = {bazi,eng,trait,name,gender,year,age,jobId,recommendedJobs:recs,photoUrl:state.photoUrl};
+
+  const photo = document.getElementById('f-photo').files[0];
+  if (photo) {
+    const r = new FileReader();
+    r.onload = e => { state.photoUrl = e.target.result; renderCard(); };
+    r.readAsDataURL(photo);
+  } else {
+    state.photoUrl = null;
+    renderCard();
+  }
+}
+
+function renderCard() {
+  const {bazi,eng,trait,name,gender,year,age,jobId,recommendedJobs,photoUrl} = state;
+  const job   = JOBS[jobId] || JOBS['ceo'];
+  const EL_KR = {'木':'나무','火':'불','土':'흙','金':'쇠','水':'물'};
+
+  // 추천 직업 배지
+  const recWrap = document.getElementById('recommend-wrap');
+  recWrap.style.display = 'block';
+  const recBadges = document.getElementById('recommend-badges');
+  recBadges.innerHTML = recommendedJobs.map((jid,i) => {
+    const j = JOBS[jid]||JOBS['ceo'];
+    return `<button class="rec-badge${i>0?' alt':''}" onclick="switchJob('${jid}')">${j.icon} ${j.label}</button>`;
+  }).join('');
+
+  // 카드 표시
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('card-wrapper').style.display = 'block';
+  document.getElementById('action-row').style.display = 'flex';
+
+  // 배경
+  const bgTheme = BG_THEMES[job.bg] || BG_THEMES['formal'];
+  document.getElementById('card-bg').innerHTML = bgTheme;
+
+  // 상단 바
+  document.getElementById('top-tag').textContent = `${job.icon} ${job.label} 특집`;
+  document.getElementById('top-date').textContent = `${new Date().getFullYear()}`;
+
+  // 잡지 타이틀 (아이 이름 레터링)
+  const titleEl = document.getElementById('mag-title');
+  const titleColors = TITLE_COLORS[jobId] || TITLE_COLORS['default'];
+  const letters = (name || '아이').split('').slice(0,4);
+  titleEl.innerHTML = letters.map((ch,i) =>
+    `<span class="mag-letter" style="color:${titleColors[i%titleColors.length]};text-shadow:3px 3px 0 rgba(0,0,0,0.5),-1px -1px 0 #1e1208,1px -1px 0 #1e1208,-1px 1px 0 #1e1208,1px 1px 0 #1e1208;">${ch}</span>`
+  ).join('');
+
+  // 모서리 키워드 스티커
+  const palette = STICKER_PALETTES[jobId] || STICKER_PALETTES['default'];
+  const kws = job.kw.length >= 4 ? job.kw : trait ? [trait.type, ...job.kw].slice(0,4) : job.kw;
+  kws.forEach((kw,i) => {
+    const el = document.getElementById('kw'+i);
+    el.textContent = kw;
+    el.style.background = palette[i][0];
+    el.style.color = palette[i][1];
+    el.style.borderColor = '#1e1208';
+  });
+
+  // 직업 배너
+  document.getElementById('job-banner').textContent = `${job.icon} ${name} × ${job.label} 특집`;
+
+  // 아이 사진
+  const frame = document.getElementById('child-frame');
+  if (photoUrl) {
+    frame.innerHTML = `<img src="${photoUrl}" alt="${name}">`;
+  } else {
+    frame.innerHTML = `<span>${gender==='M'?'👦':'👧'}</span>`;
+  }
+
+  // 장식 요소
+  renderDecos(jobId);
+
+  // 기본 정보
+  const gLabel = gender==='M'?'남아':'여아';
+  document.getElementById('c-name').textContent = `${name}`;
+  document.getElementById('c-meta').textContent = `${year}년생 · ${gLabel} · ${age}세 · ${bazi.dayStem}(${EL_KR[EM[bazi.dayStem]]||''}) 일간`;
+
+  // 명식 알약
+  document.getElementById('c-bazi').innerHTML =
+    [bazi.year,bazi.month,bazi.day,bazi.hour]
+    .map(p=>`<span class="bazi-pill">${p}</span>`).join('');
+
+  // 사주 정보 그리드
+  document.getElementById('c-saju-grid').innerHTML = `
+    <div class="saju-cell"><div class="saju-cell-label">기질 유형</div><div class="saju-cell-value">${trait?trait.type:'개척형'}</div></div>
+    <div class="saju-cell"><div class="saju-cell-label">격국</div><div class="saju-cell-value">${eng.geukuk}</div></div>
+    <div class="saju-cell"><div class="saju-cell-label">에너지 구조</div><div class="saju-cell-value">${eng.isStrong?'신강':'신약'}</div></div>
+    <div class="saju-cell"><div class="saju-cell-label">가장 도움되는 기운</div><div class="saju-cell-value">${EL_KR[eng.yongsin]||eng.yongsin}</div></div>`;
+
+  // 육아 팁
+  const tipEl = document.getElementById('c-tip');
+  if (trait && trait.tips && trait.tips.length > 0) {
+    tipEl.textContent = trait.tips[Math.floor(Math.random() * trait.tips.length)];
+  } else {
+    tipEl.textContent = '아이의 속도를 믿고 기다려주세요.';
+  }
+
+  // 엔진 결과
+  renderEngineResult(bazi, eng);
+}
+
+function renderDecos(jobId) {
+  const decos = document.getElementById('card-decos');
+  decos.innerHTML = '';
+
+  // 직업별 장식 배지
+  const decoMap = {
+    ceo:     [{x:'8%',y:'44%',bg:'#f0c020',fg:'#1e1208',text:'No.1\nLEADER',r:'-8deg'},{x:'78%',y:'46%',bg:'#e83428',fg:'#fff',text:'2026\n특집',r:'6deg'}],
+    artist:  [{x:'6%',y:'44%',bg:'#f87060',fg:'#fff',text:'✨NEW\n작품',r:'-6deg'},{x:'76%',y:'46%',bg:'#b060e0',fg:'#fff',text:'감성\n만렙',r:'8deg'}],
+    scientist:[{x:'7%',y:'44%',bg:'#0a1828',fg:'#60e0f8',text:'🔬탐구\n정신',r:'-7deg'},{x:'76%',y:'46%',bg:'#f8e060',fg:'#1e1208',text:'IQ\n천재',r:'6deg'}],
+    doctor:  [{x:'7%',y:'44%',bg:'#e84868',fg:'#fff',text:'❤️치유\n본능',r:'-6deg'},{x:'76%',y:'46%',bg:'#3060a8',fg:'#fff',text:'미래\n의사',r:'7deg'}],
+    musician:[{x:'6%',y:'44%',bg:'#f8e060',fg:'#1e1208',text:'🎵음감\n천재',r:'-8deg'},{x:'76%',y:'46%',bg:'#b060e0',fg:'#fff',text:'TOP\n스타',r:'6deg'}],
+    default: [{x:'7%',y:'44%',bg:'#e83428',fg:'#fff',text:'★특집\n주인공',r:'-7deg'},{x:'76%',y:'46%',bg:'#f0c020',fg:'#1e1208',text:'2026\n주목',r:'6deg'}],
+  };
+  const dData = decoMap[jobId] || decoMap['default'];
+
+  dData.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'deco-badge';
+    div.style.cssText = `
+      left:${d.x};top:${d.y};
+      width:clamp(36px,9%,54px);height:clamp(36px,9%,54px);
+      background:${d.bg};color:${d.fg};
+      font-size:clamp(7px,1.6%,11px);
+      transform:rotate(${d.r});
+    `;
+    div.innerHTML = d.text.replace('\n','<br>');
+    decos.appendChild(div);
+  });
+}
+
+function switchJob(jobId) {
+  state.jobId = jobId;
+  // 배지 활성화 업데이트
+  document.querySelectorAll('.rec-badge').forEach(b => {
+    const jid = b.getAttribute('onclick').match(/'([^']+)'/)[1];
+    b.className = 'rec-badge' + (jid !== jobId ? ' alt' : '');
+  });
+  renderCard();
+}
+
+function renderEngineResult(bazi, eng) {
+  const el = document.getElementById('engine-result');
+  el.style.display = 'block';
+  const EL_KR = {'木':'나무(木)','火':'불(火)','土':'흙(土)','金':'쇠(金)','水':'물(水)'};
+  const items = [
+    ['일간', `${bazi.dayStem} — ${EL_KR[EM[bazi.dayStem]]||''}`],
+    ['격국', eng.geukuk],
+    ['에너지 구조', eng.isStrong?'신강 — 추진력 강한 구조':'신약 — 섬세한 에너지 구조'],
+    ['용신', EL_KR[eng.yongsin]||eng.yongsin],
+    ['오행', bazi.elText],
+    ['12운성', eng.unsung],
+  ];
+  document.getElementById('er-grid').innerHTML =
+    items.map(([l,v])=>`<div class="er-cell"><div class="er-label">${l}</div><div class="er-value">${v}</div></div>`).join('');
+}
+
+function saveCard() {
+  const overlay = document.getElementById('loading-overlay');
+  overlay.classList.add('show');
+  html2canvas(document.getElementById('saju-card'), {scale:2,useCORS:true,allowTaint:true}).then(canvas => {
+    overlay.classList.remove('show');
+    const a = document.createElement('a');
+    a.download = `팔자길드_${state.name}_사주카드.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }).catch(() => { overlay.classList.remove('show'); showToast('저장 중 오류가 발생했어요.',true); });
+}
+
+function shareCard() {
+  if (navigator.share) {
+    html2canvas(document.getElementById('saju-card'),{scale:2,useCORS:true}).then(canvas => {
+      canvas.toBlob(blob => {
+        const file = new File([blob],`팔자길드_${state.name}.png`,{type:'image/png'});
+        navigator.share({files:[file],title:`${state.name} 사주 카드 — 팔자길드`}).catch(()=>{});
+      });
+    });
+  } else {
+    navigator.clipboard.writeText('paljaguild.vercel.app/kidcard.html')
+      .then(()=>showToast('링크가 복사됐어요!'));
+  }
+}
+
+function showToast(msg, isError=false) {
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:${isError?'#8a3a20':'#1e1208'};color:${isError?'#fff':'#c9943a'};padding:9px 20px;border-radius:22px;font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s;white-space:nowrap;border:1.5px solid ${isError?'#c06040':'#c9943a'};`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(()=>t.style.opacity='1');
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},2800);
+}
+</script>
+</body>
+</html>
