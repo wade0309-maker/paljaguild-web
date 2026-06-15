@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>팔자길드 — 오늘의 기운 카드</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+:root{--bg:#0f0f11;--card:#1a1a1c;--txt:#f5f0e8;--muted:#88888b;--gold:#d4af37;--gdim:rgba(212,175,55,0.14);--border:#333336;--inp:#131314;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden;padding-bottom:72px;}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;width:2px;height:2px;background:rgba(212,175,55,.35);border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite;animation-delay:var(--dl,0s);}
+@keyframes twinkle{0%,100%{opacity:.08;transform:scale(1);}50%{opacity:.75;transform:scale(1.5);}}
+
+/* 히어로 */
+.hero{position:relative;z-index:1;text-align:center;padding:3.8rem 1rem 2rem;}
+.hero-brand{font-size:.72rem;color:var(--gold);letter-spacing:.28em;margin-bottom:1.3rem;opacity:.75;}
+.hero-divider{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:1.3rem;}
+.hero-divider span{width:42px;height:.5px;background:linear-gradient(90deg,transparent,rgba(212,175,55,.4),transparent);}
+.hero-title{font-family:'Noto Serif KR',serif;font-size:2.1rem;font-weight:700;line-height:1.3;margin-bottom:.9rem;}
+.hero-title .g{color:var(--gold);}
+.hero-sub{font-size:.87rem;color:var(--muted);line-height:1.75;}
+.hero-date{display:inline-block;margin-top:1.1rem;background:var(--gdim);border:.5px solid rgba(212,175,55,.3);color:rgba(212,175,55,.8);padding:5px 18px;border-radius:20px;font-size:.78rem;letter-spacing:.06em;}
+
+/* 입력 */
+.inp-wrap{position:relative;z-index:1;width:100%;max-width:440px;padding:0 1.2rem 5rem;}
+.inp-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.9rem 1.5rem;box-shadow:0 24px 70px rgba(0,0,0,.65);}
+.f-label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.5rem;letter-spacing:.04em;}
+.f-group{margin-bottom:1.3rem;}
+.f-hint{font-size:.73rem;color:rgba(212,175,55,.55);margin-top:.45rem;}
+input[type=text],input[type=number],select{width:100%;background:var(--inp);border:1px solid var(--border);color:var(--txt);padding:.88rem 1rem;border-radius:10px;font-size:.93rem;outline:none;font-family:inherit;appearance:none;-webkit-appearance:none;}
+input:focus,select:focus{border-color:var(--gold);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2388888b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;}
+.g2{display:grid;grid-template-columns:2fr 1fr;gap:.7rem;}
+.tog{display:flex;background:var(--inp);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.tog label{flex:1;text-align:center;padding:.88rem;cursor:pointer;color:var(--muted);font-size:.9rem;}
+.tog input{display:none;}
+.tog input:checked+label{background:var(--border);color:var(--txt);font-weight:600;}
+.btn-gold{width:100%;padding:1.12rem;border-radius:12px;font-weight:700;cursor:pointer;border:none;background:linear-gradient(135deg,#d4af37,#b8962e);color:#0a0a0c;font-size:.98rem;margin-top:1.5rem;transition:.2s;letter-spacing:.05em;}
+.btn-gold:hover{opacity:.9;transform:translateY(-1px);}
+#err{color:#ff6b6b;font-size:.83rem;text-align:center;margin-top:8px;min-height:20px;}
+
+/* 로딩 */
+.load-wrap{position:relative;z-index:1;display:none;flex-direction:column;align-items:center;gap:1rem;padding:5rem 2rem;text-align:center;}
+.hg{font-size:2.6rem;animation:hgf 2s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(212,175,55,.5));}
+@keyframes hgf{0%,40%{transform:rotate(0deg);}50%,90%{transform:rotate(180deg);}100%{transform:rotate(360deg);}}
+.load-txt{color:var(--gold);font-size:.93rem;letter-spacing:.06em;}
+.load-sub{color:var(--muted);font-size:.78rem;}
+
+/* 카드 플립 */
+.card-wrap{position:relative;z-index:1;display:none;width:100%;max-width:400px;padding:0 1.2rem 5rem;}
+.scene{perspective:1000px;width:100%;}
+.fc{position:relative;width:100%;transform-style:preserve-3d;transition:transform .72s cubic-bezier(.4,0,.2,1);min-height:660px;}
+.fc.flipped{transform:rotateY(180deg);}
+.ff,.fb{position:absolute;width:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+.fb{transform:rotateY(180deg);}
+
+/* 앞면 */
+.cfront{background:linear-gradient(160deg,#141428 0%,#0d1230 50%,#111120 100%);border:1.5px solid var(--gold);border-radius:20px;padding:2rem 1.5rem;min-height:660px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;}
+.fstar{font-size:9px;color:var(--gold);letter-spacing:14px;margin-bottom:1.8rem;opacity:.65;}
+.forb{width:92px;height:92px;border:2px solid var(--gold);border-radius:50%;margin:0 auto 1.5rem;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 22px rgba(212,175,55,.12);}
+.forb::before{content:'';position:absolute;inset:7px;border:1px solid rgba(212,175,55,.2);border-radius:50%;}
+.el-badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:.72rem;font-weight:500;margin-bottom:10px;letter-spacing:.05em;border:.5px solid;}
+.fname{font-size:.82rem;color:rgba(212,175,55,.55);letter-spacing:.15em;margin-bottom:7px;}
+.fheadline{font-family:'Noto Serif KR',serif;font-size:1.35rem;font-weight:700;color:#fff;margin-bottom:4px;line-height:1.35;}
+.fpillars{font-size:.72rem;color:rgba(212,175,55,.4);margin-bottom:4px;letter-spacing:.04em;}
+.fdate{font-size:.7rem;color:rgba(255,255,255,.25);margin-bottom:2.5rem;}
+.tap-btn{border:1px solid rgba(212,175,55,.48);border-radius:25px;padding:10px 28px;color:var(--gold);font-size:.87rem;background:none;cursor:pointer;letter-spacing:.05em;animation:pb 2.2s ease-in-out infinite;}
+@keyframes pb{0%,100%{border-color:rgba(212,175,55,.35);box-shadow:0 0 0 0 rgba(212,175,55,0);}50%{border-color:rgba(212,175,55,.7);box-shadow:0 0 10px 2px rgba(212,175,55,.13);}}
+
+/* 뒷면 */
+.cback{background:linear-gradient(160deg,#141428 0%,#0d1230 50%,#111120 100%);border:1.5px solid var(--gold);border-radius:20px;padding:1.5rem 1.35rem;min-height:660px;}
+.bhd{text-align:center;padding-bottom:1rem;border-bottom:.5px solid rgba(212,175,55,.18);margin-bottom:1rem;}
+.bbrand{font-size:.68rem;color:rgba(212,175,55,.42);letter-spacing:.12em;margin-bottom:4px;}
+.bhl{font-family:'Noto Serif KR',serif;font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:2px;}
+.bdt{font-size:.68rem;color:rgba(255,255,255,.22);}
+.ov-box{background:rgba(212,175,55,.07);border:.5px solid rgba(212,175,55,.2);border-radius:10px;padding:1rem;text-align:center;margin-bottom:10px;}
+.ov-lbl{font-size:.7rem;color:rgba(212,175,55,.5);letter-spacing:.08em;margin-bottom:6px;}
+.ov-grade{display:inline-block;padding:4px 22px;border-radius:14px;font-size:1.05rem;font-weight:700;margin-bottom:7px;}
+.ov-msg{font-size:.8rem;color:rgba(255,255,255,.52);line-height:1.55;}
+.cat{background:rgba(255,255,255,.025);border:.5px solid rgba(212,175,55,.14);border-radius:10px;padding:10px 12px;margin-bottom:7px;}
+.cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.cat-nm{font-size:.84rem;color:rgba(255,255,255,.78);font-weight:500;}
+.cat-gr{padding:2px 11px;border-radius:10px;font-size:.76rem;font-weight:600;border:.5px solid;}
+.cat-msg{font-size:.76rem;color:rgba(255,255,255,.42);line-height:1.5;}
+.bot-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
+.ibox{background:rgba(212,175,55,.05);border:.5px solid rgba(212,175,55,.17);border-radius:9px;padding:10px 11px;}
+.ilbl{font-size:.66rem;color:rgba(212,175,55,.48);margin-bottom:4px;letter-spacing:.04em;}
+.ival{font-size:.79rem;color:rgba(255,255,255,.55);line-height:1.45;}
+.luck-num{font-size:1.7rem;font-weight:700;color:var(--gold);}
+.btn-reset{width:100%;padding:11px;border-radius:10px;background:rgba(212,175,55,.06);border:.5px solid rgba(212,175,55,.22);color:var(--gold);font-size:.83rem;cursor:pointer;margin-top:6px;letter-spacing:.04em;}
+
+/* 등급·오행 색상 */
+.g-ap{background:rgba(212,175,55,.15);color:#d4af37;border-color:rgba(212,175,55,.42);}
+.g-a{background:rgba(29,158,117,.13);color:#5dcaa5;border-color:rgba(93,202,165,.38);}
+.g-b{background:rgba(55,138,221,.12);color:#85b7eb;border-color:rgba(133,183,235,.36);}
+.g-c{background:rgba(239,159,39,.12);color:#ef9f27;border-color:rgba(239,159,39,.36);}
+.g-d{background:rgba(240,149,149,.12);color:#f09595;border-color:rgba(240,149,149,.36);}
+.el-목{background:rgba(76,175,80,.13);color:#81c784;border-color:rgba(76,175,80,.38);}
+.el-화{background:rgba(244,81,30,.11);color:#ff7043;border-color:rgba(244,81,30,.38);}
+.el-토{background:rgba(212,175,55,.14);color:#d4af37;border-color:rgba(212,175,55,.38);}
+.el-금{background:rgba(158,158,158,.14);color:#c0c0c0;border-color:rgba(190,190,190,.35);}
+.el-수{background:rgba(33,150,243,.12);color:#64b5f6;border-color:rgba(33,150,243,.36);}
+
+/* 하단 고정 배너 */
+.site-banner{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:linear-gradient(0deg,rgba(10,10,12,.98) 0%,rgba(15,15,17,.92) 100%);
+  border-top:1px solid rgba(212,175,55,.2);
+  padding:10px 16px 12px;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+.banner-inner{display:flex;gap:8px;max-width:440px;margin:0 auto;}
+.banner-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 8px;border-radius:10px;text-decoration:none;
+  font-size:.82rem;font-weight:600;letter-spacing:.03em;
+  transition:opacity .2s,transform .15s;
+  border:1px solid;
+}
+.banner-btn:hover{opacity:.85;transform:translateY(-1px);}
+.banner-btn.main{
+  background:linear-gradient(135deg,#d4af37,#b8962e);
+  color:#0a0a0c;border-color:#d4af37;
+}
+.banner-btn.gungham{
+  background:rgba(212,175,55,.07);
+  color:var(--gold);border-color:rgba(212,175,55,.35);
+}
+.banner-icon{font-size:1rem;line-height:1;}
+</style>
+</head>
+<body>
+<div class="stars" id="starbg" aria-hidden="true"></div>
+
+<div class="hero" id="hero">
+  <p class="hero-brand">✦ P A L J A G U I L D ✦</p>
+  <div class="hero-divider"><span></span><span style="font-size:.9rem;color:rgba(212,175,55,.5);">✦</span><span></span></div>
+  <h1 class="hero-title">오늘의 <span class="g">기운 카드</span></h1>
+  <p class="hero-sub">사주팔자가 읽어내는 오늘 하루<br>투자 · 사업 · 학업 · 인간관계 등급을 확인하세요</p>
+  <span class="hero-date" id="today-lbl"></span>
+</div>
+
+<div class="inp-wrap" id="inp-sec">
+  <div class="inp-card">
+    <div class="f-group">
+      <label class="f-label">성함 (선택)</label>
+      <input type="text" id="f-name" placeholder="이름을 입력하세요">
+    </div>
+    <div class="f-group">
+      <label class="f-label">성별</label>
+      <div class="tog">
+        <input type="radio" id="gm" name="gender" value="M">
+        <label for="gm">남성</label>
+        <input type="radio" id="gf" name="gender" value="F" checked>
+        <label for="gf">여성</label>
+      </div>
+    </div>
+    <div class="f-group">
+      <label class="f-label">생년월일 (양력)</label>
+      <div class="g3">
+        <input type="number" id="fy" placeholder="YYYY" min="1940" max="2008">
+        <input type="number" id="fm" placeholder="MM" min="1" max="12">
+        <input type="number" id="fd" placeholder="DD" min="1" max="31">
+      </div>
+    </div>
+    <div class="f-group">
+      <label class="f-label">태어난 시간</label>
+      <div class="g2">
+        <select id="fh">
+          <option value="-1">모름 — 12시 기준으로 분석</option>
+          <option value="0">0시 (자시)</option>
+          <option value="1">1시 (축시)</option>
+          <option value="2">2시 (축시)</option>
+          <option value="3">3시 (인시)</option>
+          <option value="4">4시 (인시)</option>
+          <option value="5">5시 (묘시)</option>
+          <option value="6">6시 (묘시)</option>
+          <option value="7">7시 (진시)</option>
+          <option value="8">8시 (진시)</option>
+          <option value="9">9시 (사시)</option>
+          <option value="10">10시 (사시)</option>
+          <option value="11">11시 (오시)</option>
+          <option value="12">12시 (오시)</option>
+          <option value="13">13시 (미시)</option>
+          <option value="14">14시 (미시)</option>
+          <option value="15">15시 (신시)</option>
+          <option value="16">16시 (신시)</option>
+          <option value="17">17시 (유시)</option>
+          <option value="18">18시 (유시)</option>
+          <option value="19">19시 (술시)</option>
+          <option value="20">20시 (술시)</option>
+          <option value="21">21시 (해시)</option>
+          <option value="22">22시 (해시)</option>
+          <option value="23">23시 (자시)</option>
+        </select>
+        <input type="number" id="fmi" placeholder="분" min="0" max="59" value="0">
+      </div>
+      <p class="f-hint">시간을 모르시면 그냥 넘어가셔도 돼요</p>
+    </div>
+    <div id="err"></div>
+    <button class="btn-gold" onclick="runCard()">✦ 오늘의 기운 카드 받기</button>
+  </div>
+</div>
+
+<div class="load-wrap" id="load-sec">
+  <div class="hg">⌛</div>
+  <p class="load-txt">사주를 분석하고 있어요</p>
+  <p class="load-sub">오늘의 기운을 읽는 중...</p>
+</div>
+
+<div class="card-wrap" id="card-sec">
+  <div class="scene">
+    <div class="fc" id="fc">
+      <div class="ff">
+        <div class="cfront" onclick="doFlip()">
+          <p class="fstar">★ · · · ★ · · · ★</p>
+          <div class="forb">
+            <svg width="50" height="50" viewBox="0 0 50 50">
+              <circle cx="25" cy="25" r="21" fill="none" stroke="#d4af37" stroke-width=".8"/>
+              <circle cx="25" cy="25" r="11" fill="none" stroke="#d4af37" stroke-width=".5" stroke-dasharray="3 2"/>
+              <circle cx="25" cy="25" r="3" fill="#d4af37" opacity=".7"/>
+              <line x1="25" y1="4" x2="25" y2="46" stroke="#d4af37" stroke-width=".4" opacity=".3"/>
+              <line x1="4" y1="25" x2="46" y2="25" stroke="#d4af37" stroke-width=".4" opacity=".3"/>
+              <line x1="10" y1="10" x2="40" y2="40" stroke="#d4af37" stroke-width=".3" opacity=".15"/>
+              <line x1="40" y1="10" x2="10" y2="40" stroke="#d4af37" stroke-width=".3" opacity=".15"/>
+            </svg>
+          </div>
+          <span class="el-badge el-토" id="el-badge">일주 분석 중</span>
+          <p class="fname" id="fname">팔자길드</p>
+          <p class="fheadline" id="fheadline">기운을 읽는 중...</p>
+          <p class="fpillars" id="fpillars"></p>
+          <p class="fdate" id="fdate"></p>
+          <button class="tap-btn">✦ 탭해서 오늘의 운세 확인</button>
+          <p style="font-size:8px;color:rgba(255,255,255,.1);margin-top:2.5rem;letter-spacing:13px;">· · ★ · · ★ · ·</p>
+        </div>
+      </div>
+      <div class="fb">
+        <div class="cback">
+          <div class="bhd">
+            <p class="bbrand">✦ 팔자길드 · 오늘의 기운 카드 ✦</p>
+            <p class="bhl" id="bhl"></p>
+            <p class="bdt" id="bdt"></p>
+          </div>
+          <div class="ov-box">
+            <p class="ov-lbl">오늘 전체 운세</p>
+            <span class="ov-grade" id="ov-grade"></span>
+            <p class="ov-msg" id="ov-msg"></p>
+          </div>
+          <div id="cats"></div>
+          <div class="bot-grid">
+            <div class="ibox" style="text-align:center;">
+              <p class="ilbl">오늘의 행운 숫자</p>
+              <p class="luck-num" id="luck"></p>
+            </div>
+            <div class="ibox">
+              <p class="ilbl">오늘 피할 것</p>
+              <p class="ival" id="caution"></p>
+            </div>
+          </div>
+          <button class="btn-reset" onclick="doReset()">↩ 다시 입력하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 팔자길드 사주 엔진 (4기둥 완전체) =====
+function getJulianDay(y,mo,d,h=0,mi=0,s=0){if(mo<=2){y--;mo+=12;}const A=Math.floor(y/100),B=2-A+Math.floor(A/4);return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(mo+1))+d+(h+mi/60+s/3600)/24+B-1524.5;}
+function getSunLon(jd){const T=(jd-2451545)/36525,L0=280.46646+36000.76983*T+0.0003032*T*T,M=357.52911+35999.05029*T-0.0001537*T*T,r=M*Math.PI/180,C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(r)+(0.019993-0.000101*T)*Math.sin(2*r)+0.000289*Math.sin(3*r);return(((L0+C)%360)+360)%360;}
+function jdToDate(jd){let Z=Math.floor(jd+.5),F=(jd+.5)-Z,A=Z;if(Z>=2299161){const a=Math.floor((Z-1867216.25)/36524.25);A=Z+1+a-Math.floor(a/4);}const B=A+1524,C=Math.floor((B-122.1)/365.25),D=Math.floor(365.25*C),E=Math.floor((B-D)/30.6001);let day=B-D-Math.floor(30.6001*E)+F,mo=(E<14)?E-1:E-13,yr=(mo>2)?C-4716:C-4715;const di=Math.floor(day),ts=Math.round((day-di)*86400);return new Date(Date.UTC(yr,mo-1,di,Math.floor(ts/3600),Math.floor((ts%3600)/60),ts%60));}
+function mkKST(y,mo,d,h=0,mi=0){return new Date(Date.UTC(y,mo-1,d,h-9,mi,0));}
+function getTermDT(y,mo){const key=y+'-'+mo;if(window._tc&&window._tc[key])return window._tc[key];if(!window._tc)window._tc={};const deg=[0,285,315,345,15,45,75,105,135,165,195,225,255][mo];let lo=getJulianDay(y,mo,15,12)-20,hi=lo+40;for(let i=0;i<60;i++){const mid=(lo+hi)/2;let diff=getSunLon(mid)-deg;if(diff>180)diff-=360;if(diff<-180)diff+=360;if(Math.abs(diff)<1e-7){window._tc[key]=jdToDate(mid);return window._tc[key];}let dl=getSunLon(lo)-deg;if(dl>180)dl-=360;if(dl<-180)dl+=360;((dl<=0&&diff>=0)||(dl>=0&&diff<=0))?hi=mid:lo=mid;}window._tc[key]=jdToDate((lo+hi)/2);return window._tc[key];}
+
+const ST=["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+const BR=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const EM={'甲':'木','乙':'木','寅':'木','卯':'木','丙':'火','丁':'火','巳':'火','午':'火','戊':'土','己':'土','辰':'土','戌':'土','丑':'土','未':'土','庚':'金','辛':'金','申':'金','酉':'金','壬':'水','癸':'水','亥':'水','子':'水'};
+const EKR={'木':'목','火':'화','土':'토','金':'금','水':'수'};
+const SI_KR=['자시','축시','축시','인시','인시','묘시','묘시','진시','진시','사시','사시','오시','오시','미시','미시','신시','신시','유시','유시','술시','술시','해시','해시','자시'];
+
+// 시지 인덱스 (23:30 기준 권장)
+function getHourBrIdx(h,mi){
+  const t=h*60+mi;
+  if(t>=1410||t<90)return 0;   // 23:30~ 또는 ~01:30 → 자시(0)
+  return Math.floor((t-90)/120)+1;
+}
+
+// 4기둥 완전 계산
+function calcBazi(y,mo,d,h=12,mi=0){
+  const bd=mkKST(y,mo,d,h,mi);
+  const diff=Math.floor((Date.UTC(y,mo-1,d)-Date.UTC(1900,0,1))/86400000);
+  let di=(diff+10)%60;if(di<0)di+=60;
+  const dayP=ST[di%10]+BR[di%12];
+
+  // 시주
+  const hbIdx=getHourBrIdx(h,mi);
+  const hourP=ST[((di%5)*2+hbIdx)%10]+BR[hbIdx];
+
+  // 연주 (입춘 기준)
+  const ip=getTermDT(y,2);
+  let yi=((bd>=ip?y:y-1)-4)%60;if(yi<0)yi+=60;
+  const yearP=ST[yi%10]+BR[yi%12];
+
+  // 월주 (절기 기준)
+  const ct=getTermDT(y,mo);
+  let bm=mo;if(bd<ct)bm--;if(bm<=0)bm+=12;
+  const msi=((yi%5)*2+(bm-2+12)%12+2)%10;
+  const monthP=ST[msi]+BR[bm%12];
+
+  // 오행 (8자 전체)
+  const el={'木':0,'火':0,'土':0,'金':0,'水':0};
+  for(const c of yearP+monthP+dayP+hourP){if(EM[c])el[EM[c]]++;}
+
+  return{year:yearP,month:monthP,day:dayP,hour:hourP,dayStem:ST[di%10],el,hourKnown:h!==12||mi!==0};
+}
+
+// ===== 초기화 (오늘 날짜 동적 계산) =====
+const WD=['일','월','화','수','목','금','토'];
+const td=new Date();
+const TODAY={y:td.getFullYear(),m:td.getMonth()+1,d:td.getDate()};
+const todayStr=`${TODAY.y}년 ${TODAY.m}월 ${TODAY.d}일 ${WD[td.getDay()]}요일`;
+const todayShort=`${TODAY.y}.${String(TODAY.m).padStart(2,'0')}.${String(TODAY.d).padStart(2,'0')}`;
+document.getElementById('today-lbl').textContent=todayStr;
+const todayBazi=calcBazi(TODAY.y,TODAY.m,TODAY.d,12,0);
+
+(function(){
+  const bg=document.getElementById('starbg');
+  for(let i=0;i<65;i++){
+    const s=document.createElement('div');s.className='star';
+    s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+    s.style.setProperty('--d',(2+Math.random()*3.5)+'s');
+    s.style.setProperty('--dl',(Math.random()*5)+'s');
+    bg.appendChild(s);
+  }
+})();
+
+const GC={'A+':'g-ap','A':'g-a','B':'g-b','C':'g-c','D':'g-d'};
+const CATS=[{k:'investment',l:'💰 투자'},{k:'business',l:'💼 사업 · 직장'},{k:'study',l:'📚 학업 · 자기계발'},{k:'relations',l:'🤝 인간관계'}];
+const FB={headline:'흐름을 읽어야 하는 날',overall:'B',overall_msg:'큰 결정보다 오늘은 준비에 집중하면 내일이 빛나요.',categories:{investment:{grade:'C',msg:'오늘은 관망이 정답이에요. 충동 매수는 특히 피하세요.'},business:{grade:'B',msg:'새 계약보다 기존 관계를 다지는 게 훨씬 유리한 날이에요.'},study:{grade:'A',msg:'집중력이 좋은 날이에요. 어렵던 내용도 오늘은 술술 들어와요.'},relations:{grade:'B',msg:'먼저 연락하면 좋은 반응이 올 가능성이 높아요.'}},lucky_num:7,caution:'성급한 결정과 충동 지출은 오늘 하루만 참아보세요'};
+
+let data=null,flipped=false;
+
+async function runCard(){
+  const name=document.getElementById('f-name').value.trim();
+  const y=parseInt(document.getElementById('fy').value);
+  const mo=parseInt(document.getElementById('fm').value);
+  const d=parseInt(document.getElementById('fd').value);
+  const fhVal=document.getElementById('fh').value;
+  const h=fhVal==='-1'?12:parseInt(fhVal);
+  const mi=parseInt(document.getElementById('fmi').value)||0;
+  const hourKnown=fhVal!=='-1';
+  const err=document.getElementById('err');err.textContent='';
+
+  if(!y||!mo||!d){err.textContent='생년월일을 모두 입력해주세요.';return;}
+  if(y<1940||y>2008){err.textContent='올바른 출생연도를 입력해주세요.';return;}
+
+  const uBazi=calcBazi(y,mo,d,h,mi);
+  const dsEl=EM[uBazi.dayStem]||'土';
+  const elKr=EKR[dsEl]||'토';
+  const gender=document.querySelector('input[name=gender]:checked').value;
+  const uName=name||'고객';
+  const elDist=Object.entries(uBazi.el).map(([e,c])=>`${e}${c}개`).join(' ');
+  const pillarsStr=`${uBazi.year} ${uBazi.month} ${uBazi.day} ${uBazi.hour}`;
+  const hourNote=hourKnown?`${h}시 ${mi}분 (${SI_KR[h]}) → 시주 ${uBazi.hour}`:'시간 미입력 → 12시 기준 시주 적용';
+
+  document.getElementById('inp-sec').style.display='none';
+  document.getElementById('load-sec').style.display='flex';
+  flipped=false;document.getElementById('fc').classList.remove('flipped');
+
+  const prompt=`사주명리 전문가. 어려운 사주 한자 용어 절대 금지. 쉬운 일상 언어만 사용.
+
+오늘: ${todayStr} / 일진: ${todayBazi.day} / 세운: ${todayBazi.year} / 월건: ${todayBazi.month}
+
+사용자 사주 (4기둥): ${pillarsStr}
+일간: ${uBazi.dayStem}(${dsEl}) / 성별: ${gender==='M'?'남':'여'} / 오행분포: ${elDist}
+시주 참고: ${hourNote}
+
+위 4기둥과 오늘 일진을 바탕으로 오늘 운세 분석. 등급 A+/A/B/C/D 중 하나. JSON만 응답(마크다운 없이):
+{"headline":"오늘을 표현하는 짧고 강한 한 마디","overall":"등급","overall_msg":"오늘 전체 운세 한 줄 따뜻하고 친근하게","categories":{"investment":{"grade":"등급","msg":"투자 구체적 조언 한 줄"},"business":{"grade":"등급","msg":"사업/직장 구체적 조언 한 줄"},"study":{"grade":"등급","msg":"학업/자기계발 구체적 조언 한 줄"},"relations":{"grade":"등급","msg":"인간관계 구체적 조언 한 줄"}},"lucky_num":숫자,"caution":"오늘 하지 말아야 할 것 한 줄"}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:800,messages:[{role:'user',content:prompt}]})});
+    const r=await res.json();
+    const txt=r.content.filter(x=>x.type==='text').map(x=>x.text).join('').replace(/```json|```/g,'').trim();
+    data=JSON.parse(txt);
+  }catch(e){data=FB;}
+
+  // 앞면 채우기
+  const badge=document.getElementById('el-badge');
+  badge.className='el-badge el-'+elKr;
+  badge.textContent=elKr+'('+dsEl+')기운 · 일주 '+uBazi.day;
+  document.getElementById('fname').textContent=uName+'님의 오늘';
+  document.getElementById('fheadline').textContent=data.headline;
+  document.getElementById('fpillars').textContent=
+    `${uBazi.year} ${uBazi.month} ${uBazi.day} ${uBazi.hour}`+
+    (hourKnown?'':' ※시간미입력');
+  document.getElementById('fdate').textContent=
+    `${y}.${String(mo).padStart(2,'0')}.${String(d).padStart(2,'0')} 생`+
+    (hourKnown?` ${h}시`:'')+` · ${todayShort}`;
+
+  // 뒷면 채우기
+  document.getElementById('bhl').textContent=data.headline;
+  document.getElementById('bdt').textContent=`${todayShort} · ${y}년생`;
+  const og=document.getElementById('ov-grade');
+  og.textContent=data.overall;og.className='ov-grade '+(GC[data.overall]||'g-b');
+  document.getElementById('ov-msg').textContent=data.overall_msg;
+  document.getElementById('cats').innerHTML=CATS.map(cat=>{
+    const c=(data.categories||{})[cat.k]||{grade:'B',msg:''};
+    return`<div class="cat"><div class="cat-top"><span class="cat-nm">${cat.l}</span><span class="cat-gr ${GC[c.grade]||'g-b'}">${c.grade}</span></div><p class="cat-msg">${c.msg}</p></div>`;
+  }).join('');
+  document.getElementById('luck').textContent=data.lucky_num;
+  document.getElementById('caution').textContent=data.caution;
+
+  document.getElementById('load-sec').style.display='none';
+  document.getElementById('card-sec').style.display='block';
+
+  // 백그라운드 로깅 (카드 표시에 영향 없음)
+  logCardResult(uBazi, gender, y, mo, d, h, data);
+}
+
+function doFlip(){if(!data)return;flipped=!flipped;document.getElementById('fc').classList.toggle('flipped',flipped);}
+function doReset(){data=null;flipped=false;document.getElementById('fc').classList.remove('flipped');document.getElementById('card-sec').style.display='none';document.getElementById('inp-sec').style.display='block';}
+
+// ===== 유입 로깅 =====
+function getSessionId(){
+  let sid=sessionStorage.getItem('pg_sid');
+  if(!sid){sid=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem('pg_sid',sid);}
+  return sid;
+}
+async function logCardResult(uBazi,gender,y,mo,d,h,cardData){
+  try{
+    await fetch('https://saju-backend-3vgw.onrender.com/api/daily-card-log',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        birth_year:      y,
+        birth_month:     mo,
+        birth_day:       d,
+        birth_hour:      h,
+        gender:          gender,
+        day_pillar:      uBazi.day,
+        element:         EM[uBazi.dayStem]||'土',
+        overall_grade:   cardData.overall,
+        invest_grade:    cardData.categories?.investment?.grade||'',
+        business_grade:  cardData.categories?.business?.grade||'',
+        study_grade:     cardData.categories?.study?.grade||'',
+        relations_grade: cardData.categories?.relations?.grade||'',
+        session_id:      getSessionId(),
+      })
+    });
+  }catch(e){/* 로깅 실패해도 카드는 정상 동작 */}
+}</script>
+
+<!-- 하단 고정 배너 -->
+<nav class="site-banner" aria-label="팔자길드 서비스 바로가기">
+  <div class="banner-inner">
+    <a href="https://paljaguild-web.vercel.app/" class="banner-btn main" target="_blank" rel="noopener">
+      <span class="banner-icon">👑</span>
+      <span>팔자길드 메인</span>
+    </a>
+    <a href="https://paljaguild-web.vercel.app/gungham.html" class="banner-btn gungham" target="_blank" rel="noopener">
+      <span class="banner-icon">💕</span>
+      <span>커플 궁합 분석</span>
+    </a>
+  </div>
+</nav>
+</body>
+</html>
